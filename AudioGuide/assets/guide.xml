@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<city id="1" name="Prague" mainImageName="dummy">
+    <sights>
+        <sight id="10" name="Municipal House" 
+	        audioName="aud_010.mp3">
+            <looks>
+                <look imageName="st_010_01.jpg" 
+                    latitude="50.087666" longitude="14.428493" />
+            </looks>
+        </sight>
+        <sight id="11" name="The Powder Tower" 
+	        audioName="aud_011.mp3">
+            <looks>
+                <look imageName="st_011_01.jpg" 
+                    latitude="50.087131" longitude="14.428262" />
+                <look imageName="st_011_02.jpg" 
+                    latitude="50.087262" longitude="14.427345" />
+            </looks>
+        </sight>
+    </sights>    
+</city>
