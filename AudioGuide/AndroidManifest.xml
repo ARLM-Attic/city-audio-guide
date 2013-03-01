@@ -28,6 +28,10 @@
             android:name="com.gerken.audioGuide.SightActivity"
             android:label="@string/title_activity_sight" >
         </activity>
+        <activity
+            android:name="com.gerken.audioGuide.MainPreferenceActivity"
+            android:label="TODO" >
+        </activity>
     </application>
 
 </manifest>
