@@ -15,6 +15,8 @@ public class City {
 	
 	@ElementList(name="sights")
 	private List<Sight> _sights;
+	@ElementList(name="routes")
+	private List<Route> _routes;
 	
 	public String getName() {
 		return _name;
@@ -22,5 +24,8 @@ public class City {
 	
 	public List<Sight> getSights() {
 		return _sights;
+	}
+	public List<Route> getRoutes() {
+		return _routes;
 	}
 }

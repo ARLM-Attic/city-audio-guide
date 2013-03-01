@@ -15,10 +15,12 @@ import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.os.Bundle;
 import android.app.Activity;
+import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.*;
@@ -71,6 +73,16 @@ public class MainActivity extends Activity implements SightView {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
+    }
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+    	switch(item.getItemId()) {
+    	case R.id.action_settings:
+    		Intent intent = new Intent(this, MainPreferenceActivity.class);
+    		startActivity(intent);
+    	}
+    	return super.onOptionsItemSelected(item);
     }
     
     private <T> T findControl(int controlId) {
@@ -148,5 +160,9 @@ public class MainActivity extends Activity implements SightView {
 			_playButton.setSelected(false);
 		}
 	};
+	
+	/*
+	
+	 */
 
 }
