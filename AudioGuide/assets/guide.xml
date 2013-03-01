@@ -1,21 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <city id="1" name="Prague" mainImageName="dummy">
     <sights>
-        <sight id="10" name="Municipal House" 
+        <sight id="10" name="The Municipal House" 
 	        audioName="aud_010.mp3">
             <looks>
                 <look imageName="st_010_01.jpg" 
-                    latitude="50.087666" longitude="14.428493" />
+                    latitude="50.087666" longitude="14.428493">
+                    <nextRoutePoints>
+                        <nextRoutePoint routeId="1" heading="-80" />
+                    </nextRoutePoints>
+                </look>
             </looks>
         </sight>
         <sight id="11" name="The Powder Tower" 
 	        audioName="aud_011.mp3">
             <looks>
                 <look imageName="st_011_01.jpg" 
-                    latitude="50.087131" longitude="14.428262" />
+                    latitude="50.087131" longitude="14.428262">
+                    <nextRoutePoints>
+                        <nextRoutePoint routeId="1" heading="0" />
+                    </nextRoutePoints>             
+                </look>
                 <look imageName="st_011_02.jpg" 
-                    latitude="50.087262" longitude="14.427345" />
+                    latitude="50.087262" longitude="14.427345">
+                    <nextRoutePoints>
+                        <nextRoutePoint routeId="1" heading="180" />
+                    </nextRoutePoints>
+                </look>
             </looks>
         </sight>
-    </sights>    
+        <sight id="12" name=""
+            audioName="aud_011.mp3">
+            <looks>
+                <look imageName="st_012_01.jpg" 
+                    latitude="50.087213" longitude="14.425939" />
+            </looks>
+        </sight>
+    </sights>
+    <routes>
+        <route id="1" name="The Old Town" />
+        <route id="2" name="The New Town" />
+        <route id="3" name="The Prague Castle" />
+    </routes>
 </city>
