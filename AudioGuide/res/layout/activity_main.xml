@@ -17,24 +17,27 @@
 	    android:layout_height="110dp"
 	    android:layout_gravity="bottom"
 	    android:background="#80CCCCCC" >
-        <TextView
-	        android:id="@+id/sightCaption"
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	        android:layout_gravity="top"
-	        android:background="#80999999"
-	        android:textColor="#FF4CFF00"  />
+	    <LinearLayout
+		    android:orientation="vertical"
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+		    android:layout_gravity="bottom"
+		    android:background="#80666666" >
+	        <TextView
+		        android:id="@+id/sightCaption"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_gravity="center"
+		        android:textColor="#FF75FF3A"  />
+        </LinearLayout>
         
         <ImageButton
-        android:id="@+id/playButton"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:layout_gravity="center"
-        android:background="@android:color/transparent"
-         />   
-    </LinearLayout>
-
-    
-    
+	        android:id="@+id/playButton"
+	        android:layout_width="80dp"
+	        android:layout_height="80dp"
+	        android:layout_gravity="center"
+	        android:background="@android:color/transparent"
+	         />   
+    </LinearLayout>  
 
 </FrameLayout>

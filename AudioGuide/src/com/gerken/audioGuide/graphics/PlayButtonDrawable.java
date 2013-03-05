@@ -62,12 +62,13 @@ public class PlayButtonDrawable extends Drawable {
 		int boundSize = (int)_size;
 		GradientDrawable oval = new GradientDrawable(Orientation.BOTTOM_TOP, 
 				new int[]{0xCDFFFFFF, 0xCDCCCCCC});
+
 		oval.setGradientType(GradientDrawable.RADIAL_GRADIENT);
 		oval.setShape(GradientDrawable.OVAL);
 		oval.setBounds(0, 0, boundSize, boundSize);
 		oval.setStroke(4, 0xFF4CFF00);
-		oval.setGradientRadius(_size);
-		oval.setGradientCenter(0.25f*_size, 0.25f*_size);
+		oval.setGradientRadius(0.5f*_size);
+		oval.setGradientCenter(0.3f, 0.3f);
 		
 		ShapeDrawable playSign = new ShapeDrawable(
 				new RegularConvexShape(3, 0.4f*_size, 0));

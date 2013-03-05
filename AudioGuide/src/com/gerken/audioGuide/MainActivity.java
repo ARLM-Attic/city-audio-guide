@@ -80,7 +80,8 @@ public class MainActivity extends Activity implements SightView {
     public boolean onOptionsItemSelected(MenuItem item) {
     	switch(item.getItemId()) {
     	case R.id.action_settings:
-    		Intent intent = new Intent(this, MainPreferenceActivity.class);
+    		//Intent intent = new Intent(this, MainPreferenceActivity.class);
+    		Intent intent = new Intent(this, RouteMapActivity.class);
     		startActivity(intent);
     	}
     	return super.onOptionsItemSelected(item);
@@ -162,8 +163,5 @@ public class MainActivity extends Activity implements SightView {
 		}
 	};
 	
-	/*
-	
-	 */
 
 }
