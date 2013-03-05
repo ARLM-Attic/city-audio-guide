@@ -3,8 +3,8 @@ package com.gerken.audioGuide;
 import java.io.InputStream;
 
 import com.gerken.audioGuide.R;
+import com.gerken.audioGuide.graphics.PlayButtonDrawable;
 import com.gerken.audioGuide.interfaces.SightView;
-import com.gerken.audioGuide.objectModel.Sight;
 import com.gerken.audioGuide.presenters.SightPresenter;
 import com.gerken.audioGuide.services.DefaultLoggingAdapter;
 import com.gerken.audioGuide.services.GuideAssetManager;
@@ -19,9 +19,7 @@ import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
+import android.view.*;
 import android.view.View.OnClickListener;
 import android.widget.*;
 
@@ -49,10 +47,13 @@ public class MainActivity extends Activity implements SightView {
         		getApplicationContext(), _presenter);     
         
         _playButton = findControl(R.id.playButton);
+        ViewGroup.LayoutParams lp = _playButton.getLayoutParams();
+        _playButton.setImageDrawable(new PlayButtonDrawable(lp.width, lp.height));
         _playButton.setOnClickListener(_playButtonClickListener);
+        _playButton.invalidate();
         
         _mediaPlayer = new MediaPlayer();
-        _mediaPlayer.setOnCompletionListener(_mediaPlayerCompletionListener);    
+        _mediaPlayer.setOnCompletionListener(_mediaPlayerCompletionListener);
     }
     
     @Override
