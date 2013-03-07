@@ -7,7 +7,12 @@ import android.media.MediaPlayer.OnCompletionListener;
 public interface AudioPlayer {
 	void signalSightInRange();
 	
-	void playAudioAsset(String asetFileName) throws IOException;
+	void prepareAudioAsset(String asetFileName) throws IOException;
+	
+	void play();
+	void pause();
+	void stop();
+	boolean isPlaying();
 	
 	void setAudioAssetCompletionListener(OnCompletionListener listener);
 }

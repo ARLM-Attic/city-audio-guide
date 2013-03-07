@@ -29,7 +29,7 @@
                 </look>
             </looks>
         </sight>
-        <sight id="12" name=""
+        <sight id="12" name="House of the Black Madonna"
             audioName="aud_011.mp3">
             <looks>
                 <look imageName="st_012_01.jpg" 

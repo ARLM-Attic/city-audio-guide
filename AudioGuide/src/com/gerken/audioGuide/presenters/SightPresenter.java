@@ -4,8 +4,12 @@ import java.io.InputStream;
 
 import android.location.Location;
 import android.location.LocationListener;
+import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnCompletionListener;
 import android.os.Bundle;
+import android.util.Log;
 
+import com.gerken.audioGuide.R;
 import com.gerken.audioGuide.interfaces.*;
 import com.gerken.audioGuide.objectModel.*;
 
@@ -17,18 +21,30 @@ public class SightPresenter implements LocationListener {
 	private City _city;
 	private SightView _sightView;
 	private AssetStreamProvider _assetStreamProvider;
+	private AudioPlayer _audioPlayer;
 	private Logger _logger;
 	
 	private Sight _currentSight = null;
 	private SightLook _currentSightLook = null;
 	
-	public SightPresenter(City city, SightView sightView, AssetStreamProvider assetStreamProvider, Logger logger) {
+	private OnCompletionListener _mediaPlayerCompletionListener = new OnCompletionListener() {		
+		@Override
+		public void onCompletion(MediaPlayer mp) {
+			_sightView.displayPlayerStopped();	
+		}
+	};
+	
+	public SightPresenter(City city, SightView sightView, 
+			AssetStreamProvider assetStreamProvider, AudioPlayer audioPlayer,
+			Logger logger) {
 		_city = city;
 		_sightView = sightView;
 		_assetStreamProvider = assetStreamProvider;
+		_audioPlayer = audioPlayer;
 		_logger = logger;
+		
+		_audioPlayer.setAudioAssetCompletionListener(_mediaPlayerCompletionListener);
 	}
-
 
 	@Override
 	public void onLocationChanged(Location location) {
@@ -65,6 +81,17 @@ public class SightPresenter implements LocationListener {
 		
 	}
 	
+	public void handlePlayButtonClick() {
+		if(_audioPlayer.isPlaying()) {
+			_audioPlayer.pause();
+			_sightView.displayPlayerStopped();			
+		}
+		else {
+			_audioPlayer.play();
+			_sightView.displayPlayerPlaying();			
+		}
+	}	
+	
 	private void notifyViewAboutNewSight(SightLook newSightLook) {
 		Sight newSight = newSightLook.getSight();
 		InputStream imgStream = null;
@@ -75,9 +102,8 @@ public class SightPresenter implements LocationListener {
 			_logger.logError("Unable to get the sight image " + newSightLook.getImageName(), ex);
 		}
 		
-		_sightView.acceptNewSightGotInRange(newSight.getName(), 
-				imgStream,
-				String.format("%s/%s", AUDIO_FOLDER, newSight.getAudioName()));
+		_sightView.acceptNewSightGotInRange(newSight.getName(), imgStream);
+		prepareNewAudio(newSight.getAudioName());
 	}
 	
 	private void notifyViewAboutNewSightLook(SightLook newSightLook) {
@@ -90,6 +116,18 @@ public class SightPresenter implements LocationListener {
 		}
 		
 		_sightView.acceptNewSightLookGotInRange(imgStream);
+	}
+	
+	private void prepareNewAudio(String audioFileName) {
+		try {
+			_audioPlayer.prepareAudioAsset(
+					String.format("%s/%s", AUDIO_FOLDER, audioFileName));
+		}
+		catch(Exception ex){ 
+        	String logMsg=String.format("Error when setting %s as the new MediaPlayer datasource", audioFileName);
+        	_logger.logError(logMsg, ex);
+        	_sightView.displayError(R.string.error_invalid_sight_audio);
+    	}
 	}
 	
 	private SightLook findClosestSightLookInRange(double latitude, double longitude){
@@ -121,6 +159,5 @@ public class SightPresenter implements LocationListener {
 	
 	private double deg2rad(double deg) {
 		return deg * (Math.PI/180.0);
-	}
-	
+	}	
 }

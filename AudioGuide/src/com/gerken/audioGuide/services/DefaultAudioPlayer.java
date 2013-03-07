@@ -15,8 +15,11 @@ public class DefaultAudioPlayer implements AudioPlayer {
 	private Context _context;
 	private MediaPlayer _mediaPlayer;
 	
+	private boolean _isPlaying = false;
+	
 	public DefaultAudioPlayer(Context context) {
 		_context = context;
+		_mediaPlayer = new MediaPlayer();
 	}
 	
 	@Override
@@ -26,7 +29,7 @@ public class DefaultAudioPlayer implements AudioPlayer {
 	}
 
 	@Override
-	public void playAudioAsset(String asetFileName) throws IOException {
+	public void prepareAudioAsset(String asetFileName) throws IOException {
 		AssetManager assetManager = _context.getAssets();
 		AssetFileDescriptor descriptor =  assetManager.openFd(asetFileName);
         _mediaPlayer.reset();
@@ -38,8 +41,30 @@ public class DefaultAudioPlayer implements AudioPlayer {
 
 	@Override
 	public void setAudioAssetCompletionListener(OnCompletionListener listener) {
-		// TODO Auto-generated method stub
-		
+		_mediaPlayer.setOnCompletionListener(listener);		
+	}
+
+	@Override
+	public void play() {
+		_mediaPlayer.start();
+		_isPlaying = true;
+	}
+
+	@Override
+	public void pause() {
+		_mediaPlayer.pause();
+		_isPlaying = false;
+	}
+
+	@Override
+	public void stop() {
+		_mediaPlayer.stop();
+		_isPlaying = false;
+	}
+
+	@Override
+	public boolean isPlaying() {
+		return _isPlaying;
 	}
 
 }

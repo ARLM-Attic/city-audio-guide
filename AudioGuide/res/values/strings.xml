@@ -9,5 +9,6 @@
     <string name="pref_category_route">Route</string>
     <string name="pref_route_none">None, free rambling</string>
     <string name="title_activity_route_map">RouteMapActivity</string>
+    <string name="error_invalid_sight_audio">Cannot play audio record for the current sight</string>
 
 </resources>

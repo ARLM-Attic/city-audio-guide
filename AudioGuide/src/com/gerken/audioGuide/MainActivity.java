@@ -6,18 +6,12 @@ import com.gerken.audioGuide.R;
 import com.gerken.audioGuide.graphics.PlayButtonDrawable;
 import com.gerken.audioGuide.interfaces.SightView;
 import com.gerken.audioGuide.presenters.SightPresenter;
-import com.gerken.audioGuide.services.DefaultLoggingAdapter;
-import com.gerken.audioGuide.services.GuideAssetManager;
-import com.gerken.audioGuide.services.LocationManagerFacade;
+import com.gerken.audioGuide.services.*;
 
 import android.graphics.drawable.Drawable;
-import android.media.MediaPlayer;
-import android.media.MediaPlayer.OnCompletionListener;
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
-import android.content.res.AssetFileDescriptor;
-import android.content.res.AssetManager;
 import android.util.Log;
 import android.view.*;
 import android.view.View.OnClickListener;
@@ -26,8 +20,6 @@ import android.widget.*;
 public class MainActivity extends Activity implements SightView {
 	private final String LOG_TAG = "MainActivity";
 	
-	private boolean _isPlayerPlaying = false;
-	private MediaPlayer _mediaPlayer;
 	private ImageButton _playButton;
 	
 	private SightPresenter _presenter;
@@ -41,6 +33,7 @@ public class MainActivity extends Activity implements SightView {
         _presenter = new SightPresenter(
         		((GuideApplication)getApplication()).getCity(), 
         		this, new GuideAssetManager(getApplicationContext()),
+        		new DefaultAudioPlayer(getApplicationContext()),
         		new DefaultLoggingAdapter("SightPresenter"));
         
         _locationManager = new LocationManagerFacade(
@@ -51,9 +44,6 @@ public class MainActivity extends Activity implements SightView {
         _playButton.setImageDrawable(new PlayButtonDrawable(lp.width, lp.height));
         _playButton.setOnClickListener(_playButtonClickListener);
         _playButton.invalidate();
-        
-        _mediaPlayer = new MediaPlayer();
-        _mediaPlayer.setOnCompletionListener(_mediaPlayerCompletionListener);
     }
     
     @Override
@@ -93,12 +83,11 @@ public class MainActivity extends Activity implements SightView {
     }
 
 	@Override
-	public void acceptNewSightGotInRange(String sightName, InputStream imageStream, String audioFileName) {
+	public void acceptNewSightGotInRange(String sightName, InputStream imageStream) {
 		TextView caption = findControl(R.id.sightCaption);
         caption.setText(sightName);
         
         setNewBackgroundImage(imageStream);        
-        setNewAudioFile(audioFileName);
 	}
 	
 	@Override
@@ -120,48 +109,35 @@ public class MainActivity extends Activity implements SightView {
         }
 	}
 	
-	private void setNewAudioFile(String audioFileName) {
-		try {    
-	        AssetManager assetManager = getApplicationContext().getAssets();
-	        AssetFileDescriptor descriptor =  assetManager.openFd(audioFileName);
-	        _mediaPlayer.reset();
-           _mediaPlayer.setDataSource(descriptor.getFileDescriptor(), 
-        		   descriptor.getStartOffset(), descriptor.getLength() );
-           descriptor.close();
-           _mediaPlayer.prepare();
-        }
-        catch(Exception ex){ 
-        	String msg=String.format("Error when setting %s as the new MediaPlayer datasource", audioFileName);
-        	Log.e(LOG_TAG, msg, ex);
-    	}
-	}
 
     
-    private OnClickListener _playButtonClickListener = new OnClickListener() {
-		
+    private OnClickListener _playButtonClickListener = new OnClickListener() {		
 		@Override
 		public void onClick(View v) {
-			if(_isPlayerPlaying) {
-				_isPlayerPlaying = false;
-				_playButton.setSelected(false);
-				_mediaPlayer.pause();
-			}
-			else {
-				_isPlayerPlaying = true;
-				_playButton.setSelected(true);
-				_mediaPlayer.start();
-			}
+			_presenter.handlePlayButtonClick();
 		}
 	};
-	
-	private OnCompletionListener _mediaPlayerCompletionListener = new OnCompletionListener() {
-		
-		@Override
-		public void onCompletion(MediaPlayer mp) {
-			_isPlayerPlaying = false;
-			_playButton.setSelected(false);
-		}
-	};
-	
 
+
+	@Override
+	public void displayPlayerPlaying() {
+		_playButton.setSelected(true);		
+	}
+
+	@Override
+	public void displayPlayerStopped() {
+		_playButton.setSelected(false);		
+	}
+
+	@Override
+	public void displayError(String message) {
+		//Toster.
+		
+	}
+	
+	@Override
+	public void displayError(int messageResourceId) {
+		//Toster.
+		
+	}
 }
