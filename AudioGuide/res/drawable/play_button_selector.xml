@@ -11,8 +11,21 @@
     	  android:state_pressed="true"
 		  android:drawable="@drawable/play_button_pressed" />
 		   -->
-    <item android:state_selected="true"
-		  android:drawable="@drawable/play_button_pressed" />
+    <item android:state_selected="true">
+       <layer-list>
+            <item>
+                <shape android:shape="oval">
+					<gradient android:type="radial" android:gradientRadius="50"
+					     android:startColor="#CDFFFFFF" android:endColor="#CDCCCCCC"					     
+					     android:centerX="0.6" android:centerY="0.6" />
+
+					<stroke android:width="2dp" android:color="#FF4CFF00" />
+
+					<size android:width="80dp" android:height="80dp"/>
+				</shape>
+            </item>
+        </layer-list>
+    </item>
     <item>
         <layer-list>
             <item>

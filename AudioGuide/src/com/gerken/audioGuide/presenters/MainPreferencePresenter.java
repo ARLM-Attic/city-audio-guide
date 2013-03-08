@@ -24,8 +24,6 @@ public class MainPreferencePresenter {
 		ArrayList<CharSequence> entries = new ArrayList<CharSequence>();
 		ArrayList<CharSequence> entryValues = new ArrayList<CharSequence>();
 		
-		entries.add("None");
-		entryValues.add("");
 		for(Route route : _city.getRoutes()) {
 			entries.add(route.getName());
 			entryValues.add(String.valueOf(route.getId()));

@@ -3,12 +3,16 @@ package com.gerken.audioGuide;
 import java.io.InputStream;
 
 import com.gerken.audioGuide.R;
+import com.gerken.audioGuide.graphics.PauseSignShape;
 import com.gerken.audioGuide.graphics.PlayButtonDrawable;
 import com.gerken.audioGuide.interfaces.SightView;
 import com.gerken.audioGuide.presenters.SightPresenter;
 import com.gerken.audioGuide.services.*;
 
+import android.graphics.Paint;
+import android.graphics.Paint.Style;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.ShapeDrawable;
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
@@ -24,6 +28,8 @@ public class MainActivity extends Activity implements SightView {
 	
 	private SightPresenter _presenter;
 	private LocationManagerFacade _locationManager;
+	
+	private PlayButtonDrawable _playButtonDrawable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,11 +43,22 @@ public class MainActivity extends Activity implements SightView {
         		new DefaultLoggingAdapter("SightPresenter"));
         
         _locationManager = new LocationManagerFacade(
-        		getApplicationContext(), _presenter);     
+        		getApplicationContext(), _presenter);         
+        
         
         _playButton = findControl(R.id.playButton);
         ViewGroup.LayoutParams lp = _playButton.getLayoutParams();
-        _playButton.setImageDrawable(new PlayButtonDrawable(lp.width, lp.height));
+        
+        ShapeDrawable pauseSign = new ShapeDrawable(
+				new PauseSignShape(0.4f));
+		Paint psPaint = pauseSign.getPaint();
+		psPaint.setStyle(Style.FILL);
+		psPaint.setColor(0xFF4CFF00);
+		pauseSign.setBounds(0, 0, lp.width, lp.height);
+		pauseSign.invalidateSelf();
+        
+        _playButtonDrawable = new PlayButtonDrawable(lp.width, lp.height);
+        _playButton.setImageDrawable(pauseSign);
         _playButton.setOnClickListener(_playButtonClickListener);
         _playButton.invalidate();
     }
@@ -70,8 +87,8 @@ public class MainActivity extends Activity implements SightView {
     public boolean onOptionsItemSelected(MenuItem item) {
     	switch(item.getItemId()) {
     	case R.id.action_settings:
-    		//Intent intent = new Intent(this, MainPreferenceActivity.class);
-    		Intent intent = new Intent(this, RouteMapActivity.class);
+    		Intent intent = new Intent(this, MainPreferenceActivity.class);
+    		//Intent intent = new Intent(this, RouteMapActivity.class);
     		startActivity(intent);
     	}
     	return super.onOptionsItemSelected(item);
@@ -131,13 +148,11 @@ public class MainActivity extends Activity implements SightView {
 
 	@Override
 	public void displayError(String message) {
-		//Toster.
-		
+		Toast.makeText(getBaseContext(), message, Toast.LENGTH_SHORT).show();	
 	}
 	
 	@Override
 	public void displayError(int messageResourceId) {
-		//Toster.
-		
+		Toast.makeText(getBaseContext(), messageResourceId, Toast.LENGTH_SHORT).show();
 	}
 }

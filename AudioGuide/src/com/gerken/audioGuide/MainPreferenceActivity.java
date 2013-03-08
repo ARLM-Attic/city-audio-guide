@@ -1,29 +1,67 @@
 package com.gerken.audioGuide;
 
-import com.gerken.audioGuide.objectModel.City;
+import java.util.List;
 
+import com.gerken.audioGuide.interfaces.MainPreferenceView;
+import com.gerken.audioGuide.objectModel.City;
+import com.gerken.audioGuide.objectModel.Route;
+import com.gerken.audioGuide.presenters.MainPreferencePresenter;
+import com.gerken.audioGuide.services.*;
+
+import android.app.Activity;
 import android.os.Bundle;
 import android.preference.ListPreference;
-import android.preference.PreferenceActivity;
+import android.view.View;
+import android.widget.*;
+import android.widget.LinearLayout.LayoutParams;
 
-public class MainPreferenceActivity extends PreferenceActivity {
+
+public class MainPreferenceActivity extends Activity implements MainPreferenceView {
+	
+	private MainPreferencePresenter _presenter;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+		super.onCreate(savedInstanceState);		
+		setContentView(R.layout.activity_main_preference);
 		
-		addPreferencesFromResource(R.xml.preferences_main);
+		_presenter = new MainPreferencePresenter(
+				((GuideApplication)getApplication()).getCity(), 
+				this, new SharedPreferenceManager(getApplicationContext()), 
+				new DefaultLoggingAdapter("SightPresenter"));
+		_presenter.init();
+	}
+
+
+	@Override
+	public void setRouteChoices(CharSequence[] entries,
+			CharSequence[] entryValues) {
+		RadioGroup routeChoices = (RadioGroup)findViewById(R.id.routeChoiceGroup);
 		
-		setRouteOptions();
+		int maxIdx = Math.min(entries.length, entryValues.length);
+		for(int i=0; i<maxIdx; i++) 
+			routeChoices.addView(createRouteChoice(entries[i], entryValues[i]));
 	}
 	
-	private void setRouteOptions() {
-		ListPreference lp = (ListPreference)findPreference("routeList");
+	private View createRouteChoice(CharSequence entry, CharSequence entryValue) {
+		LinearLayout layout = new LinearLayout(this);
+		layout.setOrientation(LinearLayout.HORIZONTAL);
 		
-		City city = ((GuideApplication)getApplication()).getCity();
-		CharSequence[] entries = { "One", "Two", "Three" };
-		CharSequence[] entryValues = { "", "2", "3" };
-		lp.setEntries(entries);
-		lp.setEntryValues(entryValues);
+		RadioButton choice = new RadioButton(this);
+		choice.setText(entry);
+		choice.setTag(entryValue);
+		layout.addView(choice, 
+				new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
+		);
+		
+		Button showMapButton = new Button(this);
+		showMapButton.setText("Map");
+		layout.addView(showMapButton, 
+				new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
+		);
+		
+		return layout;
 	}
+
 	
 }
