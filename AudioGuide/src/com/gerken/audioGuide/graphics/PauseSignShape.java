@@ -4,6 +4,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.drawable.shapes.Shape;
+import android.util.Log;
 
 public class PauseSignShape extends Shape {
 	

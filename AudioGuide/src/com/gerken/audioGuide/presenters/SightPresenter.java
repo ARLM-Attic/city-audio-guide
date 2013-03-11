@@ -87,10 +87,24 @@ public class SightPresenter implements LocationListener {
 			_sightView.displayPlayerStopped();			
 		}
 		else {
+			try {
 			_audioPlayer.play();
+			}
+			catch(Exception ex) {
+				String sightName = (_currentSight != null) ?
+					_currentSight.getName() : "[unknown]";
+				_logger.logError("Unable to play audio track for the sight " + sightName, ex);
+			}
 			_sightView.displayPlayerPlaying();			
 		}
 	}	
+	
+	public void handleStopButtonClick() {
+		if(_audioPlayer.isPlaying()) {
+			_audioPlayer.stop();
+			_sightView.displayPlayerStopped();	
+		}
+	}
 	
 	private void notifyViewAboutNewSight(SightLook newSightLook) {
 		Sight newSight = newSightLook.getSight();

@@ -16,6 +16,7 @@ public class DefaultAudioPlayer implements AudioPlayer {
 	private MediaPlayer _mediaPlayer;
 	
 	private boolean _isPlaying = false;
+	private boolean _needsPreparation = false;
 	
 	public DefaultAudioPlayer(Context context) {
 		_context = context;
@@ -45,7 +46,9 @@ public class DefaultAudioPlayer implements AudioPlayer {
 	}
 
 	@Override
-	public void play() {
+	public void play() throws IOException {
+		if(_needsPreparation) 
+			_mediaPlayer.prepare();
 		_mediaPlayer.start();
 		_isPlaying = true;
 	}
@@ -59,6 +62,7 @@ public class DefaultAudioPlayer implements AudioPlayer {
 	@Override
 	public void stop() {
 		_mediaPlayer.stop();
+		_needsPreparation = true;
 		_isPlaying = false;
 	}
 

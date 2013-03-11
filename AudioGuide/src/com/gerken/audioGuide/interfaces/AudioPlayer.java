@@ -9,7 +9,7 @@ public interface AudioPlayer {
 	
 	void prepareAudioAsset(String asetFileName) throws IOException;
 	
-	void play();
+	void play() throws IOException;
 	void pause();
 	void stop();
 	boolean isPlaying();

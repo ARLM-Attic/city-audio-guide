@@ -31,13 +31,27 @@
 		        android:textColor="#FF75FF3A"  />
         </LinearLayout>
         
-        <ImageButton
-	        android:id="@+id/playButton"
-	        android:layout_width="80dp"
-	        android:layout_height="80dp"
-	        android:layout_gravity="center"
-	        android:background="@drawable/play_button_selector"
-	         />   
+	    <LinearLayout
+		    android:orientation="horizontal"
+		    android:layout_width="match_parent"
+		    android:layout_height="match_parent"
+		    android:layout_gravity="center">
+	        
+	        <ImageButton
+		        android:id="@+id/stopButton"
+		        android:layout_width="40dp"
+		        android:layout_height="40dp"
+		        android:layout_gravity="left"
+		         /> 
+        
+	        <ImageButton
+		        android:id="@+id/playButton"
+		        android:layout_width="80dp"
+		        android:layout_height="80dp"
+		        android:layout_gravity="center"
+		        android:background="@drawable/play_button_selector"
+		         />   
+         </LinearLayout>
     </LinearLayout>  
 
 </FrameLayout>
