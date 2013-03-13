@@ -59,7 +59,8 @@ public class RouteMapActivity extends Activity implements RouteMapView {
 	public void displayError(int messageResourceId) {
 		findViewById(R.id.routeMapMainView).setVisibility(View.INVISIBLE);
 		
-		((TextView)findViewById(R.id.routeMapErrorMessage)).setText("can't read map");		
+		((TextView)findViewById(R.id.routeMapErrorMessage)).setText(
+				getString(messageResourceId));		
 	}
 
 }

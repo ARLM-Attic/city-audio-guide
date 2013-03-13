@@ -40,7 +40,7 @@ public class RouteMapPresenter {
 		catch (Exception e) {
 			String emsg = String.format("Cannot display map for the route %d", routeId);
 			_logger.logError(emsg, e);
-			_view.displayError(0);
+			_view.displayError(R.string.route_map_cannot_read);
 		}	
 	}
 
