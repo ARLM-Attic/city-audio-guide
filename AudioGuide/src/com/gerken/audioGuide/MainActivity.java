@@ -4,7 +4,7 @@ import java.io.InputStream;
 
 import com.gerken.audioGuide.R;
 import com.gerken.audioGuide.graphics.*;
-import com.gerken.audioGuide.interfaces.SightView;
+import com.gerken.audioGuide.interfaces.views.SightView;
 import com.gerken.audioGuide.presenters.SightPresenter;
 import com.gerken.audioGuide.services.*;
 

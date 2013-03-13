@@ -2,7 +2,7 @@ package com.gerken.audioGuide;
 
 import java.util.List;
 
-import com.gerken.audioGuide.interfaces.MainPreferenceView;
+import com.gerken.audioGuide.interfaces.views.MainPreferenceView;
 import com.gerken.audioGuide.objectModel.City;
 import com.gerken.audioGuide.objectModel.Route;
 import com.gerken.audioGuide.presenters.MainPreferencePresenter;

@@ -1,4 +1,4 @@
-package com.gerken.audioGuide.interfaces;
+package com.gerken.audioGuide.interfaces.views;
 
 import java.io.InputStream;
 

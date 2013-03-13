@@ -1,17 +1,14 @@
 package com.gerken.audioGuide;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 import com.gerken.audioGuide.interfaces.views.RouteMapView;
 import com.gerken.audioGuide.presenters.RouteMapPresenter;
 import com.gerken.audioGuide.services.DefaultLoggingAdapter;
 import com.gerken.audioGuide.services.GuideAssetManager;
-import com.gerken.audioGuide.util.IntentExtraManager;
 
 import android.os.Bundle;
 import android.app.Activity;
-import android.content.res.AssetManager;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.Menu;

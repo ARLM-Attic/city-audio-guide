@@ -11,6 +11,7 @@ import android.util.Log;
 
 import com.gerken.audioGuide.R;
 import com.gerken.audioGuide.interfaces.*;
+import com.gerken.audioGuide.interfaces.views.SightView;
 import com.gerken.audioGuide.objectModel.*;
 
 public class SightPresenter implements LocationListener {
