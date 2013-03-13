@@ -9,6 +9,7 @@ import com.gerken.audioGuide.interfaces.SharedPreferenceStorage;
 
 public class SharedPreferenceManager implements SharedPreferenceStorage {
 	private final String KEY_ROUTE_ID = "currentRouteId";
+	private final String KEY_LAST_SIGHT_ID = "lastSightId";
 	
 	private Context _context;
 	
@@ -23,18 +24,32 @@ public class SharedPreferenceManager implements SharedPreferenceStorage {
 
 	@Override
 	public int getCurrentRouteId() {
-		// TODO Auto-generated method stub
 		return getSharedPreferences().getInt(KEY_ROUTE_ID, 0);
 	}
 
 	@Override
 	public void setCurrentRouteId(int id) {
-		Editor ed = getSharedPreferences().edit();
-		ed.putInt(KEY_ROUTE_ID, id);
-		ed.commit();		
+		storeInt(KEY_ROUTE_ID, id);
+	}
+
+	@Override
+	public int getLastSightId() {
+		return getSharedPreferences().getInt(KEY_LAST_SIGHT_ID, 0);
+	}
+
+	@Override
+	public void setLastSightId(int id) {
+		storeInt(KEY_LAST_SIGHT_ID, id);
 	}
 	
 	private SharedPreferences getSharedPreferences() {
 		return PreferenceManager.getDefaultSharedPreferences(_context);
 	}
+	
+	private void storeInt(String key, int value) {
+		Editor ed = getSharedPreferences().edit();
+		ed.putInt(key, value);
+		ed.commit();	
+	}
+
 }

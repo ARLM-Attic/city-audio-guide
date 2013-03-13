@@ -68,12 +68,14 @@ public class MainActivity extends Activity implements SightView {
     protected void onResume() {
     	super.onResume();
     	_locationManager.startTracking();
+    	_presenter.handleActivityResume();
     }
     
     @Override
     protected void onPause() {
     	super.onPause();
     	_locationManager.stopTracking();
+    	_presenter.handleActivityPause();
     }
 
 

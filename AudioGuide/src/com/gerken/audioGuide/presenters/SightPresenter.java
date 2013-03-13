@@ -106,6 +106,14 @@ public class SightPresenter implements LocationListener {
 		}
 	}
 	
+	public void handleActivityPause() {
+		
+	}
+	
+	public void handleActivityResume() {
+		
+	}
+	
 	private void notifyViewAboutNewSight(SightLook newSightLook) {
 		Sight newSight = newSightLook.getSight();
 		InputStream imgStream = null;

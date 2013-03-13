@@ -7,11 +7,14 @@ import com.gerken.audioGuide.objectModel.City;
 import com.gerken.audioGuide.objectModel.Route;
 import com.gerken.audioGuide.presenters.MainPreferencePresenter;
 import com.gerken.audioGuide.services.*;
+import com.gerken.audioGuide.util.IntentExtraManager;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.*;
 import android.widget.LinearLayout.LayoutParams;
 
@@ -56,6 +59,8 @@ public class MainPreferenceActivity extends Activity implements MainPreferenceVi
 		
 		Button showMapButton = new Button(this);
 		showMapButton.setText("Map");
+		showMapButton.setTag(entryValue);
+		showMapButton.setOnClickListener(_mapButtonOnClickListener);
 		layout.addView(showMapButton, 
 				new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
 		);
@@ -63,5 +68,16 @@ public class MainPreferenceActivity extends Activity implements MainPreferenceVi
 		return layout;
 	}
 
+	private OnClickListener _mapButtonOnClickListener = new OnClickListener() {
+		
+		@Override
+		public void onClick(View v) {
+			String tag = (String)v.getTag();
+			int routeId = Integer.valueOf(tag);
+			Intent intent = new Intent(MainPreferenceActivity.this, RouteMapActivity.class);
+			new IntentExtraManager(intent).setRouteId(routeId);
+    		startActivity(intent);			
+		}
+	};
 	
 }
