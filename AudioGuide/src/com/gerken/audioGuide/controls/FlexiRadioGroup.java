@@ -30,6 +30,17 @@ public class FlexiRadioGroup extends RadioGroup {
 
 	@Override
 	public void addView(View child) {
+		processAddedView(child);		
+		super.addView(child);
+	}	
+
+	@Override
+	public void addView(View child, int index, ViewGroup.LayoutParams params) {
+		processAddedView(child);
+		super.addView(child, index, params);
+	}
+	
+	private void processAddedView(View child) {
 		if(child instanceof RadioButton) {
 			RadioButton rb = (RadioButton)child;
 			rb.setOnCheckedChangeListener(_radioButtonCheckedChangeListener);
@@ -40,10 +51,9 @@ public class FlexiRadioGroup extends RadioGroup {
 			for(RadioButton rb : rbs)
 				rb.setOnCheckedChangeListener(_radioButtonCheckedChangeListener);
 			_buttons.addAll(rbs);
-		}		
-		
-		super.addView(child);
+		}
 	}
+	
 	
 	private List<RadioButton> getRadioButtonChildren(ViewGroup parent) {
 		ArrayList<RadioButton> result = new ArrayList<RadioButton>();

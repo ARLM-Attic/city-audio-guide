@@ -23,6 +23,7 @@ public class SightPresenter implements LocationListener {
 	private SightView _sightView;
 	private AssetStreamProvider _assetStreamProvider;
 	private AudioPlayer _audioPlayer;
+	private SharedPreferenceStorage _prefStorage;
 	private Logger _logger;
 	
 	private Sight _currentSight = null;
@@ -35,16 +36,38 @@ public class SightPresenter implements LocationListener {
 		}
 	};
 	
+	private OnEventListener _routeChangeListener = new OnEventListener() {
+		
+		@Override
+		public void onEvent() {
+			if(_currentSight != null) {
+				if(_prefStorage.isRouteChosen()) {
+					String routeName = null;
+					for(Route r: _city.getRoutes()) {
+						if(r.getId()==_prefStorage.getCurrentRouteId()) {
+							routeName = r.getName();
+							break;
+						}
+					}
+					_sightView.acceptNewRouteSelected(_currentSight.getName(), routeName);
+				}
+			}
+			
+		}
+	};
+	
 	public SightPresenter(City city, SightView sightView, 
 			AssetStreamProvider assetStreamProvider, AudioPlayer audioPlayer,
-			Logger logger) {
+			SharedPreferenceStorage prefStorage, Logger logger) {
 		_city = city;
 		_sightView = sightView;
 		_assetStreamProvider = assetStreamProvider;
 		_audioPlayer = audioPlayer;
+		_prefStorage = prefStorage;
 		_logger = logger;
 		
 		_audioPlayer.setAudioAssetCompletionListener(_mediaPlayerCompletionListener);
+		_prefStorage.setOnCurrentRouteChangedListener(_routeChangeListener);
 	}
 
 	@Override

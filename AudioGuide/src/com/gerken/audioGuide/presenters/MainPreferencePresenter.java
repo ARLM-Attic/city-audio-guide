@@ -9,14 +9,14 @@ import com.gerken.audioGuide.objectModel.*;
 public class MainPreferencePresenter {
 	
 	private City _city;
-	private MainPreferenceView _prefView;
+	private MainPreferenceView _view;
 	private SharedPreferenceStorage _prefStorage;
 	private Logger _logger;
 	
 	public MainPreferencePresenter(City city, MainPreferenceView prefView, 
 			SharedPreferenceStorage prefStorage, Logger logger) {
 		_city = city;
-		_prefView = prefView;
+		_view = prefView;
 		_prefStorage = prefStorage;
 		_logger = logger;
 	}
@@ -30,8 +30,21 @@ public class MainPreferencePresenter {
 			entryValues.add(String.valueOf(route.getId()));
 		}
 		
-		_prefView.setRouteChoices(entries.toArray(new CharSequence[entries.size()]), 
+		_view.setRouteChoices(entries.toArray(new CharSequence[entries.size()]), 
 				entryValues.toArray(new CharSequence[entryValues.size()]));
 	}
+	
+	public void handleOk(Object selectedRouteTag) {
+		if(selectedRouteTag != null && selectedRouteTag instanceof String) {
+			int routeId = Integer.valueOf((String)selectedRouteTag);
+			_prefStorage.setCurrentRouteId(routeId);
+		}
+		else
+			_prefStorage.resetCurrentRoute();
+		
+		_view.finish();
+	}
+	
+	
 
 }

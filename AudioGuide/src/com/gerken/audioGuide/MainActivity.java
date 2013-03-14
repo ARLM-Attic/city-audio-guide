@@ -16,6 +16,7 @@ import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.Shape;
 import android.os.Bundle;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 import android.view.*;
@@ -41,15 +42,15 @@ public class MainActivity extends Activity implements SightView {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         
+        Context ctx = getApplicationContext();
         _presenter = new SightPresenter(
         		((GuideApplication)getApplication()).getCity(), 
-        		this, new GuideAssetManager(getApplicationContext()),
-        		new DefaultAudioPlayer(getApplicationContext()),
+        		this, new GuideAssetManager(ctx),
+        		new DefaultAudioPlayer(ctx),
+        		new SharedPreferenceManager(ctx),
         		new DefaultLoggingAdapter("SightPresenter"));
         
-        _locationManager = new LocationManagerFacade(
-        		getApplicationContext(), _presenter);         
-        
+        _locationManager = new LocationManagerFacade(ctx, _presenter);       
         
         _playButton = findControl(R.id.playButton);
         ViewGroup.LayoutParams lp = _playButton.getLayoutParams();      
@@ -104,15 +105,24 @@ public class MainActivity extends Activity implements SightView {
 
 	@Override
 	public void acceptNewSightGotInRange(String sightName, InputStream imageStream) {
-		TextView caption = findControl(R.id.sightCaption);
-        caption.setText(sightName);
-        
+		setSightCaption(sightName);
         setNewBackgroundImage(imageStream);        
 	}
 	
 	@Override
 	public void acceptNewSightLookGotInRange(InputStream imageStream) {
 		setNewBackgroundImage(imageStream);
+	}
+
+	@Override
+	public void acceptNewRouteSelected(String sightName, String routeName) {
+		setSightCaption(String.format("%s: %s", sightName, routeName));
+		
+	}
+	
+	private void setSightCaption(String text) {
+		TextView caption = findControl(R.id.sightCaption);
+        caption.setText(text);
 	}
 
 	private void setNewBackgroundImage(InputStream imageStream) {
@@ -201,4 +211,5 @@ public class MainActivity extends Activity implements SightView {
 			_presenter.handleStopButtonClick();
 		}
 	};
+
 }

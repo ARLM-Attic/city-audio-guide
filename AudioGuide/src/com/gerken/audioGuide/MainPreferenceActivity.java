@@ -2,6 +2,7 @@ package com.gerken.audioGuide;
 
 import java.util.List;
 
+import com.gerken.audioGuide.controls.FlexiRadioGroup;
 import com.gerken.audioGuide.interfaces.views.MainPreferenceView;
 import com.gerken.audioGuide.objectModel.City;
 import com.gerken.audioGuide.objectModel.Route;
@@ -23,6 +24,8 @@ public class MainPreferenceActivity extends Activity implements MainPreferenceVi
 	
 	private MainPreferencePresenter _presenter;
 	
+	private FlexiRadioGroup _routeChoiceGroup;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);		
@@ -33,8 +36,13 @@ public class MainPreferenceActivity extends Activity implements MainPreferenceVi
 				this, new SharedPreferenceManager(getApplicationContext()), 
 				new DefaultLoggingAdapter("SightPresenter"));
 		_presenter.init();
+		
+		View okButton = findViewById(R.id.buttonOk);
+		okButton.setOnClickListener(_okButtonOnClickListener);
+		findViewById(R.id.buttonCancel).setOnClickListener(_cancelButtonOnClickListener);
+		
+		_routeChoiceGroup = (FlexiRadioGroup)findViewById(R.id.routeChoiceGroup);
 	}
-
 
 	@Override
 	public void setRouteChoices(CharSequence[] entries,
@@ -80,4 +88,19 @@ public class MainPreferenceActivity extends Activity implements MainPreferenceVi
 		}
 	};
 	
+	private OnClickListener _okButtonOnClickListener = new OnClickListener() {
+		
+		@Override
+		public void onClick(View v) {
+			RadioButton selected = _routeChoiceGroup.getSelected();
+			_presenter.handleOk(selected.getTag());			
+		}
+	};
+	
+	private OnClickListener _cancelButtonOnClickListener = new OnClickListener() {		
+		@Override
+		public void onClick(View v) {
+			finish();			
+		}
+	};
 }
