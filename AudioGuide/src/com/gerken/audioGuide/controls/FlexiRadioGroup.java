@@ -27,6 +27,12 @@ public class FlexiRadioGroup extends RadioGroup {
 		}
 		return null;
 	}
+	
+	public void setSelectedValue(Object tagValue) {
+		for(RadioButton rb : _buttons) {
+			rb.setChecked(rb.getTag() != null && rb.getTag()==tagValue);
+		}
+	}
 
 	@Override
 	public void addView(View child) {

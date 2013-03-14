@@ -26,7 +26,7 @@
 
     </com.gerken.audioGuide.controls.FlexiRadioGroup>
     
-    <RelativeLayout
+    <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -35,15 +35,17 @@
             android:id="@+id/buttonCancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
+            android:layout_gravity="left"
+            android:layout_weight="1"
             android:text="Cancel"/>
         <Button 
             android:id="@+id/buttonOk"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
+            android:layout_gravity="right"
+            android:layout_weight="1"
             android:text="Ok"/>
         
-    </RelativeLayout>
+    </LinearLayout>
 
 </RelativeLayout>

@@ -32,6 +32,9 @@ public class MainPreferencePresenter {
 		
 		_view.setRouteChoices(entries.toArray(new CharSequence[entries.size()]), 
 				entryValues.toArray(new CharSequence[entryValues.size()]));
+		
+		if(_prefStorage.isRouteChosen())
+			_view.setSelectedRoute(String.valueOf(_prefStorage.getCurrentRouteId()));
 	}
 	
 	public void handleOk(Object selectedRouteTag) {
@@ -44,7 +47,4 @@ public class MainPreferencePresenter {
 		
 		_view.finish();
 	}
-	
-	
-
 }

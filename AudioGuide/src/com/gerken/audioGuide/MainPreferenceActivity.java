@@ -31,6 +31,8 @@ public class MainPreferenceActivity extends Activity implements MainPreferenceVi
 		super.onCreate(savedInstanceState);		
 		setContentView(R.layout.activity_main_preference);
 		
+		_routeChoiceGroup = (FlexiRadioGroup)findViewById(R.id.routeChoiceGroup);
+		
 		_presenter = new MainPreferencePresenter(
 				((GuideApplication)getApplication()).getCity(), 
 				this, new SharedPreferenceManager(getApplicationContext()), 
@@ -39,19 +41,21 @@ public class MainPreferenceActivity extends Activity implements MainPreferenceVi
 		
 		View okButton = findViewById(R.id.buttonOk);
 		okButton.setOnClickListener(_okButtonOnClickListener);
-		findViewById(R.id.buttonCancel).setOnClickListener(_cancelButtonOnClickListener);
-		
-		_routeChoiceGroup = (FlexiRadioGroup)findViewById(R.id.routeChoiceGroup);
+		findViewById(R.id.buttonCancel).setOnClickListener(_cancelButtonOnClickListener);	
 	}
 
 	@Override
 	public void setRouteChoices(CharSequence[] entries,
 			CharSequence[] entryValues) {
-		RadioGroup routeChoices = (RadioGroup)findViewById(R.id.routeChoiceGroup);
 		
 		int maxIdx = Math.min(entries.length, entryValues.length);
 		for(int i=0; i<maxIdx; i++) 
-			routeChoices.addView(createRouteChoice(entries[i], entryValues[i]));
+			_routeChoiceGroup.addView(createRouteChoice(entries[i], entryValues[i]));
+	}	
+
+	@Override
+	public void setSelectedRoute(CharSequence value) {
+		_routeChoiceGroup.setSelectedValue(value);		
 	}
 	
 	private View createRouteChoice(CharSequence entry, CharSequence entryValue) {
