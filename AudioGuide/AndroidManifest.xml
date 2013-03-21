@@ -31,7 +31,7 @@
         </activity>
         <activity
             android:name="com.gerken.audioGuide.MainPreferenceActivity"
-            android:label="TODO" >
+            android:label="@string/title_activity_main_preference" >
         </activity>
         <activity
             android:name="com.gerken.audioGuide.RouteMapActivity"

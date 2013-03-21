@@ -2,19 +2,15 @@ package com.gerken.audioGuide.presenters;
 
 import java.io.InputStream;
 
-import android.location.Location;
-import android.location.LocationListener;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
-import android.os.Bundle;
-import android.util.Log;
 
 import com.gerken.audioGuide.R;
 import com.gerken.audioGuide.interfaces.*;
 import com.gerken.audioGuide.interfaces.views.SightView;
 import com.gerken.audioGuide.objectModel.*;
 
-public class SightPresenter implements LocationListener {
+public class SightPresenter {
 	private final float SIGHT_ACTIVATION_RADIUS = 20.0f;
 	private final double EARTH_RADIUS = 6371.0;
 	private final String AUDIO_FOLDER = "audio";
@@ -69,41 +65,20 @@ public class SightPresenter implements LocationListener {
 		_audioPlayer.setAudioAssetCompletionListener(_mediaPlayerCompletionListener);
 		_prefStorage.setOnCurrentRouteChangedListener(_routeChangeListener);
 	}
-
-	@Override
-	public void onLocationChanged(Location location) {
-		if(location != null) {
-			SightLook newSightLook = findClosestSightLookInRange(location.getLatitude(), location.getLongitude());
-			if(newSightLook != null && !newSightLook.equals(_currentSightLook)) {
-				if(!newSightLook.getSight().equals(_currentSight)) {
-					notifyViewAboutNewSight(newSightLook);
-					_currentSight = newSightLook.getSight();
-				}					
-				else
-					notifyViewAboutNewSightLook(newSightLook);
-				
-				_currentSightLook = newSightLook;
-			}
+	
+	public void handleLocationChange(double latitude, double longitude) {
+		SightLook newSightLook = findClosestSightLookInRange(latitude, longitude);
+		if(newSightLook != null && !newSightLook.equals(_currentSightLook)) {
+			if(!newSightLook.getSight().equals(_currentSight)) {
+				notifyViewAboutNewSight(newSightLook);
+				_currentSight = newSightLook.getSight();
+			}					
+			else
+				notifyViewAboutNewSightLook(newSightLook);
+			
+			_currentSightLook = newSightLook;
 		}
-	}
-
-	@Override
-	public void onProviderDisabled(String provider) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onProviderEnabled(String provider) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onStatusChanged(String provider, int status, Bundle extras) {
-		// TODO Auto-generated method stub
-		
-	}
+	}	
 	
 	public void handlePlayButtonClick() {
 		if(_audioPlayer.isPlaying()) {

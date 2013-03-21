@@ -14,6 +14,8 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.Shape;
+import android.location.Location;
+import android.location.LocationListener;
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Context;
@@ -22,7 +24,6 @@ import android.util.Log;
 import android.view.*;
 import android.view.View.OnClickListener;
 import android.widget.*;
-import android.widget.ImageView.ScaleType;
 
 public class MainActivity extends Activity implements SightView {
 	private final String LOG_TAG = "MainActivity";
@@ -50,7 +51,7 @@ public class MainActivity extends Activity implements SightView {
         		new SharedPreferenceManager(ctx),
         		new DefaultLoggingAdapter("SightPresenter"));
         
-        _locationManager = new LocationManagerFacade(ctx, _presenter);       
+        _locationManager = new LocationManagerFacade(ctx, _locationListener);       
         
         _playButton = findControl(R.id.playButton);
         ViewGroup.LayoutParams lp = _playButton.getLayoutParams();      
@@ -209,6 +210,34 @@ public class MainActivity extends Activity implements SightView {
 		@Override
 		public void onClick(View v) {
 			_presenter.handleStopButtonClick();
+		}
+	};
+	
+	private LocationListener _locationListener = new LocationListener() {
+		
+		@Override
+		public void onStatusChanged(String provider, int status, Bundle extras) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		@Override
+		public void onProviderEnabled(String provider) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		@Override
+		public void onProviderDisabled(String provider) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		@Override
+		public void onLocationChanged(Location location) {
+			if(location != null) {
+				_presenter.handleLocationChange(location.getLatitude(), location.getLongitude());
+			}			
 		}
 	};
 

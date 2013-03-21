@@ -1,5 +1,6 @@
 package com.gerken.audioGuide.objectModel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.simpleframework.xml.*;
@@ -17,6 +18,16 @@ public class Sight {
 	@ElementList(name="looks")
 	private List<SightLook> _looks;
 	
+	public Sight() {		
+	}
+	
+	public Sight(int id, String name, String audioName) {
+		_id = id;
+		_name = name;
+		_audioName = audioName;
+		_looks = new ArrayList<SightLook>();
+	}
+	
 	public int getId(){
 		return _id;
 	}
@@ -31,5 +42,10 @@ public class Sight {
 
 	public List<SightLook> getSightLooks() {
 		return _looks;
+	}
+	
+	public void addLook(SightLook look) {
+		_looks.add(look);
+		look.setSight(this);
 	}
 }
