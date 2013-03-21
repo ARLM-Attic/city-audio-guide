@@ -2,8 +2,6 @@ package com.gerken.audioGuide.interfaces;
 
 import java.io.IOException;
 
-import android.media.MediaPlayer.OnCompletionListener;
-
 public interface AudioPlayer {
 	void signalSightInRange();
 	
@@ -14,5 +12,5 @@ public interface AudioPlayer {
 	void stop();
 	boolean isPlaying();
 	
-	void setAudioAssetCompletionListener(OnCompletionListener listener);
+	void addAudioAssetCompletionListener(OnEventListener listener);
 }

@@ -1,6 +1,7 @@
 package com.gerken.audioGuide.services;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
@@ -9,6 +10,7 @@ import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 
 import com.gerken.audioGuide.interfaces.AudioPlayer;
+import com.gerken.audioGuide.interfaces.OnEventListener;
 
 public class DefaultAudioPlayer implements AudioPlayer {
 
@@ -18,9 +20,22 @@ public class DefaultAudioPlayer implements AudioPlayer {
 	private boolean _isPlaying = false;
 	private boolean _needsPreparation = false;
 	
+	private ArrayList<OnEventListener> _completionListeners;
+	
+	private OnCompletionListener _audioAssetCompletionListener = new OnCompletionListener() {		
+		@Override
+		public void onCompletion(MediaPlayer mp) {
+			for(OnEventListener l: _completionListeners)
+				l.onEvent();			
+		}
+	};
+	
 	public DefaultAudioPlayer(Context context) {
 		_context = context;
 		_mediaPlayer = new MediaPlayer();
+		
+		_completionListeners = new ArrayList<OnEventListener>();
+		_mediaPlayer.setOnCompletionListener(_audioAssetCompletionListener);
 	}
 	
 	@Override
@@ -41,8 +56,8 @@ public class DefaultAudioPlayer implements AudioPlayer {
 	}
 
 	@Override
-	public void setAudioAssetCompletionListener(OnCompletionListener listener) {
-		_mediaPlayer.setOnCompletionListener(listener);		
+	public void addAudioAssetCompletionListener(OnEventListener listener) {
+		_completionListeners.add(listener);		
 	}
 
 	@Override

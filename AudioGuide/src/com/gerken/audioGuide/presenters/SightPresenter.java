@@ -2,9 +2,6 @@ package com.gerken.audioGuide.presenters;
 
 import java.io.InputStream;
 
-import android.media.MediaPlayer;
-import android.media.MediaPlayer.OnCompletionListener;
-
 import com.gerken.audioGuide.R;
 import com.gerken.audioGuide.interfaces.*;
 import com.gerken.audioGuide.interfaces.views.SightView;
@@ -25,9 +22,9 @@ public class SightPresenter {
 	private Sight _currentSight = null;
 	private SightLook _currentSightLook = null;
 	
-	private OnCompletionListener _mediaPlayerCompletionListener = new OnCompletionListener() {		
+	private OnEventListener _mediaPlayerCompletionListener = new OnEventListener() {		
 		@Override
-		public void onCompletion(MediaPlayer mp) {
+		public void onEvent() {
 			_sightView.displayPlayerStopped();	
 		}
 	};
@@ -62,7 +59,7 @@ public class SightPresenter {
 		_prefStorage = prefStorage;
 		_logger = logger;
 		
-		_audioPlayer.setAudioAssetCompletionListener(_mediaPlayerCompletionListener);
+		_audioPlayer.addAudioAssetCompletionListener(_mediaPlayerCompletionListener);
 		_prefStorage.setOnCurrentRouteChangedListener(_routeChangeListener);
 	}
 	
