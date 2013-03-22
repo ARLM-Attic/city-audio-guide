@@ -11,6 +11,8 @@ public interface SightView {
 	void displayPlayerPlaying();
 	void displayPlayerStopped();
 	
+	void displayNextSightDirection(float heading);
+	
 	void displayError(String message);
 	void displayError(int messageResourceId);
 }

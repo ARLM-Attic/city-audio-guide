@@ -9,4 +9,15 @@ public class NextRoutePoint {
 	private int _routeId;
 	@Attribute(name="heading")
 	private short _heading;
+	
+	public NextRoutePoint() {		
+	}
+	
+	public int getRouteId() {
+		return _routeId;
+	}
+	
+	public short getHeading() {
+		return _heading;
+	}
 }

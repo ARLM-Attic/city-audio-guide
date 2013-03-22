@@ -18,7 +18,7 @@
                 <look imageName="st_011_01.jpg" 
                     latitude="50.087131" longitude="14.428262">
                     <nextRoutePoints>
-                        <nextRoutePoint routeId="1" heading="0" />
+                        <nextRoutePoint routeId="1" heading="10" />
                     </nextRoutePoints>             
                 </look>
                 <look imageName="st_011_02.jpg" 
@@ -30,7 +30,7 @@
             </looks>
         </sight>
         <sight id="12" name="House of the Black Madonna"
-            audioName="aud_011.mp3">
+            audioName="aud_012.mp3">
             <looks>
                 <look imageName="st_012_01.jpg" 
                     latitude="50.087213" longitude="14.425939" />

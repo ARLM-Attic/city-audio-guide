@@ -99,6 +99,11 @@ public class SightPresenter {
 		if(_audioPlayer.isPlaying()) {
 			_audioPlayer.stop();
 			_sightView.displayPlayerStopped();	
+			if(_prefStorage.isRouteChosen()) {
+				NextRoutePoint nrp = getNextRoutePoint();
+				float heading = (float)(Math.PI*nrp.getHeading()/180.0);
+				_sightView.displayNextSightDirection(heading);
+			}
 		}
 	}
 	
@@ -177,5 +182,18 @@ public class SightPresenter {
 	
 	private double deg2rad(double deg) {
 		return deg * (Math.PI/180.0);
-	}	
+	}
+	
+	private NextRoutePoint getNextRoutePoint() {
+		if(_currentSightLook == null)
+			return null;
+		
+		int routeId = _prefStorage.getCurrentRouteId();
+		for(NextRoutePoint nrp: _currentSightLook.getNextRoutePoints()) {
+			if(nrp.getRouteId() == routeId)
+				return nrp;
+		}
+		
+		return null;
+	}
 }

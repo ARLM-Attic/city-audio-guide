@@ -29,8 +29,11 @@ public class MainActivity extends Activity implements SightView {
 	private final String LOG_TAG = "MainActivity";
 	private final int PLAY_BUTTON_SIGN_COLOR = 0xFF4CFF00;
 	
+	private View _playerPanel;
 	private ImageButton _playButton;
 	private ImageButton _stopButton;
+	
+	private RouteArrowsView _nextSightPointerArrow;
 	
 	private SightPresenter _presenter;
 	private LocationManagerFacade _locationManager;
@@ -64,6 +67,9 @@ public class MainActivity extends Activity implements SightView {
         
         _stopButton = findControl(R.id.stopButton);
         _stopButton.setOnClickListener(_stopButtonClickListener);
+        
+        _nextSightPointerArrow = findControl(R.id.nextSightPointerArrow);
+        _playerPanel = findControl(R.id.playerPanel);
     }
     
     @Override
@@ -107,12 +113,14 @@ public class MainActivity extends Activity implements SightView {
 	@Override
 	public void acceptNewSightGotInRange(String sightName, InputStream imageStream) {
 		setSightCaption(sightName);
-        setNewBackgroundImage(imageStream);        
+        setNewBackgroundImage(imageStream);     
+        _nextSightPointerArrow.setVisibility(View.INVISIBLE);
 	}
 	
 	@Override
 	public void acceptNewSightLookGotInRange(InputStream imageStream) {
 		setNewBackgroundImage(imageStream);
+		_nextSightPointerArrow.setVisibility(View.INVISIBLE);
 	}
 
 	@Override
@@ -188,6 +196,14 @@ public class MainActivity extends Activity implements SightView {
 		_playButton.setSelected(false);
 		_playButton.setImageDrawable(_playButtonDefaultDrawable);
 	}
+	
+	@Override
+	public void displayNextSightDirection(float heading) {
+		_nextSightPointerArrow.setHeading(heading);
+		_nextSightPointerArrow.invalidate();
+		_nextSightPointerArrow.setVisibility(View.VISIBLE);	
+		_playerPanel.setVisibility(View.INVISIBLE);	
+	}
 
 	@Override
 	public void displayError(String message) {
@@ -240,5 +256,7 @@ public class MainActivity extends Activity implements SightView {
 			}			
 		}
 	};
+
+
 
 }
