@@ -1,6 +1,8 @@
 package com.gerken.audioGuide.presenters;
 
 import java.io.InputStream;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import com.gerken.audioGuide.R;
 import com.gerken.audioGuide.interfaces.*;
@@ -11,6 +13,7 @@ public class SightPresenter {
 	private final float SIGHT_ACTIVATION_RADIUS = 20.0f;
 	private final double EARTH_RADIUS = 6371.0;
 	private final String AUDIO_FOLDER = "audio";
+	private final int AUDIO_PLAYER_POLLING_INTERVAL_MS = 250;
 	
 	private City _city;
 	private SightView _sightView;
@@ -22,6 +25,8 @@ public class SightPresenter {
 	private Sight _currentSight = null;
 	private SightLook _currentSightLook = null;
 	
+	private Timer _audioUpdateTimer;
+	
 	private OnEventListener _mediaPlayerCompletionListener = new OnEventListener() {		
 		@Override
 		public void onEvent() {
@@ -29,8 +34,7 @@ public class SightPresenter {
 		}
 	};
 	
-	private OnEventListener _routeChangeListener = new OnEventListener() {
-		
+	private OnEventListener _routeChangeListener = new OnEventListener() {		
 		@Override
 		public void onEvent() {
 			if(_currentSight != null) {
@@ -59,6 +63,8 @@ public class SightPresenter {
 		_prefStorage = prefStorage;
 		_logger = logger;
 		
+		_audioUpdateTimer = new Timer();
+		
 		_audioPlayer.addAudioAssetCompletionListener(_mediaPlayerCompletionListener);
 		_prefStorage.setOnCurrentRouteChangedListener(_routeChangeListener);
 	}
@@ -80,18 +86,20 @@ public class SightPresenter {
 	public void handlePlayButtonClick() {
 		if(_audioPlayer.isPlaying()) {
 			_audioPlayer.pause();
-			_sightView.displayPlayerStopped();			
+			_sightView.displayPlayerStopped();		
+			resetAudioUpdateTimer();
 		}
 		else {
 			try {
-			_audioPlayer.play();
+				_audioPlayer.play();
 			}
 			catch(Exception ex) {
 				String sightName = (_currentSight != null) ?
 					_currentSight.getName() : "[unknown]";
 				_logger.logError("Unable to play audio track for the sight " + sightName, ex);
 			}
-			_sightView.displayPlayerPlaying();			
+			_sightView.displayPlayerPlaying();
+			startAudioUpdateTimer();			
 		}
 	}	
 	
@@ -104,6 +112,8 @@ public class SightPresenter {
 				float heading = (float)(Math.PI*nrp.getHeading()/180.0);
 				_sightView.displayNextSightDirection(heading);
 			}
+			
+			resetAudioUpdateTimer();
 		}
 	}
 	
@@ -145,6 +155,9 @@ public class SightPresenter {
 		try {
 			_audioPlayer.prepareAudioAsset(
 					String.format("%s/%s", AUDIO_FOLDER, audioFileName));
+			int duration = _audioPlayer.getDuration();
+			_sightView.setAudioProgressMaximum(duration);
+			_sightView.setAudioDuration(MsToString(duration));
 		}
 		catch(Exception ex){ 
         	String logMsg=String.format("Error when setting %s as the new MediaPlayer datasource", audioFileName);
@@ -196,4 +209,32 @@ public class SightPresenter {
 		
 		return null;
 	}
+	
+	private String MsToString(int ms) {
+		int s = ms / 1000;
+		int m = s / 60;
+		s -= m*60;
+		return String.format("%d:%02d", m, s);
+	}
+	
+	private void startAudioUpdateTimer() {
+		_audioUpdateTimer.scheduleAtFixedRate(
+			new TimerTask() {				
+				@Override
+				public void run() {
+					int pos = _audioPlayer.getCurrentPosition();
+					_sightView.setAudioProgressPosition(pos);
+					_sightView.setAudioPosition(MsToString(pos));
+					
+				}
+			},
+			0, AUDIO_PLAYER_POLLING_INTERVAL_MS
+		);
+	}
+	
+	private void resetAudioUpdateTimer() {
+		_audioUpdateTimer.cancel();
+		_audioUpdateTimer = new Timer();
+	}
+	
 }

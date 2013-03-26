@@ -86,4 +86,14 @@ public class DefaultAudioPlayer implements AudioPlayer {
 		return _isPlaying;
 	}
 
+	@Override
+	public int getCurrentPosition() {
+		return _mediaPlayer.getCurrentPosition();
+	}
+
+	@Override
+	public int getDuration() {
+		return _mediaPlayer.getDuration();
+	}
+
 }

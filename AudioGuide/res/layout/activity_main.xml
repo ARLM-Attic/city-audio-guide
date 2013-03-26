@@ -12,17 +12,19 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
     
+    <!--  android:layout_gravity="bottom" -->
     <LinearLayout
-	    android:id="@+id/playerPanel"
+	    android:id="@+id/playerInfoPanel"
 	    android:orientation="vertical"
 	    android:layout_width="match_parent"
-	    android:layout_height="110dp"
-	    android:layout_gravity="bottom"
+	    android:layout_height="wrap_content"
+	    android:layout_gravity="bottom"	   
 	    android:background="#80CCCCCC" >
 	    <LinearLayout
+	        android:id="@+id/sightCaptionFrame"
 		    android:orientation="vertical"
 		    android:layout_width="match_parent"
-		    android:layout_height="wrap_content"
+		    android:layout_height="24dp"
 		    android:layout_gravity="bottom"
 		    android:background="#80666666" >
 	        <TextView
@@ -30,20 +32,23 @@
 		        android:layout_width="wrap_content"
 		        android:layout_height="wrap_content"
 		        android:layout_gravity="center"
-		        android:textColor="#FF75FF3A"  />
+		        android:textColor="#FF75FF3A"
+		        android:textStyle="bold"
+		        android:textSize="16sp"
+		        android:text="@string/sight_info_none"  />
         </LinearLayout>
         
 	    <RelativeLayout
-		    android:orientation="horizontal"
+	        android:id="@+id/playerPanel"
 		    android:layout_width="match_parent"
-		    android:layout_height="match_parent"
+		    android:layout_height="108dp"
 		    android:layout_gravity="center">
 	        
 	        <ImageButton
 		        android:id="@+id/stopButton"
 		        android:layout_width="40dp"
 		        android:layout_height="40dp"
-		        android:layout_alignBottom="@+id/playButton"
+		        android:layout_alignTop="@+id/playButton"
 		        android:layout_toLeftOf="@+id/playButton"
 		         /> 
         
@@ -52,9 +57,43 @@
 		        android:layout_width="80dp"
 		        android:layout_height="80dp"
 		        android:layout_centerHorizontal="true"
-		        android:layout_centerVertical="true"
+		        android:layout_alignParentTop="true"
+		        android:layout_marginTop="8dp"
 		        android:background="@drawable/play_button_selector"
-		         />   
+		         />
+	        
+	        <ProgressBar android:id="@+id/audioProgressBar"
+				android:layout_width="match_parent"
+				android:layout_height="4dp"
+				android:layout_alignParentBottom="true"
+				android:layout_marginBottom="8dp"
+				android:layout_marginLeft="16dp"
+				android:layout_marginRight="16dp"
+				android:progressDrawable="@drawable/audio_progress_drawable"
+				style="@android:style/Widget.ProgressBar.Horizontal" />
+	        
+	        <TextView android:id="@+id/audioDuration"
+	            android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:textColor="#FF75FF3A"
+		        android:textStyle="bold"
+		        android:textSize="16sp"
+		        android:text="0:00"
+		        android:layout_alignRight="@+id/audioProgressBar"
+		        android:layout_alignBottom="@+id/audioProgressBar"
+		        android:layout_marginBottom="4dp" />
+	        
+	        <TextView android:id="@+id/audioPlayed"
+	            android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:textColor="#FF75FF3A"
+		        android:textStyle="bold"
+		        android:textSize="16sp"
+		        android:text="0:00"
+		        android:layout_alignLeft="@+id/audioProgressBar"
+		        android:layout_alignBottom="@+id/audioProgressBar"
+		        android:layout_marginBottom="4dp" />
+	        
          </RelativeLayout>
     </LinearLayout>  
 

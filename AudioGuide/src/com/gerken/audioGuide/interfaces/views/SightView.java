@@ -11,6 +11,11 @@ public interface SightView {
 	void displayPlayerPlaying();
 	void displayPlayerStopped();
 	
+	void setAudioProgressMaximum(int ms);
+	void setAudioProgressPosition(int ms);
+	void setAudioDuration(String formattedDuration);
+	void setAudioPosition(String formattedPosition);
+	
 	void displayNextSightDirection(float heading);
 	
 	void displayError(String message);

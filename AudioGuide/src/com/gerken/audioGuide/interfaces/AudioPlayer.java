@@ -12,5 +12,8 @@ public interface AudioPlayer {
 	void stop();
 	boolean isPlaying();
 	
+	int getCurrentPosition();
+	int getDuration();
+	
 	void addAudioAssetCompletionListener(OnEventListener listener);
 }

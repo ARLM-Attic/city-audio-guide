@@ -1,8 +1,10 @@
 package com.gerken.audioGuide;
 
 import java.io.InputStream;
+import java.util.Date;
 
 import com.gerken.audioGuide.R;
+import com.gerken.audioGuide.controls.ControlUpdater;
 import com.gerken.audioGuide.graphics.*;
 import com.gerken.audioGuide.interfaces.views.SightView;
 import com.gerken.audioGuide.presenters.SightPresenter;
@@ -17,21 +19,31 @@ import android.graphics.drawable.shapes.Shape;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
+import android.os.Handler;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 import android.view.*;
 import android.view.View.OnClickListener;
+import android.view.ViewTreeObserver.OnGlobalLayoutListener;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.TranslateAnimation;
 import android.widget.*;
 
 public class MainActivity extends Activity implements SightView {
 	private final String LOG_TAG = "MainActivity";
 	private final int PLAY_BUTTON_SIGN_COLOR = 0xFF4CFF00;
 	
+	private View _rootView;
+	private View _playerInfoPanel;
 	private View _playerPanel;
 	private ImageButton _playButton;
 	private ImageButton _stopButton;
+	private ProgressBar _audioProgressBar;
+	private TextView _audioDuration;
+	private TextView _audioPlayed;
 	
 	private RouteArrowsView _nextSightPointerArrow;
 	
@@ -40,11 +52,15 @@ public class MainActivity extends Activity implements SightView {
 	
 	private Drawable _playButtonDefaultDrawable;
 	private Drawable _playButtonPressedDrawable;
+	
+	private Handler _handler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        
+        _handler = new Handler();
         
         Context ctx = getApplicationContext();
         _presenter = new SightPresenter(
@@ -55,6 +71,9 @@ public class MainActivity extends Activity implements SightView {
         		new DefaultLoggingAdapter("SightPresenter"));
         
         _locationManager = new LocationManagerFacade(ctx, _locationListener);       
+        
+        _rootView = findViewById(R.id.rootLayout);
+        _rootView.setOnClickListener(_rootViewClickListener);
         
         _playButton = findControl(R.id.playButton);
         ViewGroup.LayoutParams lp = _playButton.getLayoutParams();      
@@ -68,9 +87,31 @@ public class MainActivity extends Activity implements SightView {
         _stopButton = findControl(R.id.stopButton);
         _stopButton.setOnClickListener(_stopButtonClickListener);
         
+        _audioProgressBar = findControl(R.id.audioProgressBar);
+        _audioDuration = findControl(R.id.audioDuration);
+        _audioPlayed = findControl(R.id.audioPlayed);
+        
         _nextSightPointerArrow = findControl(R.id.nextSightPointerArrow);
         _playerPanel = findControl(R.id.playerPanel);
+        _playerInfoPanel = findControl(R.id.playerInfoPanel);
+        
+        ViewGroup sightCaptionFrame = findControl(R.id.sightCaptionFrame);
+        ViewGroup.LayoutParams sightCaptionFrameLp = sightCaptionFrame.getLayoutParams();
+        //_playerInfoPanel.set
+        Display display = getWindowManager().getDefaultDisplay(); 
+        int height = display.getHeight();
+        int py = height-sightCaptionFrameLp.height;
+        
+        /*
+        FrameLayout.LayoutParams playerInfoPanelLp = (FrameLayout.LayoutParams)_playerInfoPanel.getLayoutParams();
+        playerInfoPanelLp.topMargin = 220;
+        playerInfoPanelLp.gravity = Gravity.LEFT | Gravity.TOP;
+        _playerInfoPanel.setLayoutParams(playerInfoPanelLp);
+        */
+        //TranslateAnimation ta = new TranslateAnimation(0, 0, 0, toYDelta)
     }
+    
+    //private View.OnLayoutChangeListener lcl = 
     
     @Override
     protected void onResume() {
@@ -115,6 +156,7 @@ public class MainActivity extends Activity implements SightView {
 		setSightCaption(sightName);
         setNewBackgroundImage(imageStream);     
         _nextSightPointerArrow.setVisibility(View.INVISIBLE);
+        _playerInfoPanel.setVisibility(View.VISIBLE);
 	}
 	
 	@Override
@@ -135,9 +177,8 @@ public class MainActivity extends Activity implements SightView {
 	}
 
 	private void setNewBackgroundImage(InputStream imageStream) {
-		View root = findViewById(R.id.rootLayout);
         if(imageStream != null) {
-        	root.setBackgroundDrawable(
+        	_rootView.setBackgroundDrawable(
             		Drawable.createFromStream(imageStream, ""));
         	try{
         		imageStream.close();
@@ -196,13 +237,35 @@ public class MainActivity extends Activity implements SightView {
 		_playButton.setSelected(false);
 		_playButton.setImageDrawable(_playButtonDefaultDrawable);
 	}
+
+	@Override
+	public void setAudioProgressMaximum(int ms) {
+		_audioProgressBar.setMax(ms);		
+	}
+
+	@Override
+	public void setAudioProgressPosition(int ms) {
+		_audioProgressBarUpdater.setStatus(ms);
+		_handler.post(_audioProgressBarUpdater);				
+	}
+
+	@Override
+	public void setAudioDuration(String formattedDuration) {
+		_audioDuration.setText(formattedDuration);		
+	}
+
+	@Override
+	public void setAudioPosition(String formattedPosition) {
+		_audioPlayedUpdater.setStatus(formattedPosition);
+		_handler.post(_audioPlayedUpdater);
+	}
 	
 	@Override
 	public void displayNextSightDirection(float heading) {
 		_nextSightPointerArrow.setHeading(heading);
 		_nextSightPointerArrow.invalidate();
 		_nextSightPointerArrow.setVisibility(View.VISIBLE);	
-		_playerPanel.setVisibility(View.INVISIBLE);	
+		_playerInfoPanel.setVisibility(View.INVISIBLE);	
 	}
 
 	@Override
@@ -214,6 +277,21 @@ public class MainActivity extends Activity implements SightView {
 	public void displayError(int messageResourceId) {
 		Toast.makeText(getBaseContext(), messageResourceId, Toast.LENGTH_SHORT).show();
 	}
+
+	private OnClickListener _rootViewClickListener = new OnClickListener() {		
+		@Override
+		public void onClick(View v) {
+			Animation a = AnimationUtils.loadAnimation(MainActivity.this, R.anim.sight_player_panel_show);
+		    a.reset();
+		    _playerInfoPanel.clearAnimation();
+		    //_playerInfoPanel.startAnimation(a);
+		    _playerInfoPanel.setAnimation(a);
+		    _playerInfoPanel.invalidate();
+		    try {Thread.sleep(1000);} catch(Exception e) {}
+		    a.startNow();
+		    _playerInfoPanel.invalidate();
+		}
+	};
 	
     private OnClickListener _playButtonClickListener = new OnClickListener() {		
 		@Override
@@ -256,7 +334,24 @@ public class MainActivity extends Activity implements SightView {
 			}			
 		}
 	};
-
-
-
+	
+	private ControlUpdater<String> _audioPlayedUpdater = new ControlUpdater<String>(
+			new ControlUpdater.Updater<String>() {
+				@Override
+				public void Update(String param) {
+					_audioPlayed.setText(param);
+				}
+			}, 
+			"0:00"//MainActivity.this.getString(R.string.audio_formatted_position_default)
+		);
+	
+	private ControlUpdater<Integer> _audioProgressBarUpdater = new ControlUpdater<Integer>(
+			new ControlUpdater.Updater<Integer>() {
+				@Override
+				public void Update(Integer param) {
+					 _audioProgressBar.setProgress(param);
+				}
+			}, 
+			0
+		);
 }
