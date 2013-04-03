@@ -5,6 +5,7 @@ import java.io.InputStream;
 public interface SightView {
 	void acceptNewSightGotInRange(String sightName, InputStream imageStream);
 	void acceptNewSightLookGotInRange(InputStream imageStream);
+	void acceptNoSightInRange();
 	
 	void acceptNewRouteSelected(String sightName, String routeName);
 	

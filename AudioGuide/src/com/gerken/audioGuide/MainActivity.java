@@ -173,6 +173,12 @@ public class MainActivity extends Activity implements SightView {
 		setNewBackgroundImage(imageStream);
 		_nextSightPointerArrow.setVisibility(View.INVISIBLE);
 	}
+	
+	@Override
+	public void acceptNoSightInRange() {
+		setSightCaption(getString(R.string.sight_info_none));
+		_rootView.setBackgroundResource(R.drawable.prague_silhouette);
+	}
 
 	@Override
 	public void acceptNewRouteSelected(String sightName, String routeName) {

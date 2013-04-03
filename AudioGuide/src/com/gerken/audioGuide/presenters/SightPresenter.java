@@ -74,15 +74,22 @@ public class SightPresenter {
 	
 	public void handleLocationChange(double latitude, double longitude) {
 		SightLook newSightLook = findClosestSightLookInRange(latitude, longitude);
-		if(newSightLook != null && !newSightLook.equals(_currentSightLook)) {
-			if(!newSightLook.getSight().equals(_currentSight)) {
-				notifyViewAboutNewSight(newSightLook);
-				_currentSight = newSightLook.getSight();
-			}					
-			else
-				notifyViewAboutNewSightLook(newSightLook);
-			
-			_currentSightLook = newSightLook;
+		if(newSightLook != null) {
+			if(!newSightLook.equals(_currentSightLook)) {
+				if(!newSightLook.getSight().equals(_currentSight)) {
+					notifyViewAboutNewSight(newSightLook);
+					_currentSight = newSightLook.getSight();
+				}					
+				else
+					notifyViewAboutNewSightLook(newSightLook);
+				
+				_currentSightLook = newSightLook;
+			}
+		}
+		else if(_currentSightLook != null) {
+			_sightView.acceptNoSightInRange();
+			_currentSight = null;
+			_currentSightLook = null;
 		}
 	}	
 	
