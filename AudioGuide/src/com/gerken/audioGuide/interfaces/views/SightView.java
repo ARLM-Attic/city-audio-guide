@@ -18,6 +18,9 @@ public interface SightView {
 	
 	void displayNextSightDirection(float heading);
 	
+	void hidePlayerPanel();
+	void showPlayerPanel();
+	
 	void displayError(String message);
 	void displayError(int messageResourceId);
 }

@@ -54,6 +54,8 @@ public class MainActivity extends Activity implements SightView {
 	private Drawable _playButtonPressedDrawable;
 	
 	private Handler _handler;
+	
+	private float _playerPanelHeight = 0.0f;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,20 +97,27 @@ public class MainActivity extends Activity implements SightView {
         _playerPanel = findControl(R.id.playerPanel);
         _playerInfoPanel = findControl(R.id.playerInfoPanel);
         
-        ViewGroup sightCaptionFrame = findControl(R.id.sightCaptionFrame);
-        ViewGroup.LayoutParams sightCaptionFrameLp = sightCaptionFrame.getLayoutParams();
-        //_playerInfoPanel.set
-        Display display = getWindowManager().getDefaultDisplay(); 
-        int height = display.getHeight();
-        int py = height-sightCaptionFrameLp.height;
+        _playerPanelHeight = calculatePlayerPanelHeight();
+        playPlayerPanelHidingAnimation(1);
         
         /*
-        FrameLayout.LayoutParams playerInfoPanelLp = (FrameLayout.LayoutParams)_playerInfoPanel.getLayoutParams();
+        
         playerInfoPanelLp.topMargin = 220;
         playerInfoPanelLp.gravity = Gravity.LEFT | Gravity.TOP;
         _playerInfoPanel.setLayoutParams(playerInfoPanelLp);
         */
-        //TranslateAnimation ta = new TranslateAnimation(0, 0, 0, toYDelta)
+        //
+    }
+    
+    private float calculatePlayerPanelHeight() {
+        //Display display = getWindowManager().getDefaultDisplay(); 
+        //int height = display.getHeight();
+
+    	ViewGroup sightCaptionFrame = findControl(R.id.sightCaptionFrame);
+        ViewGroup.LayoutParams sightCaptionFrameLp = sightCaptionFrame.getLayoutParams();
+        
+        ViewGroup.LayoutParams playerInfoPanelLp = (ViewGroup.LayoutParams)_playerInfoPanel.getLayoutParams();
+        return playerInfoPanelLp.height-sightCaptionFrameLp.height;
     }
     
     //private View.OnLayoutChangeListener lcl = 
@@ -246,7 +255,7 @@ public class MainActivity extends Activity implements SightView {
 	@Override
 	public void setAudioProgressPosition(int ms) {
 		_audioProgressBarUpdater.setStatus(ms);
-		_handler.post(_audioProgressBarUpdater);				
+		_handler.post(_audioProgressBarUpdater);
 	}
 
 	@Override
@@ -267,6 +276,20 @@ public class MainActivity extends Activity implements SightView {
 		_nextSightPointerArrow.setVisibility(View.VISIBLE);	
 		_playerInfoPanel.setVisibility(View.INVISIBLE);	
 	}
+	
+	@Override
+	public void hidePlayerPanel() {
+		_handler.post(_playerPanelUpdater);		
+	}
+	
+	@Override
+	public void showPlayerPanel() {
+		TranslateAnimation ta = new TranslateAnimation(0, 0, _playerPanelHeight, 0);
+        ta.setDuration(500);
+        ta.setRepeatCount(0);
+        ta.setFillAfter(true);
+	    _playerInfoPanel.startAnimation(ta);		
+	}	
 
 	@Override
 	public void displayError(String message) {
@@ -277,19 +300,20 @@ public class MainActivity extends Activity implements SightView {
 	public void displayError(int messageResourceId) {
 		Toast.makeText(getBaseContext(), messageResourceId, Toast.LENGTH_SHORT).show();
 	}
+	
+	private void playPlayerPanelHidingAnimation(long duration) {
+		TranslateAnimation ta = new TranslateAnimation(0, 0, 0, _playerPanelHeight);
+        ta.setDuration(duration);
+        ta.setRepeatCount(0);
+        ta.setFillAfter(true);
+        _playerInfoPanel.clearAnimation();
+	    _playerInfoPanel.startAnimation(ta);
+	}
 
 	private OnClickListener _rootViewClickListener = new OnClickListener() {		
 		@Override
 		public void onClick(View v) {
-			Animation a = AnimationUtils.loadAnimation(MainActivity.this, R.anim.sight_player_panel_show);
-		    a.reset();
-		    _playerInfoPanel.clearAnimation();
-		    //_playerInfoPanel.startAnimation(a);
-		    _playerInfoPanel.setAnimation(a);
-		    _playerInfoPanel.invalidate();
-		    try {Thread.sleep(1000);} catch(Exception e) {}
-		    a.startNow();
-		    _playerInfoPanel.invalidate();
+			_presenter.handleWindowClick();
 		}
 	};
 	
@@ -353,5 +377,15 @@ public class MainActivity extends Activity implements SightView {
 				}
 			}, 
 			0
+		);
+	
+	private ControlUpdater<Long> _playerPanelUpdater = new ControlUpdater<Long>(
+			new ControlUpdater.Updater<Long>() {
+				@Override
+				public void Update(Long param) {
+					playPlayerPanelHidingAnimation(param);					
+				}
+			}, 
+			500L
 		);
 }

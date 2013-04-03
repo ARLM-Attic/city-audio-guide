@@ -14,6 +14,7 @@ public class SightPresenter {
 	private final double EARTH_RADIUS = 6371.0;
 	private final String AUDIO_FOLDER = "audio";
 	private final int AUDIO_PLAYER_POLLING_INTERVAL_MS = 250;
+	private final int PLAYER_PANEL_HIDING_DELAY_MS = 2000;
 	
 	private City _city;
 	private SightView _sightView;
@@ -26,6 +27,7 @@ public class SightPresenter {
 	private SightLook _currentSightLook = null;
 	
 	private Timer _audioUpdateTimer;
+	private Timer _playerPanelHidingTimer;
 	
 	private OnEventListener _mediaPlayerCompletionListener = new OnEventListener() {		
 		@Override
@@ -64,6 +66,7 @@ public class SightPresenter {
 		_logger = logger;
 		
 		_audioUpdateTimer = new Timer();
+		_playerPanelHidingTimer = new Timer();
 		
 		_audioPlayer.addAudioAssetCompletionListener(_mediaPlayerCompletionListener);
 		_prefStorage.setOnCurrentRouteChangedListener(_routeChangeListener);
@@ -114,6 +117,13 @@ public class SightPresenter {
 			}
 			
 			resetAudioUpdateTimer();
+		}
+	}
+	
+	public void handleWindowClick() {
+		if(_currentSightLook != null) {
+			_sightView.showPlayerPanel();
+			startPlayerPanelHidingTimer();
 		}
 	}
 	
@@ -235,6 +245,23 @@ public class SightPresenter {
 	private void resetAudioUpdateTimer() {
 		_audioUpdateTimer.cancel();
 		_audioUpdateTimer = new Timer();
+	}
+	
+	private void startPlayerPanelHidingTimer() {
+		_audioUpdateTimer.schedule(
+			new TimerTask() {				
+				@Override
+				public void run() {
+					_sightView.hidePlayerPanel();
+				}
+			},
+			PLAYER_PANEL_HIDING_DELAY_MS
+		);
+	}
+	
+	private void resetPlayerPanelHidingTimer() {
+		_playerPanelHidingTimer.cancel();
+		_playerPanelHidingTimer = new Timer();
 	}
 	
 }

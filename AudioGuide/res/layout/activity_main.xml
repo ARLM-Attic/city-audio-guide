@@ -17,7 +17,7 @@
 	    android:id="@+id/playerInfoPanel"
 	    android:orientation="vertical"
 	    android:layout_width="match_parent"
-	    android:layout_height="wrap_content"
+	    android:layout_height="132dp"
 	    android:layout_gravity="bottom"	   
 	    android:background="#80CCCCCC" >
 	    <LinearLayout
