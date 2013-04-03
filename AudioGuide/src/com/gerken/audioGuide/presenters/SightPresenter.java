@@ -14,7 +14,7 @@ public class SightPresenter {
 	private final double EARTH_RADIUS = 6371.0;
 	private final String AUDIO_FOLDER = "audio";
 	private final int AUDIO_PLAYER_POLLING_INTERVAL_MS = 250;
-	private final int PLAYER_PANEL_HIDING_DELAY_MS = 2000;
+	private final long PLAYER_PANEL_HIDING_DELAY_MS = 2000L;
 	
 	private City _city;
 	private SightView _sightView;
@@ -87,6 +87,7 @@ public class SightPresenter {
 	}	
 	
 	public void handlePlayButtonClick() {
+		restartPlayerPanelHidingTimer();
 		if(_audioPlayer.isPlaying()) {
 			_audioPlayer.pause();
 			_sightView.displayPlayerStopped();		
@@ -107,21 +108,25 @@ public class SightPresenter {
 	}	
 	
 	public void handleStopButtonClick() {
-		if(_audioPlayer.isPlaying()) {
+		restartPlayerPanelHidingTimer();
+		if(_audioPlayer.isPlaying())
 			_audioPlayer.stop();
-			_sightView.displayPlayerStopped();	
-			if(_prefStorage.isRouteChosen()) {
-				NextRoutePoint nrp = getNextRoutePoint();
-				float heading = (float)(Math.PI*nrp.getHeading()/180.0);
-				_sightView.displayNextSightDirection(heading);
-			}
-			
-			resetAudioUpdateTimer();
+		
+		resetAudioUpdateTimer();
+		_sightView.displayPlayerStopped();	
+		_sightView.setAudioProgressPosition(0);
+		_sightView.setAudioPosition(MsToString(0));
+		if(_prefStorage.isRouteChosen()) {
+			NextRoutePoint nrp = getNextRoutePoint();
+			float heading = (float)(Math.PI*nrp.getHeading()/180.0);
+			_sightView.displayNextSightDirection(heading);
 		}
+		
+		
 	}
 	
 	public void handleWindowClick() {
-		if(_currentSightLook != null) {
+		if(isSightInRange()) {
 			_sightView.showPlayerPanel();
 			startPlayerPanelHidingTimer();
 		}
@@ -133,6 +138,10 @@ public class SightPresenter {
 	
 	public void handleActivityResume() {
 		
+	}
+	
+	private boolean isSightInRange() {
+		return (_currentSightLook != null);
 	}
 	
 	private void notifyViewAboutNewSight(SightLook newSightLook) {
@@ -248,7 +257,7 @@ public class SightPresenter {
 	}
 	
 	private void startPlayerPanelHidingTimer() {
-		_audioUpdateTimer.schedule(
+		_playerPanelHidingTimer.schedule(
 			new TimerTask() {				
 				@Override
 				public void run() {
@@ -259,9 +268,10 @@ public class SightPresenter {
 		);
 	}
 	
-	private void resetPlayerPanelHidingTimer() {
+	private void restartPlayerPanelHidingTimer() {
 		_playerPanelHidingTimer.cancel();
 		_playerPanelHidingTimer = new Timer();
+		startPlayerPanelHidingTimer();
 	}
 	
 }
