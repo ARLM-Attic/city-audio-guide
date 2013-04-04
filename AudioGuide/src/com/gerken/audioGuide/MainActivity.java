@@ -99,6 +99,7 @@ public class MainActivity extends Activity implements SightView {
         
         _playerPanelHeight = calculatePlayerPanelHeight();
         playPlayerPanelHidingAnimation(1);
+        setPlayerButtonsClickable(false);
         
         /*
         
@@ -280,12 +281,16 @@ public class MainActivity extends Activity implements SightView {
 		_nextSightPointerArrow.setHeading(heading);
 		_nextSightPointerArrow.invalidate();
 		_nextSightPointerArrow.setVisibility(View.VISIBLE);	
-		_playerInfoPanel.setVisibility(View.INVISIBLE);	
+	}
+	
+	@Override
+	public void hideNextSightDirection() {
+		_nextSightPointerArrow.setVisibility(View.INVISIBLE);
 	}
 	
 	@Override
 	public void hidePlayerPanel() {
-		_handler.post(_playerPanelUpdater);		
+		_handler.post(_playerPanelHider);		
 	}
 	
 	@Override
@@ -294,7 +299,8 @@ public class MainActivity extends Activity implements SightView {
         ta.setDuration(500);
         ta.setRepeatCount(0);
         ta.setFillAfter(true);
-	    _playerInfoPanel.startAnimation(ta);		
+	    _playerInfoPanel.startAnimation(ta);	
+	    setPlayerButtonsClickable(true);
 	}	
 
 	@Override
@@ -313,7 +319,13 @@ public class MainActivity extends Activity implements SightView {
         ta.setRepeatCount(0);
         ta.setFillAfter(true);
         _playerInfoPanel.clearAnimation();
-	    _playerInfoPanel.startAnimation(ta);
+	    _playerInfoPanel.startAnimation(ta);  
+	}
+	
+	private void setPlayerButtonsClickable(boolean clickable) {
+		_playerPanel.setClickable(clickable);
+		_playButton.setClickable(clickable);
+		_stopButton.setClickable(clickable);
 	}
 
 	private OnClickListener _rootViewClickListener = new OnClickListener() {		
@@ -385,11 +397,12 @@ public class MainActivity extends Activity implements SightView {
 			0
 		);
 	
-	private ControlUpdater<Long> _playerPanelUpdater = new ControlUpdater<Long>(
+	private ControlUpdater<Long> _playerPanelHider = new ControlUpdater<Long>(
 			new ControlUpdater.Updater<Long>() {
 				@Override
 				public void Update(Long param) {
-					playPlayerPanelHidingAnimation(param);					
+					playPlayerPanelHidingAnimation(param);		
+					setPlayerButtonsClickable(false);
 				}
 			}, 
 			500L

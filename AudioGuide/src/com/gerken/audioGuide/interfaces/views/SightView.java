@@ -18,6 +18,7 @@ public interface SightView {
 	void setAudioPosition(String formattedPosition);
 	
 	void displayNextSightDirection(float heading);
+	void hideNextSightDirection();
 	
 	void hidePlayerPanel();
 	void showPlayerPanel();

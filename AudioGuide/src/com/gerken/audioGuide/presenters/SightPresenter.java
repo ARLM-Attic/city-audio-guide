@@ -110,6 +110,7 @@ public class SightPresenter {
 				_logger.logError("Unable to play audio track for the sight " + sightName, ex);
 			}
 			_sightView.displayPlayerPlaying();
+			_sightView.hideNextSightDirection();
 			startAudioUpdateTimer();			
 		}
 	}	
