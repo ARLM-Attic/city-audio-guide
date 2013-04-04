@@ -152,6 +152,9 @@ public class MainActivity extends Activity implements SightView {
     		Intent intent = new Intent(this, MainPreferenceActivity.class);
     		//Intent intent = new Intent(this, RouteMapActivity.class);
     		startActivity(intent);
+    	case R.id.action_help:
+    		Intent helpIntent = new Intent(this, HelpActivity.class);
+    		startActivity(helpIntent);
     	}
     	return super.onOptionsItemSelected(item);
     }

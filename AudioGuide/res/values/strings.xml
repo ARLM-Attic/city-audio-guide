@@ -5,13 +5,22 @@
     <string name="action_help">Help</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
-    
     <string name="pref_category_route">Route</string>
     <string name="pref_route_none">None, free rambling</string>
-    
     <string name="error_invalid_sight_audio">Cannot play audio record for the current sight</string>
-    <string name="route_map_cannot_read">An error occurred when reading the route map</string><string name="title_activity_route_map">RouteMapActivity</string><string name="title_activity_sight">SightActivity</string>
+    <string name="route_map_cannot_read">An error occurred when reading the route map</string>
+    <string name="title_activity_route_map">RouteMapActivity</string>
+    <string name="title_activity_sight">SightActivity</string>
     <string name="title_activity_main_preference">Choose the route</string>
     <string name="sight_info_none">No sight in range</string>
-	<string name="audio_formatted_position_default">0:00</string>
+    <string name="audio_formatted_position_default">0:00</string>
+    <string name="title_activity_help">Help</string>
+    <string name="help_text_sight_activity">
+        The application tracks your position using GPS. As soon as any sight gets in range
+        you get the notification and you can see how the sight looks from your position.
+        Tap on the screen to open the player control panel.
+        If you have chosen a route you see the direction to the next route point after finishing
+        the audio record or after pressing the Stop button. 
+    </string>
+
 </resources>
