@@ -14,6 +14,7 @@ public interface AudioPlayer {
 	
 	int getCurrentPosition();
 	int getDuration();
+	void seekTo(int ms);
 	
 	void addAudioAssetCompletionListener(OnEventListener listener);
 }

@@ -15,6 +15,7 @@ public class SightPresenter {
 	private final String AUDIO_FOLDER = "audio";
 	private final int AUDIO_PLAYER_POLLING_INTERVAL_MS = 250;
 	private final long PLAYER_PANEL_HIDING_DELAY_MS = 2000L;
+	private final float AUDIO_PLAYER_REWIND_STEP_RATIO = 0.02f;
 	
 	private City _city;
 	private SightView _sightView;
@@ -87,7 +88,8 @@ public class SightPresenter {
 			}
 		}
 		else if(_currentSightLook != null) {
-			_sightView.acceptNoSightInRange();
+			_sightView.acceptNoSightInRange();					
+			_audioPlayer.stop();
 			_currentSight = null;
 			_currentSightLook = null;
 		}
@@ -117,8 +119,9 @@ public class SightPresenter {
 	
 	public void handleStopButtonClick() {
 		restartPlayerPanelHidingTimer();
-		if(_audioPlayer.isPlaying())
+		if(_audioPlayer.isPlaying()) {			
 			_audioPlayer.stop();
+		}
 		
 		resetAudioUpdateTimer();
 		_sightView.displayPlayerStopped();	
@@ -129,7 +132,22 @@ public class SightPresenter {
 			float heading = (float)(Math.PI*nrp.getHeading()/180.0);
 			_sightView.displayNextSightDirection(heading);
 		}
+	}
+	
+	public void handleRewindButtonClick() {
+		restartPlayerPanelHidingTimer();
+		int step = (int)(AUDIO_PLAYER_REWIND_STEP_RATIO * (float)_audioPlayer.getDuration());
+		int newPosition = Math.max(0, _audioPlayer.getCurrentPosition()-step);
+		_audioPlayer.seekTo(newPosition);
+		_sightView.setAudioProgressPosition(newPosition);
+		_sightView.setAudioPosition(MsToString(newPosition));
+	}
+	
+	public void handleRewindButtonLongClick() {
 		
+	}
+	
+	public void handleRewindButtonRelease() {
 		
 	}
 	
@@ -163,6 +181,7 @@ public class SightPresenter {
 		}
 		
 		_sightView.acceptNewSightGotInRange(newSight.getName(), imgStream);
+		_sightView.displayPlayerStopped();
 		prepareNewAudio(newSight.getAudioName());
 	}
 	

@@ -47,7 +47,7 @@
 		    android:layout_gravity="center">
 	        
 	        <ImageButton
-		        android:id="@+id/stopButton"
+		        android:id="@+id/rewindButton"
 		        android:layout_width="40dp"
 		        android:layout_height="40dp"
 		        android:layout_alignTop="@+id/playButton"
@@ -63,6 +63,14 @@
 		        android:layout_marginTop="8dp"
 		        android:background="@drawable/play_button_selector"
 		         />
+	        
+	        <ImageButton
+		        android:id="@+id/stopButton"
+		        android:layout_width="40dp"
+		        android:layout_height="40dp"
+		        android:layout_alignTop="@+id/playButton"
+		        android:layout_toRightOf="@+id/playButton"
+		         /> 
 	        
 	        <ProgressBar android:id="@+id/audioProgressBar"
 				android:layout_width="match_parent"

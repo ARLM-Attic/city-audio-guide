@@ -52,7 +52,8 @@ public class DefaultAudioPlayer implements AudioPlayer {
        _mediaPlayer.setDataSource(descriptor.getFileDescriptor(), 
     		   descriptor.getStartOffset(), descriptor.getLength() );
        descriptor.close();
-       _mediaPlayer.prepare();		
+       _mediaPlayer.prepare();	
+       _needsPreparation = false;
 	}
 
 	@Override
@@ -76,6 +77,7 @@ public class DefaultAudioPlayer implements AudioPlayer {
 
 	@Override
 	public void stop() {
+		_mediaPlayer.seekTo(0);
 		_mediaPlayer.stop();
 		_needsPreparation = true;
 		_isPlaying = false;
@@ -96,4 +98,8 @@ public class DefaultAudioPlayer implements AudioPlayer {
 		return _mediaPlayer.getDuration();
 	}
 
+	@Override
+	public void seekTo(int ms) {
+		_mediaPlayer.seekTo(ms);		
+	}
 }
