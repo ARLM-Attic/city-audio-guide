@@ -2,6 +2,7 @@ package com.gerken.audioGuide.services;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Timer;
 
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
@@ -12,10 +13,11 @@ import android.media.MediaPlayer.OnCompletionListener;
 import com.gerken.audioGuide.interfaces.AudioPlayer;
 import com.gerken.audioGuide.interfaces.OnEventListener;
 
-public class DefaultAudioPlayer implements AudioPlayer {
+public class AndroidMediaPlayerFacade implements AudioPlayer {	
 
 	private Context _context;
 	private MediaPlayer _mediaPlayer;
+	
 	
 	private boolean _isPlaying = false;
 	private boolean _needsPreparation = false;
@@ -30,7 +32,7 @@ public class DefaultAudioPlayer implements AudioPlayer {
 		}
 	};
 	
-	public DefaultAudioPlayer(Context context) {
+	public AndroidMediaPlayerFacade(Context context) {
 		_context = context;
 		_mediaPlayer = new MediaPlayer();
 		
@@ -102,4 +104,6 @@ public class DefaultAudioPlayer implements AudioPlayer {
 	public void seekTo(int ms) {
 		_mediaPlayer.seekTo(ms);		
 	}
+	
+
 }

@@ -21,14 +21,14 @@
 	    android:layout_width="match_parent"
 	    android:layout_height="132dp"
 	    android:layout_gravity="bottom"	   
-	    android:background="#80CCCCCC" >
+	     >
 	    <LinearLayout
 	        android:id="@+id/sightCaptionFrame"
 		    android:orientation="vertical"
 		    android:layout_width="match_parent"
 		    android:layout_height="24dp"
 		    android:layout_gravity="bottom"
-		    android:background="#80666666" >
+		    android:background="@drawable/sight_caption_background" >
 	        <TextView
 		        android:id="@+id/sightCaption"
 		        android:layout_width="wrap_content"
@@ -44,7 +44,8 @@
 	        android:id="@+id/playerPanel"
 		    android:layout_width="match_parent"
 		    android:layout_height="108dp"
-		    android:layout_gravity="center">
+		    android:layout_gravity="center"
+		    android:background="#80CCCCCC">
 	        
 	        <ImageButton
 		        android:id="@+id/rewindButton"

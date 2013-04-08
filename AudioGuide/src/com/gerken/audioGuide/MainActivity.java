@@ -71,7 +71,7 @@ public class MainActivity extends Activity implements SightView {
         _presenter = new SightPresenter(
         		((GuideApplication)getApplication()).getCity(), 
         		this, new GuideAssetManager(ctx),
-        		new DefaultAudioPlayer(ctx),
+        		new AndroidMediaPlayerFacade(ctx),
         		new SharedPreferenceManager(ctx),
         		new DefaultLoggingAdapter("SightPresenter"));
         
@@ -93,9 +93,7 @@ public class MainActivity extends Activity implements SightView {
         _stopButton.setOnClickListener(_stopButtonClickListener);
         
         _rewindButton = findControl(R.id.rewindButton);
-        _rewindButton.setOnClickListener(_rewindButtonClickListener);
-        //_rewindButton.setOnLongClickListener(_rewindButtonLongClickListener);
-        //_rewindButton.setOnTouchListener(_rewindButtonTouchListener);
+        _rewindButton.setOnTouchListener(_rewindButtonTouchListener);
         
         _audioProgressBar = findControl(R.id.audioProgressBar);
         _audioDuration = findControl(R.id.audioDuration);
@@ -352,26 +350,16 @@ public class MainActivity extends Activity implements SightView {
 		}
 	};
 	
-	private OnClickListener _rewindButtonClickListener = new OnClickListener() {		
-		@Override
-		public void onClick(View v) {
-			_presenter.handleRewindButtonClick();
-		}
-	};
-	
-	private OnLongClickListener _rewindButtonLongClickListener = new OnLongClickListener() {		
-		@Override
-		public boolean onLongClick(View v) {
-			_presenter.handleRewindButtonLongClick();
-			return true;
-		}
-	};
-	
+
 	private OnTouchListener _rewindButtonTouchListener = new OnTouchListener() {		
 		@Override
 		public boolean onTouch(View v, MotionEvent e) {
 			if(e.getAction() == MotionEvent.ACTION_UP) {
 				_presenter.handleRewindButtonRelease();
+				return true;
+			}
+			else if(e.getAction() == MotionEvent.ACTION_DOWN) {
+				_presenter.handleRewindButtonPress();
 				return true;
 			}
 			return false;
