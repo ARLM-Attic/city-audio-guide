@@ -8,14 +8,14 @@ import com.gerken.audioGuide.R;
 import com.gerken.audioGuide.interfaces.*;
 import com.gerken.audioGuide.interfaces.views.SightView;
 import com.gerken.audioGuide.objectModel.*;
+import com.gerken.audioGuide.services.AudioPlayerRewindingHelper;
 
 public class SightPresenter {
 	private final float SIGHT_ACTIVATION_RADIUS = 20.0f;
 	private final double EARTH_RADIUS = 6371.0;
 	private final String AUDIO_FOLDER = "audio";
 	private final int AUDIO_PLAYER_POLLING_INTERVAL_MS = 250;
-	private final long PLAYER_PANEL_HIDING_DELAY_MS = 2000L;
-	private final float AUDIO_PLAYER_REWIND_STEP_RATIO = 0.02f;
+	private final long PLAYER_PANEL_HIDING_DELAY_MS = 5000L;
 	
 	private City _city;
 	private SightView _sightView;
@@ -29,6 +29,8 @@ public class SightPresenter {
 	
 	private Timer _audioUpdateTimer;
 	private Timer _playerPanelHidingTimer;
+	
+	private AudioPlayerRewindingHelper _rewindingHelper;
 	
 	private OnEventListener _mediaPlayerCompletionListener = new OnEventListener() {		
 		@Override
@@ -71,6 +73,8 @@ public class SightPresenter {
 		
 		_audioPlayer.addAudioAssetCompletionListener(_mediaPlayerCompletionListener);
 		_prefStorage.setOnCurrentRouteChangedListener(_routeChangeListener);
+		
+		_rewindingHelper = new AudioPlayerRewindingHelper(_audioPlayer);
 	}
 	
 	public void handleLocationChange(double latitude, double longitude) {
@@ -134,21 +138,21 @@ public class SightPresenter {
 		}
 	}
 	
-	public void handleRewindButtonClick() {
-		restartPlayerPanelHidingTimer();
-		int step = (int)(AUDIO_PLAYER_REWIND_STEP_RATIO * (float)_audioPlayer.getDuration());
-		int newPosition = Math.max(0, _audioPlayer.getCurrentPosition()-step);
-		_audioPlayer.seekTo(newPosition);
-		_sightView.setAudioProgressPosition(newPosition);
-		_sightView.setAudioPosition(MsToString(newPosition));
-	}
-	
-	public void handleRewindButtonLongClick() {
-		
+	public void handleRewindButtonPress() {
+		_logger.logDebug("handleRewindButtonPress");
+		resetPlayerPanelHidingTimer();
+		_rewindingHelper.startRewinding();
 	}
 	
 	public void handleRewindButtonRelease() {
-		
+		_logger.logDebug("handleRewindButtonRelease");
+		try {
+			_rewindingHelper.stopRewinding();			
+		}
+		catch(Exception ex) {
+			_logger.logError("Unable to resume playing after rewinding", ex);
+		}
+		startPlayerPanelHidingTimer();
 	}
 	
 	public void handleWindowClick() {
@@ -295,9 +299,13 @@ public class SightPresenter {
 		);
 	}
 	
-	private void restartPlayerPanelHidingTimer() {
+	private void resetPlayerPanelHidingTimer() {
 		_playerPanelHidingTimer.cancel();
 		_playerPanelHidingTimer = new Timer();
+	}
+	
+	private void restartPlayerPanelHidingTimer() {
+		resetPlayerPanelHidingTimer();
 		startPlayerPanelHidingTimer();
 	}
 	
