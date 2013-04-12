@@ -79,6 +79,44 @@ public class PlayerButtonDrawableFactory {
 		return ld;
 	}
 	
+	public Drawable createRewindButtonDrawable(int width, int height) {
+		ShapeDrawable button = new ShapeDrawable(new RectShape());		
+		button.setIntrinsicHeight(height);
+		button.setIntrinsicWidth(width);
+		button.setShaderFactory(new ShapeDrawable.ShaderFactory() {			
+			@Override
+			public Shader resize(int width, int height) {
+				return new LinearGradient(0, 0, 0, height, 
+						new int[]{0xCDCCCCCC, 0xCDFFFFFF, 0xCDCCCCCC}, 
+						new float[]{0, 0.3f, 1},
+						Shader.TileMode.REPEAT);
+			}
+		});
+		
+		
+		int signSize = (int)(STOP_SIGN_SIZE_RATIO * (float)Math.min(width, height));
+		ShapeDrawable sign1 = new ShapeDrawable(
+				new RegularConvexShape(3, signSize, (float)Math.PI));		
+		sign1.setIntrinsicHeight(signSize);
+		sign1.setIntrinsicWidth(signSize);
+		Paint psPaint = sign1.getPaint();
+		psPaint.setStyle(Style.FILL);
+		psPaint.setColor(PLAY_BUTTON_SIGN_COLOR);
+		
+		Drawable sign2 = sign1.getConstantState().newDrawable();
+		
+		Drawable[] layers = new Drawable[]{ button, sign1, sign2 };
+		LayerDrawable ld = new LayerDrawable(layers);
+		ld.setBounds(0, 0, width, height);
+		ld.setLayerInset(0, 0, 0, 0, 0);
+		
+		int signDx = (int)( (width - signSize)/2.0f );
+		int signDy = (int)( (height - signSize)/2.0f );
+		ld.setLayerInset(2, signSize, 0, 0, 0);
+		//ld.setLayerInset(1, signDx, signDy+1, signDx, signDy+1);
+		return ld;
+	}
+	
 	private Drawable createPlayButtonDrawable(Shape shape, int width, int height) {
 		ShapeDrawable sign = new ShapeDrawable(shape);
 		sign.setIntrinsicHeight(height);

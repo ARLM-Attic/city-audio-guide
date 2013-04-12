@@ -58,6 +58,7 @@ public class MainActivity extends Activity implements SightView {
 	private Drawable _playButtonDefaultDrawable;
 	private Drawable _playButtonPressedDrawable;
 	private Drawable _stopButtonDefaultDrawable;
+	private Drawable _rewindButtonDefaultDrawable;
 	
 	private Handler _handler;
 	
@@ -85,9 +86,7 @@ public class MainActivity extends Activity implements SightView {
                 
         initPlayButton();
         initStopButton();
-        
-        _rewindButton = findControl(R.id.rewindButton);
-        _rewindButton.setOnTouchListener(_rewindButtonTouchListener);
+        initRewindButton();        
         
         _audioProgressBar = findControl(R.id.audioProgressBar);
         _audioDuration = findControl(R.id.audioDuration);
@@ -124,6 +123,16 @@ public class MainActivity extends Activity implements SightView {
         _stopButton.setBackgroundColor(0);
         
         _stopButton.setOnClickListener(_stopButtonClickListener);
+    }
+    
+    private void initRewindButton() {
+    	_rewindButton = findControl(R.id.rewindButton);
+    	ViewGroup.LayoutParams lp = _stopButton.getLayoutParams();   
+    	_rewindButtonDefaultDrawable = 
+        		_buttonDrawableFactory.createRewindButtonDrawable(lp.width, lp.height);
+    	_rewindButton.setImageDrawable(_rewindButtonDefaultDrawable);
+    	_rewindButton.setBackgroundColor(0);
+        _rewindButton.setOnTouchListener(_rewindButtonTouchListener);
     }
     
     private float calculatePlayerPanelHeight() {
