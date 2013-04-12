@@ -14,7 +14,6 @@ public class SightPresenter {
 	private final float SIGHT_ACTIVATION_RADIUS = 20.0f;
 	private final double EARTH_RADIUS = 6371.0;
 	private final String AUDIO_FOLDER = "audio";
-	private final int AUDIO_PLAYER_POLLING_INTERVAL_MS = 250;
 	private final long PLAYER_PANEL_HIDING_DELAY_MS = 5000L;
 	
 	private City _city;
@@ -27,10 +26,12 @@ public class SightPresenter {
 	private Sight _currentSight = null;
 	private SightLook _currentSightLook = null;
 	
-	private Timer _audioUpdateTimer;
+	
 	private Timer _playerPanelHidingTimer;
+	private boolean _isPlayerPanelVisible = false;
 	
 	private AudioPlayerRewindingHelper _rewindingHelper;
+	private AudioPositionUpdater _audioPositionUpdater;
 	
 	private OnEventListener _mediaPlayerCompletionListener = new OnEventListener() {		
 		@Override
@@ -67,14 +68,14 @@ public class SightPresenter {
 		_audioPlayer = audioPlayer;
 		_prefStorage = prefStorage;
 		_logger = logger;
-		
-		_audioUpdateTimer = new Timer();
+				
 		_playerPanelHidingTimer = new Timer();
 		
 		_audioPlayer.addAudioAssetCompletionListener(_mediaPlayerCompletionListener);
 		_prefStorage.setOnCurrentRouteChangedListener(_routeChangeListener);
 		
 		_rewindingHelper = new AudioPlayerRewindingHelper(_audioPlayer);
+		_audioPositionUpdater = new AudioPositionUpdater(_audioPlayer, _sightView);
 	}
 	
 	public void handleLocationChange(double latitude, double longitude) {
@@ -104,7 +105,7 @@ public class SightPresenter {
 		if(_audioPlayer.isPlaying()) {
 			_audioPlayer.pause();
 			_sightView.displayPlayerStopped();		
-			resetAudioUpdateTimer();
+			_audioPositionUpdater.stopAudioUpdateTimer();
 		}
 		else {
 			try {
@@ -117,7 +118,7 @@ public class SightPresenter {
 			}
 			_sightView.displayPlayerPlaying();
 			_sightView.hideNextSightDirection();
-			startAudioUpdateTimer();			
+			_audioPositionUpdater.startAudioUpdateTimer();
 		}
 	}	
 	
@@ -127,10 +128,9 @@ public class SightPresenter {
 			_audioPlayer.stop();
 		}
 		
-		resetAudioUpdateTimer();
-		_sightView.displayPlayerStopped();	
-		_sightView.setAudioProgressPosition(0);
-		_sightView.setAudioPosition(MsToString(0));
+		_audioPositionUpdater.stopAudioUpdateTimer();
+		_audioPositionUpdater.resetPlayerDisplayedPosition();
+		_sightView.displayPlayerStopped();			
 		if(_prefStorage.isRouteChosen()) {
 			NextRoutePoint nrp = getNextRoutePoint();
 			float heading = (float)(Math.PI*nrp.getHeading()/180.0);
@@ -140,6 +140,7 @@ public class SightPresenter {
 	
 	public void handleRewindButtonPress() {
 		_logger.logDebug("handleRewindButtonPress");
+		_audioPositionUpdater.startAudioUpdateTimer();
 		resetPlayerPanelHidingTimer();
 		_rewindingHelper.startRewinding();
 	}
@@ -156,8 +157,9 @@ public class SightPresenter {
 	}
 	
 	public void handleWindowClick() {
-		if(isSightInRange()) {
+		if(isSightInRange() && !_isPlayerPanelVisible) {
 			_sightView.showPlayerPanel();
+			_isPlayerPanelVisible = true;
 			startPlayerPanelHidingTimer();
 		}
 	}
@@ -205,9 +207,7 @@ public class SightPresenter {
 		try {
 			_audioPlayer.prepareAudioAsset(
 					String.format("%s/%s", AUDIO_FOLDER, audioFileName));
-			int duration = _audioPlayer.getDuration();
-			_sightView.setAudioProgressMaximum(duration);
-			_sightView.setAudioDuration(MsToString(duration));
+			_audioPositionUpdater.initPlayerDisplayedDuration();
 		}
 		catch(Exception ex){ 
         	String logMsg=String.format("Error when setting %s as the new MediaPlayer datasource", audioFileName);
@@ -260,32 +260,9 @@ public class SightPresenter {
 		return null;
 	}
 	
-	private String MsToString(int ms) {
-		int s = ms / 1000;
-		int m = s / 60;
-		s -= m*60;
-		return String.format("%d:%02d", m, s);
-	}
+
 	
-	private void startAudioUpdateTimer() {
-		_audioUpdateTimer.scheduleAtFixedRate(
-			new TimerTask() {				
-				@Override
-				public void run() {
-					int pos = _audioPlayer.getCurrentPosition();
-					_sightView.setAudioProgressPosition(pos);
-					_sightView.setAudioPosition(MsToString(pos));
-					
-				}
-			},
-			0, AUDIO_PLAYER_POLLING_INTERVAL_MS
-		);
-	}
-	
-	private void resetAudioUpdateTimer() {
-		_audioUpdateTimer.cancel();
-		_audioUpdateTimer = new Timer();
-	}
+
 	
 	private void startPlayerPanelHidingTimer() {
 		_playerPanelHidingTimer.schedule(
@@ -293,6 +270,7 @@ public class SightPresenter {
 				@Override
 				public void run() {
 					_sightView.hidePlayerPanel();
+					_isPlayerPanelVisible = false;
 				}
 			},
 			PLAYER_PANEL_HIDING_DELAY_MS

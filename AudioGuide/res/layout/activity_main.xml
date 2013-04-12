@@ -49,7 +49,7 @@
 	        
 	        <ImageButton
 		        android:id="@+id/rewindButton"
-		        android:layout_width="40dp"
+		        android:layout_width="80dp"
 		        android:layout_height="40dp"
 		        android:layout_alignTop="@+id/playButton"
 		        android:layout_toLeftOf="@+id/playButton"
@@ -67,7 +67,7 @@
 	        
 	        <ImageButton
 		        android:id="@+id/stopButton"
-		        android:layout_width="40dp"
+		        android:layout_width="80dp"
 		        android:layout_height="40dp"
 		        android:layout_alignTop="@+id/playButton"
 		        android:layout_toRightOf="@+id/playButton"

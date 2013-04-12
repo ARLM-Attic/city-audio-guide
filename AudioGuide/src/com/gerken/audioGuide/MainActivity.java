@@ -36,7 +36,6 @@ import android.widget.*;
 
 public class MainActivity extends Activity implements SightView {
 	private final String LOG_TAG = "MainActivity";
-	private final int PLAY_BUTTON_SIGN_COLOR = 0xFF4CFF00;
 	
 	private View _rootView;
 	private View _playerInfoPanel;
@@ -53,8 +52,12 @@ public class MainActivity extends Activity implements SightView {
 	private SightPresenter _presenter;
 	private LocationManagerFacade _locationManager;
 	
+	private PlayerButtonDrawableFactory _buttonDrawableFactory = 
+			new PlayerButtonDrawableFactory();
+	
 	private Drawable _playButtonDefaultDrawable;
 	private Drawable _playButtonPressedDrawable;
+	private Drawable _stopButtonDefaultDrawable;
 	
 	private Handler _handler;
 	
@@ -79,18 +82,9 @@ public class MainActivity extends Activity implements SightView {
         
         _rootView = findViewById(R.id.rootLayout);
         _rootView.setOnClickListener(_rootViewClickListener);
-        
-        _playButton = findControl(R.id.playButton);
-        ViewGroup.LayoutParams lp = _playButton.getLayoutParams();      
-		
-		_playButtonDefaultDrawable = createPlayButtonDefaultDrawable(lp.width, lp.height);
-		_playButtonPressedDrawable = createPlayButtonPressedDrawable(lp.width, lp.height);
-
-        _playButton.setImageDrawable(_playButtonDefaultDrawable);
-        _playButton.setOnClickListener(_playButtonClickListener);
-        
-        _stopButton = findControl(R.id.stopButton);
-        _stopButton.setOnClickListener(_stopButtonClickListener);
+                
+        initPlayButton();
+        initStopButton();
         
         _rewindButton = findControl(R.id.rewindButton);
         _rewindButton.setOnTouchListener(_rewindButtonTouchListener);
@@ -106,6 +100,30 @@ public class MainActivity extends Activity implements SightView {
         _playerPanelHeight = calculatePlayerPanelHeight();
         playPlayerPanelHidingAnimation(1);
         setPlayerButtonsClickable(false);
+    }
+    
+    private void initPlayButton() {
+    	_playButton = findControl(R.id.playButton);
+        ViewGroup.LayoutParams lp = _playButton.getLayoutParams();      
+		
+		_playButtonDefaultDrawable = 
+				_buttonDrawableFactory.createPlayButtonDefaultDrawable(lp.width, lp.height);
+		_playButtonPressedDrawable = 
+				_buttonDrawableFactory.createPlayButtonPressedDrawable(lp.width, lp.height);
+
+        _playButton.setImageDrawable(_playButtonDefaultDrawable);
+        _playButton.setOnClickListener(_playButtonClickListener);
+    }
+    
+    private void initStopButton() {
+    	_stopButton = findControl(R.id.stopButton);
+    	ViewGroup.LayoutParams lp = _stopButton.getLayoutParams();   
+        _stopButtonDefaultDrawable = 
+        		_buttonDrawableFactory.createStopButtonDrawable(lp.width, lp.height);
+        _stopButton.setImageDrawable(_stopButtonDefaultDrawable);
+        _stopButton.setBackgroundColor(0);
+        
+        _stopButton.setOnClickListener(_stopButtonClickListener);
     }
     
     private float calculatePlayerPanelHeight() {
@@ -201,47 +219,11 @@ public class MainActivity extends Activity implements SightView {
         		imageStream.close();
         	}
         	catch(Exception ex){
-            	Log.e(LOG_TAG, "Oops", ex);
+            	Log.e(LOG_TAG, "Unable to set the background drawable", ex);
             }
         }
 	}
 	
-	private Drawable createPlayButtonDefaultDrawable(int width, int height) {
-		Drawable playSign = createPlayButtonDrawable(
-				new RegularConvexShape(3, 0.4f*width, 0), width, height);
-		
-		ShapeDrawable shadow = new ShapeDrawable(new ShadowShape());
-		shadow.setIntrinsicHeight(width);
-		shadow.setIntrinsicWidth(height);
-		Paint psPaint = shadow.getPaint();
-		psPaint.setStyle(Style.FILL);
-		psPaint.setColor(0x40666666);
-		//psPaint.setColor(0xC00080FF);
-		
-		Drawable[] layers = new Drawable[]{ shadow, playSign };
-		LayerDrawable ld = new LayerDrawable(layers);
-		ld.setBounds(0, 0, width, height);
-		
-		return ld;
-	}
-	
-	private Drawable createPlayButtonPressedDrawable(int width, int height) {
-        Drawable pauseSign = createPlayButtonDrawable(
-    		new PauseSignShape(0.4f), width, height);
-		
-		return pauseSign;
-	}
-	
-	private Drawable createPlayButtonDrawable(Shape shape, int width, int height) {
-		ShapeDrawable sign = new ShapeDrawable(shape);
-		sign.setIntrinsicHeight(width);
-		sign.setIntrinsicWidth(height);
-		Paint psPaint = sign.getPaint();
-		psPaint.setStyle(Style.FILL);
-		psPaint.setColor(PLAY_BUTTON_SIGN_COLOR);		
-	
-		return sign;
-	}
     
 	@Override
 	public void displayPlayerPlaying() {

@@ -2,7 +2,6 @@ package com.gerken.audioGuide.services;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Timer;
 
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
@@ -65,8 +64,10 @@ public class AndroidMediaPlayerFacade implements AudioPlayer {
 
 	@Override
 	public void play() throws IOException {
-		if(_needsPreparation) 
+		if(_needsPreparation) {
 			_mediaPlayer.prepare();
+			_needsPreparation = false;
+		}
 		_mediaPlayer.start();
 		_isPlaying = true;
 	}

@@ -2,7 +2,7 @@ package com.gerken.audioGuide.interfaces.views;
 
 import java.io.InputStream;
 
-public interface SightView {
+public interface SightView extends AudioPlayerView {
 	void acceptNewSightGotInRange(String sightName, InputStream imageStream);
 	void acceptNewSightLookGotInRange(InputStream imageStream);
 	void acceptNoSightInRange();
@@ -11,11 +11,6 @@ public interface SightView {
 	
 	void displayPlayerPlaying();
 	void displayPlayerStopped();
-	
-	void setAudioProgressMaximum(int ms);
-	void setAudioProgressPosition(int ms);
-	void setAudioDuration(String formattedDuration);
-	void setAudioPosition(String formattedPosition);
 	
 	void displayNextSightDirection(float heading);
 	void hideNextSightDirection();
