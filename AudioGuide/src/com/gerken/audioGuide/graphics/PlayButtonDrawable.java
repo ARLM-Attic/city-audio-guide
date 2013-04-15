@@ -52,7 +52,7 @@ public class PlayButtonDrawable  {
 		oval.setGradientCenter(0.3f, 0.3f);
 		
 		ShapeDrawable playSign = new ShapeDrawable(
-				new RegularConvexShape(3, 0.4f*_size, 0));
+				new RegularConvexShape(3, 0));
 		Paint psPaint = playSign.getPaint();
 		psPaint.setStyle(Style.FILL);
 		psPaint.setColor(0xFF4CFF00);

@@ -120,7 +120,6 @@ public class MainActivity extends Activity implements SightView {
         _stopButtonDefaultDrawable = 
         		_buttonDrawableFactory.createStopButtonDrawable(lp.width, lp.height);
         _stopButton.setImageDrawable(_stopButtonDefaultDrawable);
-        _stopButton.setBackgroundColor(0);
         
         _stopButton.setOnClickListener(_stopButtonClickListener);
     }
@@ -131,7 +130,7 @@ public class MainActivity extends Activity implements SightView {
     	_rewindButtonDefaultDrawable = 
         		_buttonDrawableFactory.createRewindButtonDrawable(lp.width, lp.height);
     	_rewindButton.setImageDrawable(_rewindButtonDefaultDrawable);
-    	_rewindButton.setBackgroundColor(0);
+
         _rewindButton.setOnTouchListener(_rewindButtonTouchListener);
     }
     
