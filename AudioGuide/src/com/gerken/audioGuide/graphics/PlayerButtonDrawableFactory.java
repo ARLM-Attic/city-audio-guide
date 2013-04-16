@@ -1,6 +1,6 @@
 package com.gerken.audioGuide.graphics;
 
-import android.graphics.LinearGradient;
+import android.graphics.BlurMaskFilter;
 import android.graphics.Paint;
 import android.graphics.RadialGradient;
 import android.graphics.Shader;
@@ -9,11 +9,10 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
-import android.graphics.drawable.shapes.RoundRectShape;
 import android.graphics.drawable.shapes.Shape;
 
 public class PlayerButtonDrawableFactory {
-	private final int PLAY_BUTTON_SIGN_COLOR = 0xFF4CFF00;
+	private final int BUTTON_SIGN_MAIN_COLOR = 0xC04CFF00;
 	private final float PLAY_SIGN_SIZE_RATIO = 0.8f;
 	private final float STOP_SIGN_SIZE_RATIO = 0.5f;
 	
@@ -27,7 +26,7 @@ public class PlayerButtonDrawableFactory {
 	
 	public Drawable createPlayButtonPressedDrawable(int width, int height) {
 		int signSize = (int)(PLAY_SIGN_SIZE_RATIO * (float)Math.min(width, height));
-        Drawable pauseSign = createPlayButtonDrawable(width, height,
+        Drawable pauseSign = createButtonDrawable(width, height,
     		new PauseSignShape(0.4f), signSize, signSize);
 		
 		return pauseSign;
@@ -48,7 +47,7 @@ public class PlayerButtonDrawableFactory {
 		sign1.setIntrinsicHeight(signSize);
 		sign1.setIntrinsicWidth(signSize);
 		sign1.setShaderFactory(
-				new ButtonSignShaderFactory(0.35f*signSize, 0.3f*signSize, 0.75f*signSize));
+				new ButtonSignShaderFactory(signSize, signSize));
 		
 		Drawable sign2 = sign1.getConstantState().newDrawable();
 		
@@ -64,50 +63,56 @@ public class PlayerButtonDrawableFactory {
 		return ld;
 	}
 	
-	private Drawable createPlayButtonDrawable(int buttonWidth, int buttonHeight,
-			Shape shape, int signWidth, int signHeight) {
-		ShapeDrawable sign = new ShapeDrawable(shape);
-		sign.setIntrinsicHeight(signHeight);
-		sign.setIntrinsicWidth(signWidth);
-		Paint psPaint = sign.getPaint();
-		psPaint.setStyle(Style.FILL);
-		psPaint.setColor(PLAY_BUTTON_SIGN_COLOR);	
-		
-		int signDx = (int)( (buttonWidth - signWidth)/2.0f );
-		int signDy = (int)( (buttonHeight - signHeight)/2.0f );
-		sign.setPadding(signDx, signDy, signDx, signDy);
-	
-		return sign;
-	}
-	
 	private Drawable createButtonDrawable(int buttonWidth, int buttonHeight,
 			Shape shape, int signWidth, int signHeight) {
 		ShapeDrawable sign = new ShapeDrawable(shape);
 		sign.setIntrinsicHeight(signHeight);
 		sign.setIntrinsicWidth(signWidth);
 		sign.setShaderFactory(
-				new ButtonSignShaderFactory(0.35f*signWidth, 0.3f*signHeight, 0.75f*signWidth));	
+				new ButtonSignShaderFactory(signWidth, signHeight));
+		
+		ShapeDrawable sign2 = new ShapeDrawable(shape);
+		sign2.setIntrinsicHeight(signHeight);
+		sign2.setIntrinsicWidth(signWidth);
+		Paint psPaint = sign2.getPaint();
+		psPaint.setStyle(Style.STROKE);
+		psPaint.setColor(BUTTON_SIGN_MAIN_COLOR);
+		psPaint.setAntiAlias(true);
+		psPaint.setStrokeJoin(Paint.Join.ROUND);
+		psPaint.setStrokeCap(Paint.Cap.ROUND);
+		psPaint.setStrokeWidth(1.5f);
+		psPaint.setMaskFilter(new BlurMaskFilter(1.5f, BlurMaskFilter.Blur.NORMAL)); 
+		
+		Drawable[] layers = new Drawable[]{ sign, sign2 };
+		LayerDrawable ld = new LayerDrawable(layers);
+		ld.setBounds(0, 0, buttonWidth, buttonHeight);
 		
 		int signDx = (int)( (buttonWidth - signWidth)/2.0f );
 		int signDy = (int)( (buttonHeight - signHeight)/2.0f );
-		sign.setPadding(signDx, signDy, signDx, signDy);
+		ld.setLayerInset(0, signDx, signDy+1, signDx, signDy+1);
+		ld.setLayerInset(1, signDx, signDy+1, signDx+1, signDy+1);
 	
-		return sign;
+		return ld;
 	}
 	
 	private class ButtonSignShaderFactory extends ShapeDrawable.ShaderFactory {
+		private final float HIGHLIGHT_CENTER_X = 0.35f;
+		private final float HIGHLIGHT_CENTER_Y = 0.3f;
 		private float _cx;
 		private float _cy;
 		private float _r;
-		public ButtonSignShaderFactory(float cx, float cy, float r) {
-			_cx=cx;
-			_cy=cy;
-			_r=r;
+		public ButtonSignShaderFactory(float signWidth, float signHeight) {
+			_cx=HIGHLIGHT_CENTER_X*signWidth;
+			_cy=HIGHLIGHT_CENTER_Y*signHeight;
+			
+			float rx = signWidth - _cx;
+			float ry = signHeight - _cy;
+			_r=(float)Math.sqrt(rx*rx+ry*ry);
 		}
 		@Override
 		public Shader resize(int width, int height) {
 			return new RadialGradient(_cx, _cy, _r, 
-					new int[]{0xC0AEFF8C, 0xC04CFF00}, 
+					new int[]{0xC0AEFF8C, BUTTON_SIGN_MAIN_COLOR}, 
 					new float[]{0, 1},
 					Shader.TileMode.REPEAT);
 		}
