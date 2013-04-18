@@ -1,7 +1,6 @@
 package com.gerken.audioGuide;
 
 import java.io.InputStream;
-import java.util.Date;
 
 import com.gerken.audioGuide.R;
 import com.gerken.audioGuide.controls.ControlUpdater;
@@ -10,12 +9,7 @@ import com.gerken.audioGuide.interfaces.views.SightView;
 import com.gerken.audioGuide.presenters.SightPresenter;
 import com.gerken.audioGuide.services.*;
 
-import android.graphics.Paint;
-import android.graphics.Paint.Style;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.LayerDrawable;
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.shapes.Shape;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
@@ -26,11 +20,7 @@ import android.content.Intent;
 import android.util.Log;
 import android.view.*;
 import android.view.View.OnClickListener;
-import android.view.View.OnLongClickListener;
 import android.view.View.OnTouchListener;
-import android.view.ViewTreeObserver.OnGlobalLayoutListener;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.view.animation.TranslateAnimation;
 import android.widget.*;
 
@@ -176,9 +166,11 @@ public class MainActivity extends Activity implements SightView {
     		Intent intent = new Intent(this, MainPreferenceActivity.class);
     		//Intent intent = new Intent(this, RouteMapActivity.class);
     		startActivity(intent);
+    		break;
     	case R.id.action_help:
     		Intent helpIntent = new Intent(this, HelpActivity.class);
     		startActivity(helpIntent);
+    		break;
     	}
     	return super.onOptionsItemSelected(item);
     }
