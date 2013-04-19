@@ -9,6 +9,7 @@ import android.content.res.AssetManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 
+import com.gerken.audioGuide.R;
 import com.gerken.audioGuide.interfaces.AudioPlayer;
 import com.gerken.audioGuide.interfaces.OnEventListener;
 
@@ -41,8 +42,9 @@ public class AndroidMediaPlayerFacade implements AudioPlayer {
 	
 	@Override
 	public void signalSightInRange() {
-		// TODO Auto-generated method stub
-		
+		MediaPlayer player = MediaPlayer.create(_context, R.raw.inrange);
+		player.start();
+		//player.release();		
 	}
 
 	@Override

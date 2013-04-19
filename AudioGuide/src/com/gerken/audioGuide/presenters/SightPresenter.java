@@ -84,6 +84,7 @@ public class SightPresenter {
 			if(!newSightLook.equals(_currentSightLook)) {
 				if(!newSightLook.getSight().equals(_currentSight)) {
 					notifyViewAboutNewSight(newSightLook);
+					_audioPlayer.signalSightInRange();
 					_currentSight = newSightLook.getSight();
 				}					
 				else

@@ -40,7 +40,8 @@ public class AudioPositionUpdater {
 	}
 	
 	public void stopAudioUpdateTimer() {
-		_audioUpdateTimer.cancel();
+		if(_audioUpdateTimer != null)
+			_audioUpdateTimer.cancel();
 		_isTimerStarted = false;
 	}
 	
