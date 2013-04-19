@@ -52,6 +52,33 @@ public class HandleLocationChange {
 	}
 	
 	@Test
+	public void Given_NewSightGotInRange__Then_AudioNotificationPalyed() throws Exception {
+		final double EXPECTED_LOCATION_LATITUDE = 12.345;
+		final double EXPECTED_LOCATION_LONGITUDE = 24.567;
+		final String WHATEVER_STRING = "whatever";		
+		
+		Sight expectedSight = new Sight(1, WHATEVER_STRING, "audio.mp3");
+		expectedSight.addLook(new SightLook(
+				EXPECTED_LOCATION_LATITUDE, EXPECTED_LOCATION_LONGITUDE, WHATEVER_STRING));
+		City city = new City(1, "Default", WHATEVER_STRING);
+		city.getSights().add(expectedSight);
+		
+		SightView view = mock(SightView.class);
+		AssetStreamProvider assetStreamProvider = mock(AssetStreamProvider.class);
+		AudioPlayer player = mock(AudioPlayer.class);
+		when(assetStreamProvider.getImageAssetStream(anyString()))
+			.thenReturn(new ByteArrayInputStream(new byte[]{1,2,3}));
+		
+		SightPresenter sut = CreateSut(city, view, assetStreamProvider, player);
+		
+		// --- Act
+		sut.handleLocationChange(EXPECTED_LOCATION_LATITUDE, EXPECTED_LOCATION_LONGITUDE);
+		
+		// --- Assert
+		verify(player).signalSightInRange();
+	}
+	
+	@Test
 	public void Given_NewSightLookGotInRange__Then_ViewNotifiedAboutNewSightLook() throws Exception {
 		final double FIRST_SIGHTLOOK_LATITUDE = 12.345;
 		final double FIRST_SIGHTLOOK_LONGITUDE = 24.567;
@@ -98,7 +125,10 @@ public class HandleLocationChange {
 	}
 	
 	private SightPresenter CreateSut(City city, SightView view, AssetStreamProvider assetStreamProvider) {
-		AudioPlayer player = mock(AudioPlayer.class);
+		return CreateSut(city, view, assetStreamProvider, mock(AudioPlayer.class));
+	}
+	
+	private SightPresenter CreateSut(City city, SightView view, AssetStreamProvider assetStreamProvider, AudioPlayer player) {		
 		SharedPreferenceStorage prefStorage = mock(SharedPreferenceStorage.class);
 		Logger logger = mock(Logger.class);
 		
