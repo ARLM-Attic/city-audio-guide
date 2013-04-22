@@ -17,10 +17,11 @@
     <string name="title_activity_help">Help</string>
     <string name="help_text_sight_activity">
         The application tracks your position using GPS. As soon as any sight gets in range
-        you get the notification and you can see how the sight looks from your position.
+        you get the notification and you can see how the sight looks from your standpoint.
         Tap on the screen to open the player control panel.
-        If you have chosen a route you see the direction to the next route point after finishing
+        If you have chosen a route you see the direction to the next sight on the route after finishing
         the audio record or after pressing the Stop button. 
     </string>
+    <string name="button_text_close">Close</string>
 
 </resources>
