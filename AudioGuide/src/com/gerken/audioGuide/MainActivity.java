@@ -89,6 +89,8 @@ public class MainActivity extends Activity implements SightView {
         _playerPanelHeight = calculatePlayerPanelHeight();
         playPlayerPanelHidingAnimation(1);
         setPlayerButtonsClickable(false);
+        
+        _presenter.handleViewInit();
     }
     
     private void initPlayButton() {
@@ -168,8 +170,7 @@ public class MainActivity extends Activity implements SightView {
     		startActivity(intent);
     		break;
     	case R.id.action_help:
-    		Intent helpIntent = new Intent(this, HelpActivity.class);
-    		startActivity(helpIntent);
+    		showHelp();
     		break;
     	}
     	return super.onOptionsItemSelected(item);
@@ -284,7 +285,13 @@ public class MainActivity extends Activity implements SightView {
         ta.setFillAfter(true);
 	    _playerInfoPanel.startAnimation(ta);	
 	    setPlayerButtonsClickable(true);
-	}	
+	}
+	
+	@Override
+	public void showHelp() {
+		Intent helpIntent = new Intent(this, HelpActivity.class);
+		startActivity(helpIntent);
+	}
 
 	@Override
 	public void displayError(String message) {

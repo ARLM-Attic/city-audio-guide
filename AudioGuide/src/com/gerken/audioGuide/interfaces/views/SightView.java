@@ -18,6 +18,8 @@ public interface SightView extends AudioPlayerView {
 	void hidePlayerPanel();
 	void showPlayerPanel();
 	
+	void showHelp();
+	
 	void displayError(String message);
 	void displayError(int messageResourceId);
 }

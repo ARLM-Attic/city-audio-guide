@@ -10,11 +10,11 @@ public class MainPreferencePresenter {
 	
 	private City _city;
 	private MainPreferenceView _view;
-	private SharedPreferenceStorage _prefStorage;
+	private ApplicationSettingsStorage _prefStorage;
 	private Logger _logger;
 	
 	public MainPreferencePresenter(City city, MainPreferenceView prefView, 
-			SharedPreferenceStorage prefStorage, Logger logger) {
+			ApplicationSettingsStorage prefStorage, Logger logger) {
 		_city = city;
 		_view = prefView;
 		_prefStorage = prefStorage;

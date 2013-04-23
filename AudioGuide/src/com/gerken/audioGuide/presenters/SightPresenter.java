@@ -20,7 +20,7 @@ public class SightPresenter {
 	private SightView _sightView;
 	private AssetStreamProvider _assetStreamProvider;
 	private AudioPlayer _audioPlayer;
-	private SharedPreferenceStorage _prefStorage;
+	private ApplicationSettingsStorage _prefStorage;
 	private Logger _logger;
 	
 	private Sight _currentSight = null;
@@ -61,7 +61,7 @@ public class SightPresenter {
 	
 	public SightPresenter(City city, SightView sightView, 
 			AssetStreamProvider assetStreamProvider, AudioPlayer audioPlayer,
-			SharedPreferenceStorage prefStorage, Logger logger) {
+			ApplicationSettingsStorage prefStorage, Logger logger) {
 		_city = city;
 		_sightView = sightView;
 		_assetStreamProvider = assetStreamProvider;
@@ -76,6 +76,13 @@ public class SightPresenter {
 		
 		_rewindingHelper = new AudioPlayerRewindingHelper(_audioPlayer);
 		_audioPositionUpdater = new AudioPositionUpdater(_audioPlayer, _sightView);
+	}
+	
+	public void handleViewInit() {
+		if(_prefStorage.showHelpAtStartup()) {
+			_sightView.showHelp();
+			_prefStorage.setShowHelpAtStartup(false);			
+		}		
 	}
 	
 	public void handleLocationChange(double latitude, double longitude) {

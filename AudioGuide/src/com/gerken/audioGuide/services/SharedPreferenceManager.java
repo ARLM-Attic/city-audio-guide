@@ -9,11 +9,12 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.preference.PreferenceManager;
 
 import com.gerken.audioGuide.interfaces.OnEventListener;
-import com.gerken.audioGuide.interfaces.SharedPreferenceStorage;
+import com.gerken.audioGuide.interfaces.ApplicationSettingsStorage;
 
-public class SharedPreferenceManager implements SharedPreferenceStorage, OnSharedPreferenceChangeListener {
+public class SharedPreferenceManager implements ApplicationSettingsStorage, OnSharedPreferenceChangeListener {
 	private final String KEY_ROUTE_ID = "currentRouteId";
 	private final String KEY_LAST_SIGHT_ID = "lastSightId";
+	private final String KEY_SHOW_HELP = "showHelp";
 	
 	private Context _context;
 	
@@ -57,6 +58,17 @@ public class SharedPreferenceManager implements SharedPreferenceStorage, OnShare
 	}
 
 	@Override
+	public boolean showHelpAtStartup() {
+		final boolean SHOW_HELP = true;
+		return getSharedPreferences().getBoolean(KEY_SHOW_HELP, SHOW_HELP);
+	}
+
+	@Override
+	public void setShowHelpAtStartup(boolean show) {
+		storeBoolean(KEY_SHOW_HELP, show);		
+	}
+
+	@Override
 	public void setOnCurrentRouteChangedListener(OnEventListener listener) {
 		_currentRouteChangedListeners.add(listener);		
 	}
@@ -78,6 +90,12 @@ public class SharedPreferenceManager implements SharedPreferenceStorage, OnShare
 	private void storeInt(String key, int value) {
 		Editor ed = getSharedPreferences().edit();
 		ed.putInt(key, value);
+		ed.commit();	
+	}
+	
+	private void storeBoolean(String key, boolean value) {
+		Editor ed = getSharedPreferences().edit();
+		ed.putBoolean(key, value);
 		ed.commit();	
 	}
 

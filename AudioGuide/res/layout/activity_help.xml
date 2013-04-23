@@ -25,7 +25,7 @@
     </ScrollView>
 
     <Button
-        android:id="@+id/buttonClose"
+        android:id="@+id/buttonHelpClose"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
