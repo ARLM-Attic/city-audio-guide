@@ -9,8 +9,16 @@ public class NextRoutePoint {
 	private int _routeId;
 	@Attribute(name="heading")
 	private short _heading;
+	@Attribute(name="name")
+	private String _name; 
 	
 	public NextRoutePoint() {		
+	}
+	
+	public NextRoutePoint(int routeId, short heading, String name) {		
+		_routeId = routeId;
+		_heading = heading;
+		_name = name;
 	}
 	
 	public int getRouteId() {
@@ -19,5 +27,9 @@ public class NextRoutePoint {
 	
 	public short getHeading() {
 		return _heading;
+	}
+	
+	public String getName() {
+		return _name;
 	}
 }
