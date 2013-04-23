@@ -129,7 +129,7 @@ public class HandleLocationChange {
 	}
 	
 	private SightPresenter CreateSut(City city, SightView view, AssetStreamProvider assetStreamProvider, AudioPlayer player) {		
-		SharedPreferenceStorage prefStorage = mock(SharedPreferenceStorage.class);
+		ApplicationSettingsStorage prefStorage = mock(ApplicationSettingsStorage.class);
 		Logger logger = mock(Logger.class);
 		
 		return new SightPresenter(city, view, assetStreamProvider,

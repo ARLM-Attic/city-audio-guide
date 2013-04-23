@@ -33,7 +33,7 @@ public class HandleStopButtonClick {
 
 	private SightPresenter CreateSut(City city, SightView view, AudioPlayer player) {
 		AssetStreamProvider assetStreamProvider = mock(AssetStreamProvider.class);
-		SharedPreferenceStorage prefStorage = mock(SharedPreferenceStorage.class);
+		ApplicationSettingsStorage prefStorage = mock(ApplicationSettingsStorage.class);
 		Logger logger = mock(Logger.class);
 		
 		return new SightPresenter(city, view, assetStreamProvider,
