@@ -16,5 +16,11 @@
     <style name="AppTheme" parent="AppBaseTheme">
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
     </style>
+    
+    <style name="DefaultButton">
+        <item name="android:background">#FFA9FF84</item>
+        <item name="android:textColor">#FF333333</item>
+        <item name="android:padding">10dp</item>
+    </style>
 
 </resources>

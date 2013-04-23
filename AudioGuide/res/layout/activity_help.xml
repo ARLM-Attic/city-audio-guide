@@ -12,7 +12,7 @@
         android:layout_marginLeft="4dp"
         android:layout_marginRight="4dp"
         android:layout_marginBottom="8dp"
-        android:layout_above="@+id/buttonClose"
+        android:layout_above="@+id/buttonHelpClose"
         android:layout_alignParentTop="true">
 
 		<TextView
@@ -25,14 +25,12 @@
     </ScrollView>
 
     <Button
+        style="@style/DefaultButton"
         android:id="@+id/buttonHelpClose"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_alignParentBottom="true"
-        android:background="#FFA9FF84"
-        android:textColor="#FF333333"
-        android:padding="10dp"
+        android:layout_alignParentBottom="true"        
         android:layout_marginBottom="4dp"
         android:text="@string/button_text_close" />
 
