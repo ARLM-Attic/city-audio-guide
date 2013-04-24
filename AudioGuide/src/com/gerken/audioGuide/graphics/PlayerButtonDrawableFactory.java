@@ -27,7 +27,7 @@ public class PlayerButtonDrawableFactory {
 	public Drawable createPlayButtonPressedDrawable(int width, int height) {
 		int signSize = (int)(PLAY_SIGN_SIZE_RATIO * (float)Math.min(width, height));
         Drawable pauseSign = createButtonDrawable(width, height,
-    		new PauseSignShape(0.4f), signSize, signSize);
+    		new PauseSignShape(), signSize, signSize);
 		
 		return pauseSign;
 	}
