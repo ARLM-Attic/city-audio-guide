@@ -29,6 +29,7 @@ public class SightPresenter {
 	
 	private Timer _playerPanelHidingTimer;
 	private boolean _isPlayerPanelVisible = false;
+	private boolean _isNextRoutePointInfoShown = false;
 	
 	private AudioPlayerRewindingHelper _rewindingHelper;
 	private AudioPositionUpdater _audioPositionUpdater;
@@ -106,6 +107,7 @@ public class SightPresenter {
 			_currentSight = null;
 			_currentSightLook = null;
 		}
+		_isNextRoutePointInfoShown = false;
 	}	
 	
 	public void handlePlayButtonClick() {
@@ -131,18 +133,22 @@ public class SightPresenter {
 	}	
 	
 	public void handleStopButtonClick() {
-		restartPlayerPanelHidingTimer();
+		resetPlayerPanelHidingTimer();
 		if(_audioPlayer.isPlaying()) {			
 			_audioPlayer.stop();
 		}
 		
 		_audioPositionUpdater.stopAudioUpdateTimer();
 		_audioPositionUpdater.resetPlayerDisplayedPosition();
-		_sightView.displayPlayerStopped();			
+		_sightView.displayPlayerStopped();	
+		_sightView.hidePlayerPanel();
+		_isPlayerPanelVisible = false;
 		if(_prefStorage.isRouteChosen()) {
 			NextRoutePoint nrp = getNextRoutePoint();
 			float heading = (float)(Math.PI*nrp.getHeading()/180.0);
 			_sightView.displayNextSightDirection(heading);
+			_sightView.setInfoPanelCaptionText(nrp.getName());
+			_isNextRoutePointInfoShown = true;
 		}
 	}
 	
@@ -169,6 +175,12 @@ public class SightPresenter {
 			_sightView.showPlayerPanel();
 			_isPlayerPanelVisible = true;
 			startPlayerPanelHidingTimer();
+			
+			if(_isNextRoutePointInfoShown) {
+				_sightView.hideNextSightDirection();
+				_sightView.setInfoPanelCaptionText(_currentSight.getName());
+				_isNextRoutePointInfoShown = false;
+			}
 		}
 	}
 	
@@ -266,10 +278,7 @@ public class SightPresenter {
 		}
 		
 		return null;
-	}
-	
-
-	
+	}	
 
 	
 	private void startPlayerPanelHidingTimer() {

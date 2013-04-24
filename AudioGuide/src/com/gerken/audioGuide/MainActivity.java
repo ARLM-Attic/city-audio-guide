@@ -183,7 +183,7 @@ public class MainActivity extends Activity implements SightView {
 
 	@Override
 	public void acceptNewSightGotInRange(String sightName, InputStream imageStream) {
-		setSightCaption(sightName);
+		setInfoPanelCaptionText(sightName);
         setNewBackgroundImage(imageStream);     
         _nextSightPointerArrow.setVisibility(View.INVISIBLE);
         _playerInfoPanel.setVisibility(View.VISIBLE);
@@ -197,17 +197,17 @@ public class MainActivity extends Activity implements SightView {
 	
 	@Override
 	public void acceptNoSightInRange() {
-		setSightCaption(getString(R.string.sight_info_none));
+		setInfoPanelCaptionText(getString(R.string.sight_info_none));
 		_rootView.setBackgroundResource(R.drawable.prague_silhouette);
 	}
 
 	@Override
 	public void acceptNewRouteSelected(String sightName, String routeName) {
-		setSightCaption(String.format("%s: %s", sightName, routeName));
-		
+		setInfoPanelCaptionText(String.format("%s: %s", sightName, routeName));		
 	}
 	
-	private void setSightCaption(String text) {
+	@Override
+	public void setInfoPanelCaptionText(String text) {
 		TextView caption = findControl(R.id.sightCaption);
         caption.setText(text);
 	}

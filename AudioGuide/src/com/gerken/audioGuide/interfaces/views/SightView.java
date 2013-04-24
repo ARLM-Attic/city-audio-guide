@@ -6,6 +6,7 @@ public interface SightView extends AudioPlayerView {
 	void acceptNewSightGotInRange(String sightName, InputStream imageStream);
 	void acceptNewSightLookGotInRange(InputStream imageStream);
 	void acceptNoSightInRange();
+	void setInfoPanelCaptionText(String text);
 	
 	void acceptNewRouteSelected(String sightName, String routeName);
 	
