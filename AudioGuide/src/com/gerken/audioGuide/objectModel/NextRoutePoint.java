@@ -9,15 +9,18 @@ public class NextRoutePoint {
 	private int _routeId;
 	@Attribute(name="heading")
 	private short _heading;
+	@Attribute(name="horizon")
+	private byte _horizon;
 	@Attribute(name="name")
 	private String _name; 
 	
 	public NextRoutePoint() {		
 	}
 	
-	public NextRoutePoint(int routeId, short heading, String name) {		
+	public NextRoutePoint(int routeId, short heading, byte horizon, String name) {		
 		_routeId = routeId;
 		_heading = heading;
+		_horizon = horizon;
 		_name = name;
 	}
 	
@@ -27,6 +30,10 @@ public class NextRoutePoint {
 	
 	public short getHeading() {
 		return _heading;
+	}
+	
+	public byte getHorizon() {
+		return _horizon;
 	}
 	
 	public String getName() {

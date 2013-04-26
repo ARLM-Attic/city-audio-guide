@@ -7,8 +7,7 @@ import android.util.Log;
 import android.view.View;
 
 public class RouteArrowsView extends View {
-	private final float HORIZON_HEIGHT = 0.333333f; 
-	
+
 	private final float TIP_HEIGHT_RATIO = 0.5f;
 	private final float TAIL_WIDTH_RATIO = 0.5f;
 	
@@ -44,9 +43,9 @@ public class RouteArrowsView extends View {
         _camera = new Camera();
     } 
     
-    public void setHeading(float heading) {
+    public void setVector(float heading, float horizon) {
     	_tipX = (float)(0.5+0.375*Math.sin(heading));
-    	_tipY = 1.0f-HORIZON_HEIGHT;
+    	_tipY = 1.0f-horizon;
     	_heading = heading;
     }
     

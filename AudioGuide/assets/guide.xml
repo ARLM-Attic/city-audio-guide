@@ -7,7 +7,8 @@
                 <look imageName="st_010_01.jpg" 
                     latitude="50.087666" longitude="14.428493">
                     <nextRoutePoints>
-                        <nextRoutePoint routeId="1" heading="-80" name="The Powder Tower" />
+                        <nextRoutePoint routeId="1" heading="-80" horizon="19"
+                            name="The Powder Tower" />
                     </nextRoutePoints>
                 </look>
             </looks>
@@ -18,13 +19,15 @@
                 <look imageName="st_011_01.jpg" 
                     latitude="50.087131" longitude="14.428262">
                     <nextRoutePoints>
-                        <nextRoutePoint routeId="1" heading="10" name="House of the Black Madonna" />
+                        <nextRoutePoint routeId="1" heading="10" horizon="19"
+                            name="House of the Black Madonna" />
                     </nextRoutePoints>             
                 </look>
                 <look imageName="st_011_02.jpg" 
                     latitude="50.087262" longitude="14.427345">
                     <nextRoutePoints>
-                        <nextRoutePoint routeId="1" heading="180" name="House of the Black Madonna" />
+                        <nextRoutePoint routeId="1" heading="45" horizon="19"
+                            name="House of the Black Madonna" />
                     </nextRoutePoints>
                 </look>
             </looks>
@@ -33,7 +36,12 @@
             audioName="aud_012.mp3">
             <looks>
                 <look imageName="st_012_01.jpg" 
-                    latitude="50.087213" longitude="14.425939" />
+                    latitude="50.087213" longitude="14.425939">
+                    <nextRoutePoints>
+                        <nextRoutePoint routeId="1" heading="45" horizon="41"
+                            name="Ungelt" />
+                    </nextRoutePoints>
+                </look>
             </looks>
         </sight>
     </sights>

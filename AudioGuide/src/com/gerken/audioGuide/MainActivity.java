@@ -9,6 +9,10 @@ import com.gerken.audioGuide.interfaces.views.SightView;
 import com.gerken.audioGuide.presenters.SightPresenter;
 import com.gerken.audioGuide.services.*;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Point;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
@@ -182,7 +186,7 @@ public class MainActivity extends Activity implements SightView {
     }
 
 	@Override
-	public void acceptNewSightGotInRange(String sightName, InputStream imageStream) {
+	public void acceptNewSightGotInRange(String sightName, InputStream imageStream) throws Exception {
 		setInfoPanelCaptionText(sightName);
         setNewBackgroundImage(imageStream);     
         _nextSightPointerArrow.setVisibility(View.INVISIBLE);
@@ -190,7 +194,7 @@ public class MainActivity extends Activity implements SightView {
 	}
 	
 	@Override
-	public void acceptNewSightLookGotInRange(InputStream imageStream) {
+	public void acceptNewSightLookGotInRange(InputStream imageStream) throws Exception {
 		setNewBackgroundImage(imageStream);
 		_nextSightPointerArrow.setVisibility(View.INVISIBLE);
 	}
@@ -212,16 +216,31 @@ public class MainActivity extends Activity implements SightView {
         caption.setText(text);
 	}
 
-	private void setNewBackgroundImage(InputStream imageStream) {
+	private void setNewBackgroundImage(InputStream imageStream) throws Exception {
         if(imageStream != null) {
-        	_rootView.setBackgroundDrawable(
-            		Drawable.createFromStream(imageStream, ""));
-        	try{
-        		imageStream.close();
-        	}
-        	catch(Exception ex){
-            	Log.e(LOG_TAG, "Unable to set the background drawable", ex);
-            }
+        	
+        	BitmapFactory.Options boundsOpt = new BitmapFactory.Options();
+        	boundsOpt.inJustDecodeBounds = true;
+        	BitmapFactory.decodeStream(imageStream, null, boundsOpt);
+        	float imgWidth = boundsOpt.outWidth;
+        	float imgHeight = boundsOpt.outHeight;
+        	
+        	Display display = getWindowManager().getDefaultDisplay();
+        	float scrWidth = display.getWidth();
+        	float scrHeight = display.getHeight();
+
+        	int sample = Math.round(Math.max(imgWidth/scrWidth, imgHeight/scrHeight));
+        	
+        	BitmapFactory.Options loadOpt = new BitmapFactory.Options();
+        	loadOpt.inSampleSize = sample;
+        	Bitmap img = BitmapFactory.decodeStream(imageStream, null, loadOpt);
+        	
+        	_rootView.setBackgroundDrawable(new BitmapDrawable(img));
+        	//img.recycle();
+
+    		imageStream.close();
+
+        	
         }
 	}
 	
@@ -261,8 +280,8 @@ public class MainActivity extends Activity implements SightView {
 	}
 	
 	@Override
-	public void displayNextSightDirection(float heading) {
-		_nextSightPointerArrow.setHeading(heading);
+	public void displayNextSightDirection(float heading, float horizon) {
+		_nextSightPointerArrow.setVector(heading, horizon);
 		_nextSightPointerArrow.invalidate();
 		_nextSightPointerArrow.setVisibility(View.VISIBLE);	
 	}

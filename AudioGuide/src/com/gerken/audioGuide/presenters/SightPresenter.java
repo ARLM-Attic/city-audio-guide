@@ -146,7 +146,8 @@ public class SightPresenter {
 		if(_prefStorage.isRouteChosen()) {
 			NextRoutePoint nrp = getNextRoutePoint();
 			float heading = (float)(Math.PI*nrp.getHeading()/180.0);
-			_sightView.displayNextSightDirection(heading);
+			float horizon = (float)(0.01*nrp.getHorizon());
+			_sightView.displayNextSightDirection(heading, horizon);
 			_sightView.setInfoPanelCaptionText(nrp.getName());
 			_isNextRoutePointInfoShown = true;
 		}
@@ -206,7 +207,12 @@ public class SightPresenter {
 			_logger.logError("Unable to get the sight image " + newSightLook.getImageName(), ex);
 		}
 		
-		_sightView.acceptNewSightGotInRange(newSight.getName(), imgStream);
+		try {
+			_sightView.acceptNewSightGotInRange(newSight.getName(), imgStream);
+		}
+		catch(Exception ex){
+			_logger.logError("Unable to set the background drawable", ex);
+        }
 		_sightView.displayPlayerStopped();
 		prepareNewAudio(newSight.getAudioName());
 	}
@@ -220,7 +226,12 @@ public class SightPresenter {
 			_logger.logError("Unable to get the sight image " + newSightLook.getImageName(), ex);
 		}
 		
-		_sightView.acceptNewSightLookGotInRange(imgStream);
+		try {
+			_sightView.acceptNewSightLookGotInRange(imgStream);
+		}
+		catch(Exception ex){
+			_logger.logError("Unable to set the background drawable", ex);
+        }
 	}
 	
 	private void prepareNewAudio(String audioFileName) {
