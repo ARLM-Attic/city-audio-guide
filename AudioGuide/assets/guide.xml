@@ -19,7 +19,7 @@
                 <look imageName="st_011_01.jpg" 
                     latitude="50.087131" longitude="14.428262">
                     <nextRoutePoints>
-                        <nextRoutePoint routeId="1" heading="10" horizon="19"
+                        <nextRoutePoint routeId="1" heading="0" horizon="23"
                             name="House of the Black Madonna" />
                     </nextRoutePoints>             
                 </look>
@@ -27,6 +27,13 @@
                     latitude="50.087262" longitude="14.427345">
                     <nextRoutePoints>
                         <nextRoutePoint routeId="1" heading="45" horizon="19"
+                            name="House of the Black Madonna" />
+                    </nextRoutePoints>
+                </look>
+                <look imageName="st_011_03.jpg" 
+                    latitude="50.086877" longitude="14.427942">
+                    <nextRoutePoints>
+                        <nextRoutePoint routeId="1" heading="-50" horizon="16"
                             name="House of the Black Madonna" />
                     </nextRoutePoints>
                 </look>

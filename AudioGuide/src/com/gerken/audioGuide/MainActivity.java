@@ -11,7 +11,6 @@ import com.gerken.audioGuide.services.*;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
@@ -21,7 +20,6 @@ import android.os.Handler;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 import android.view.*;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
@@ -29,7 +27,6 @@ import android.view.animation.TranslateAnimation;
 import android.widget.*;
 
 public class MainActivity extends Activity implements SightView {
-	private final String LOG_TAG = "MainActivity";
 	
 	private View _rootView;
 	private View _playerInfoPanel;
@@ -225,22 +222,39 @@ public class MainActivity extends Activity implements SightView {
         	float imgWidth = boundsOpt.outWidth;
         	float imgHeight = boundsOpt.outHeight;
         	
-        	Display display = getWindowManager().getDefaultDisplay();
-        	float scrWidth = display.getWidth();
-        	float scrHeight = display.getHeight();
+        	float scrWidth = _rootView.getWidth();
+        	float scrHeight = _rootView.getHeight();
 
-        	int sample = Math.round(Math.max(imgWidth/scrWidth, imgHeight/scrHeight));
+        	int sample = (int)Math.floor(Math.min(imgWidth/scrWidth, imgHeight/scrHeight));
         	
         	BitmapFactory.Options loadOpt = new BitmapFactory.Options();
         	loadOpt.inSampleSize = sample;
-        	Bitmap img = BitmapFactory.decodeStream(imageStream, null, loadOpt);
+        	Bitmap sampledBitmap = BitmapFactory.decodeStream(imageStream, null, loadOpt);
         	
-        	_rootView.setBackgroundDrawable(new BitmapDrawable(img));
+        	float bmpWidth = sampledBitmap.getWidth();
+        	float bmpHeight = sampledBitmap.getHeight();
+        	
+        	float scrAspect = scrWidth/scrHeight;
+        	float bmpAspect = bmpWidth/bmpHeight;
+        	
+        	Bitmap finalBitmap = sampledBitmap;
+        	if(scrAspect > bmpAspect) {
+        		float newHeight = scrHeight*(bmpWidth/scrWidth);
+        		int y0 = Math.round((bmpHeight-newHeight)/2.0f);
+        		finalBitmap = Bitmap.createBitmap(sampledBitmap, 0, y0, (int)bmpWidth, (int)newHeight);
+        		sampledBitmap.recycle();
+        	}
+        	else if(scrAspect < bmpAspect) {
+        		float newWidth = scrWidth*(bmpHeight/scrHeight);
+        		int x0 = Math.round((bmpWidth-newWidth)/2.0f);
+        		finalBitmap = Bitmap.createBitmap(sampledBitmap, x0, 0, (int)newWidth, (int)bmpHeight);
+        		sampledBitmap.recycle();
+        	}
+        	
+        	_rootView.setBackgroundDrawable(new BitmapDrawable(finalBitmap));
         	//img.recycle();
 
-    		imageStream.close();
-
-        	
+    		imageStream.close();        	
         }
 	}
 	
