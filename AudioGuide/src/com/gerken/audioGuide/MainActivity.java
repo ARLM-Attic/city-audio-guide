@@ -1,5 +1,6 @@
 package com.gerken.audioGuide;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 import com.gerken.audioGuide.R;
@@ -51,6 +52,8 @@ public class MainActivity extends Activity implements SightView {
 	private Drawable _stopButtonDefaultDrawable;
 	private Drawable _rewindButtonDefaultDrawable;
 	
+	private Bitmap _backgroundBitmap;
+	
 	private Handler _handler;
 	
 	private float _playerPanelHeight = 0.0f;
@@ -68,6 +71,7 @@ public class MainActivity extends Activity implements SightView {
         		this, new GuideAssetManager(ctx),
         		new AndroidMediaPlayerFacade(ctx),
         		new SharedPreferenceManager(ctx),
+        		new DownscalableBitmapFactory(),
         		new DefaultLoggingAdapter("SightPresenter"));
         
         _locationManager = new LocationManagerFacade(ctx, _locationListener);       
@@ -138,8 +142,6 @@ public class MainActivity extends Activity implements SightView {
         return playerInfoPanelLp.height-sightCaptionFrameLp.height;
     }
     
-    //private View.OnLayoutChangeListener lcl = 
-    
     @Override
     protected void onResume() {
     	super.onResume();
@@ -182,18 +184,28 @@ public class MainActivity extends Activity implements SightView {
     	return control;
     }
 
-	@Override
+	/*
 	public void acceptNewSightGotInRange(String sightName, InputStream imageStream) throws Exception {
 		setInfoPanelCaptionText(sightName);
         setNewBackgroundImage(imageStream);     
         _nextSightPointerArrow.setVisibility(View.INVISIBLE);
-        _playerInfoPanel.setVisibility(View.VISIBLE);
 	}
 	
 	@Override
 	public void acceptNewSightLookGotInRange(InputStream imageStream) throws Exception {
 		setNewBackgroundImage(imageStream);
 		_nextSightPointerArrow.setVisibility(View.INVISIBLE);
+	}
+	*/
+
+	@Override
+	public int getWidth() {
+		return _rootView.getWidth();
+	}
+
+	@Override
+	public int getHeight() {
+		return _rootView.getHeight();
 	}
 	
 	@Override
@@ -208,56 +220,19 @@ public class MainActivity extends Activity implements SightView {
 	}
 	
 	@Override
+	public void setBackgroundImage(DownscalableBitmap bitmap) throws IOException {
+		if(_backgroundBitmap != null)
+			_backgroundBitmap.recycle();
+		
+		_backgroundBitmap = bitmap.getFinalBitmap();
+		_rootView.setBackgroundDrawable(new BitmapDrawable(_backgroundBitmap));
+	}
+	
+	@Override
 	public void setInfoPanelCaptionText(String text) {
 		TextView caption = findControl(R.id.sightCaption);
         caption.setText(text);
-	}
-
-	private void setNewBackgroundImage(InputStream imageStream) throws Exception {
-        if(imageStream != null) {
-        	
-        	BitmapFactory.Options boundsOpt = new BitmapFactory.Options();
-        	boundsOpt.inJustDecodeBounds = true;
-        	BitmapFactory.decodeStream(imageStream, null, boundsOpt);
-        	float imgWidth = boundsOpt.outWidth;
-        	float imgHeight = boundsOpt.outHeight;
-        	
-        	float scrWidth = _rootView.getWidth();
-        	float scrHeight = _rootView.getHeight();
-
-        	int sample = (int)Math.floor(Math.min(imgWidth/scrWidth, imgHeight/scrHeight));
-        	
-        	BitmapFactory.Options loadOpt = new BitmapFactory.Options();
-        	loadOpt.inSampleSize = sample;
-        	Bitmap sampledBitmap = BitmapFactory.decodeStream(imageStream, null, loadOpt);
-        	
-        	float bmpWidth = sampledBitmap.getWidth();
-        	float bmpHeight = sampledBitmap.getHeight();
-        	
-        	float scrAspect = scrWidth/scrHeight;
-        	float bmpAspect = bmpWidth/bmpHeight;
-        	
-        	Bitmap finalBitmap = sampledBitmap;
-        	if(scrAspect > bmpAspect) {
-        		float newHeight = scrHeight*(bmpWidth/scrWidth);
-        		int y0 = Math.round((bmpHeight-newHeight)/2.0f);
-        		finalBitmap = Bitmap.createBitmap(sampledBitmap, 0, y0, (int)bmpWidth, (int)newHeight);
-        		sampledBitmap.recycle();
-        	}
-        	else if(scrAspect < bmpAspect) {
-        		float newWidth = scrWidth*(bmpHeight/scrHeight);
-        		int x0 = Math.round((bmpWidth-newWidth)/2.0f);
-        		finalBitmap = Bitmap.createBitmap(sampledBitmap, x0, 0, (int)newWidth, (int)bmpHeight);
-        		sampledBitmap.recycle();
-        	}
-        	
-        	_rootView.setBackgroundDrawable(new BitmapDrawable(finalBitmap));
-        	//img.recycle();
-
-    		imageStream.close();        	
-        }
-	}
-	
+	}	
     
 	@Override
 	public void displayPlayerPlaying() {

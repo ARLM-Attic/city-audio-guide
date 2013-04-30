@@ -1,12 +1,14 @@
 package com.gerken.audioGuide.interfaces.views;
 
-import java.io.InputStream;
+import com.gerken.audioGuide.graphics.DownscalableBitmap;
 
 public interface SightView extends AudioPlayerView {
-	void acceptNewSightGotInRange(String sightName, InputStream imageStream) throws Exception;
-	void acceptNewSightLookGotInRange(InputStream imageStream) throws Exception;
+	int getWidth();
+	int getHeight();
+	
 	void acceptNoSightInRange();
 	void setInfoPanelCaptionText(String text);
+	void setBackgroundImage(DownscalableBitmap bitmap) throws java.io.IOException;
 	
 	void acceptNewRouteSelected(String sightName, String routeName);
 	

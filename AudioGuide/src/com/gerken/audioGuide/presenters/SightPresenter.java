@@ -5,6 +5,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import com.gerken.audioGuide.R;
+import com.gerken.audioGuide.graphics.DownscalableBitmap;
 import com.gerken.audioGuide.interfaces.*;
 import com.gerken.audioGuide.interfaces.views.SightView;
 import com.gerken.audioGuide.objectModel.*;
@@ -21,6 +22,7 @@ public class SightPresenter {
 	private AssetStreamProvider _assetStreamProvider;
 	private AudioPlayer _audioPlayer;
 	private ApplicationSettingsStorage _prefStorage;
+	private DownscalableBitmapCreator _downscalableBitmapCreator;
 	private Logger _logger;
 	
 	private Sight _currentSight = null;
@@ -30,6 +32,9 @@ public class SightPresenter {
 	private Timer _playerPanelHidingTimer;
 	private boolean _isPlayerPanelVisible = false;
 	private boolean _isNextRoutePointInfoShown = false;
+	
+	private int _currentSightLookImageHeight;
+	private int _currentSightLookImageVerticalPadding;
 	
 	private AudioPlayerRewindingHelper _rewindingHelper;
 	private AudioPositionUpdater _audioPositionUpdater;
@@ -62,12 +67,14 @@ public class SightPresenter {
 	
 	public SightPresenter(City city, SightView sightView, 
 			AssetStreamProvider assetStreamProvider, AudioPlayer audioPlayer,
-			ApplicationSettingsStorage prefStorage, Logger logger) {
+			ApplicationSettingsStorage prefStorage, 
+			DownscalableBitmapCreator downscalableBitmapCreator, Logger logger) {
 		_city = city;
 		_sightView = sightView;
 		_assetStreamProvider = assetStreamProvider;
 		_audioPlayer = audioPlayer;
 		_prefStorage = prefStorage;
+		_downscalableBitmapCreator = downscalableBitmapCreator;
 		_logger = logger;
 				
 		_playerPanelHidingTimer = new Timer();
@@ -146,11 +153,16 @@ public class SightPresenter {
 		if(_prefStorage.isRouteChosen()) {
 			NextRoutePoint nrp = getNextRoutePoint();
 			float heading = (float)(Math.PI*nrp.getHeading()/180.0);
-			float horizon = (float)(0.01*nrp.getHorizon());
-			_sightView.displayNextSightDirection(heading, horizon);
+			_sightView.displayNextSightDirection(heading, getAdjustedHorizon(nrp.getHorizon()));
 			_sightView.setInfoPanelCaptionText(nrp.getName());
 			_isNextRoutePointInfoShown = true;
 		}
+	}
+	
+	private float getAdjustedHorizon(byte originalHorizonPerc) {
+		int originalHeight = _currentSightLookImageHeight + 2*_currentSightLookImageVerticalPadding;
+		int originalHorizon = Math.round(0.01f*originalHorizonPerc*originalHeight);
+		return (float)(originalHorizon - _currentSightLookImageVerticalPadding)/(float)_currentSightLookImageHeight;
 	}
 	
 	public void handleRewindButtonPress() {
@@ -198,26 +210,21 @@ public class SightPresenter {
 	}
 	
 	private void notifyViewAboutNewSight(SightLook newSightLook) {
-		Sight newSight = newSightLook.getSight();
-		InputStream imgStream = null;
-		try{
-			imgStream = _assetStreamProvider.getImageAssetStream(newSightLook.getImageName());
-		}
-		catch(Exception ex) {
-			_logger.logError("Unable to get the sight image " + newSightLook.getImageName(), ex);
-		}
+		notifyViewAboutNewSightLook(newSightLook);
 		
-		try {
-			_sightView.acceptNewSightGotInRange(newSight.getName(), imgStream);
-		}
-		catch(Exception ex){
-			_logger.logError("Unable to set the background drawable", ex);
-        }
+		Sight newSight = newSightLook.getSight();
+		_sightView.setInfoPanelCaptionText(newSight.getName());		
 		_sightView.displayPlayerStopped();
 		prepareNewAudio(newSight.getAudioName());
 	}
 	
 	private void notifyViewAboutNewSightLook(SightLook newSightLook) {
+		InputStream imgStream = getSightLookImageStream(newSightLook);
+		if(imgStream != null)		
+			setViewBackgroundImage(imgStream);
+	}
+	
+	private InputStream getSightLookImageStream(SightLook newSightLook) {
 		InputStream imgStream = null;
 		try{
 			imgStream = _assetStreamProvider.getImageAssetStream(newSightLook.getImageName());
@@ -225,12 +232,19 @@ public class SightPresenter {
 		catch(Exception ex) {
 			_logger.logError("Unable to get the sight image " + newSightLook.getImageName(), ex);
 		}
-		
+		return imgStream;
+	}
+	
+	private void setViewBackgroundImage(InputStream imgStream) {
 		try {
-			_sightView.acceptNewSightLookGotInRange(imgStream);
+			DownscalableBitmap bmp = _downscalableBitmapCreator.CreateDownscalableBitmap();
+			bmp.init(imgStream, _sightView.getWidth(), _sightView.getHeight());
+			_currentSightLookImageHeight = bmp.getFinalHeight();
+			_currentSightLookImageVerticalPadding = bmp.getFinalVerticalPadding();
+			_sightView.setBackgroundImage(bmp);
 		}
 		catch(Exception ex){
-			_logger.logError("Unable to set the background drawable", ex);
+			_logger.logError("Unable to set the background image", ex);
         }
 	}
 	

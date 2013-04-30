@@ -18,7 +18,10 @@ public class RouteArrowsView extends View {
 	
 	private float _arrowWidth = 40.0f;
 	private float _arrowHeight = 60.0f;
+	private float _paddingBottom = 20.0f;
 	private float _heading = 0.0f;
+	
+	private float _xRotationAngle = 70.0f;
 	
 	private Camera _camera;
 
@@ -76,33 +79,43 @@ public class RouteArrowsView extends View {
 	}
 	
 	private Path createArrow(Canvas canvas) {
-		float tx = _tipX*getWidth();
-		float ty = _tipY*getHeight();
+		float tx = _tipX * getWidth();
+		float ty = _tipY * getHeight();
 		float left = tx - 0.5f*_arrowWidth;
 		float top = ty;
 		float right = tx + 0.5f*_arrowWidth;
-		float bottom = ty + _arrowHeight;
+		float bottom = (getHeight() - _paddingBottom);///(float)Math.cos(_xRotationAngle*Math.PI/180.0);
 		Log.d("RouteArrowsView", String.format("tip %.1f,%.1f", tx, ty));
 		
 		canvas.translate(left, top);
-		canvas.clipRect(0, 0, _arrowWidth, _arrowHeight, Region.Op.REPLACE);
+		//canvas.clipRect(0, 0, _arrowWidth, _arrowHeight, Region.Op.REPLACE);
 		Log.d("RouteArrowsView", String.format("%.1f,%.1f-%.1f,%.1f", left, top, right, bottom));
 		
 		float w = _arrowWidth;
-		float h = _arrowHeight;
+		float h = bottom-top;
 		
 		float tipBottomY = TIP_HEIGHT_RATIO*h;
 		float tailHalfWidth = 0.5f*TAIL_WIDTH_RATIO*w;
 		float cx = 0.5f*w;
 		Path path = new Path();
 		path.moveTo(0.5f*w, 0);
+		/*
+		path.lineTo(w, tipBottomY);
+		RectF arcOval= new RectF(0, tipBottomY-0.5f*w, 0, tipBottomY+0.5f*w);
+		path.arcTo(arcOval, 0, 180, false);
+		*/
 		path.lineTo(w, tipBottomY);
 		path.lineTo(cx+tailHalfWidth, tipBottomY);
 		float tailHeight = h-tipBottomY;
-		path.rLineTo(0, tailHeight);
-		path.rLineTo(-TAIL_WIDTH_RATIO*w, 0);
-		path.rLineTo(0, -tailHeight);
+		float straightTailHeight = h-TIP_HEIGHT_RATIO*h-tailHalfWidth;
+		path.rLineTo(0, straightTailHeight);
+		path.rQuadTo(-0.5f*TAIL_WIDTH_RATIO*w, 0.5f*TAIL_WIDTH_RATIO*w, -TAIL_WIDTH_RATIO*w, 0);
+		//RectF arcOval= new RectF(0.5f*(w-TAIL_WIDTH_RATIO*w), bottom-tailHalfWidth*2.0f, w-0.5f*(w-TAIL_WIDTH_RATIO*w), bottom);
+		//path.arcTo(arcOval, 0, 180, false);
+		//path.rLineTo(-TAIL_WIDTH_RATIO*w, 0);
+		path.rLineTo(0, -straightTailHeight);
 		path.lineTo(0, tipBottomY);
+		
 		path.close();
 		
 		return path;				
@@ -112,6 +125,7 @@ public class RouteArrowsView extends View {
 		Paint arrowPaint = new Paint();
 		arrowPaint.setColor(0x904AFF00);
 		arrowPaint.setStyle(Paint.Style.FILL);
+		arrowPaint.setAntiAlias(true);
 		return arrowPaint;
 	}
 	
@@ -121,12 +135,12 @@ public class RouteArrowsView extends View {
 		
 		_camera.save();
 		_camera.rotateY(-(int)(180.0*_heading/Math.PI));
-		_camera.rotateX(70);		
+		_camera.rotateX(_xRotationAngle);		
 		_camera.rotateZ(0);
 		_camera.getMatrix(m);
 
 		float cx = 0.5f*_arrowWidth;
-		float cy = 0.5f*_arrowHeight; 
+		float cy = 0;// 0.5f*_arrowHeight; 
 		m.preTranslate(-cx, -cy);
 		m.postTranslate(cx, cy); 
 		
