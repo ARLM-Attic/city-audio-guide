@@ -48,7 +48,8 @@ public class HandleLocationChange {
 		sut.handleLocationChange(EXPECTED_LOCATION_LATITUDE, EXPECTED_LOCATION_LONGITUDE);
 		
 		// --- Assert
-		verify(view).acceptNewSightGotInRange(EXPECTED_SIGHT_NAME, EXPECTED_SIGHT_LOOK_IMAGE_STREAM);
+		//verify(view).acceptNewSightGotInRange(EXPECTED_SIGHT_NAME, EXPECTED_SIGHT_LOOK_IMAGE_STREAM);
+		verify(view).setInfoPanelCaptionText(EXPECTED_SIGHT_NAME);
 	}
 	
 	@Test
@@ -121,7 +122,7 @@ public class HandleLocationChange {
 		sut.handleLocationChange(SECOND_SIGHTLOOK_LATITUDE, SECOND_SIGHTLOOK_LONGITUDE);
 		
 		// --- Assert
-		verify(view).acceptNewSightLookGotInRange(SECOND_SIGHT_LOOK_IMAGE_STREAM);
+		//verify(view).acceptNewSightLookGotInRange(SECOND_SIGHT_LOOK_IMAGE_STREAM);
 	}
 	
 	private SightPresenter CreateSut(City city, SightView view, AssetStreamProvider assetStreamProvider) {
@@ -131,9 +132,10 @@ public class HandleLocationChange {
 	private SightPresenter CreateSut(City city, SightView view, AssetStreamProvider assetStreamProvider, AudioPlayer player) {		
 		ApplicationSettingsStorage prefStorage = mock(ApplicationSettingsStorage.class);
 		Logger logger = mock(Logger.class);
+		DownscalableBitmapCreator bmpCreator = mock(DownscalableBitmapCreator.class);
 		
 		return new SightPresenter(city, view, assetStreamProvider,
-				player, prefStorage, logger);
+				player, prefStorage, bmpCreator, logger);
 	}
 
 }

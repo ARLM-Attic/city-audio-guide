@@ -12,7 +12,7 @@ import com.gerken.audioGuide.objectModel.*;
 import com.gerken.audioGuide.presenters.SightPresenter;;
 
 public class HandleStopButtonClick {
-	private Random random = new Random(System.currentTimeMillis());
+	private Random _random = new Random(System.currentTimeMillis());
 	
 	@Test
 	public void Given_PlayerHasBeenPlaying__Then_PlayerGetsStopped() throws Exception {
@@ -37,19 +37,20 @@ public class HandleStopButtonClick {
 		final double EXPECTED_LOCATION_LATITUDE = 12.345;
 		final double EXPECTED_LOCATION_LONGITUDE = 24.567;
 		final String WHATEVER_STRING = "whatever";
-		int expectedRouteId = random.nextInt();
-		short expectedHeadingDeg = (short)random.nextInt(Short.MAX_VALUE);
+		int expectedRouteId = _random.nextInt();
+		short expectedHeadingDeg = (short)_random.nextInt(Short.MAX_VALUE);
+		byte expectedHorizonPerc = (byte)_random.nextInt(Byte.MAX_VALUE);
 		final String EXPECTED_NEXT_ROUTE_POINT_NAME = "Eiffel Tower";
 		final boolean ROUTE_IS_CHOSEN = true;
 		
-		NextRoutePoint expectedRoutePoint = 
-				new NextRoutePoint(expectedRouteId, expectedHeadingDeg, EXPECTED_NEXT_ROUTE_POINT_NAME);		
+		NextRoutePoint expectedRoutePoint = new NextRoutePoint(expectedRouteId, 
+				expectedHeadingDeg, expectedHorizonPerc, EXPECTED_NEXT_ROUTE_POINT_NAME);		
 		SightLook expectedSightLook = new SightLook(
 				EXPECTED_LOCATION_LATITUDE, EXPECTED_LOCATION_LONGITUDE, WHATEVER_STRING);
 		expectedSightLook.getNextRoutePoints().add(expectedRoutePoint);
-		Sight expectedSight = new Sight(random.nextInt(), WHATEVER_STRING, WHATEVER_STRING);
+		Sight expectedSight = new Sight(_random.nextInt(), WHATEVER_STRING, WHATEVER_STRING);
 		expectedSight.addLook(expectedSightLook);
-		City city = new City(random.nextInt(), WHATEVER_STRING, WHATEVER_STRING);
+		City city = new City(_random.nextInt(), WHATEVER_STRING, WHATEVER_STRING);
 		city.getSights().add(expectedSight);
 		
 		SightView view = mock(SightView.class);
@@ -67,7 +68,7 @@ public class HandleStopButtonClick {
 		
 		// --- Assert
 		float expectedHeadingRad = (float)(Math.PI*expectedHeadingDeg/180.0);
-		verify(view).displayNextSightDirection(expectedHeadingRad);
+		verify(view).displayNextSightDirection(eq(expectedHeadingRad), anyFloat());
 		verify(view).setInfoPanelCaptionText(EXPECTED_NEXT_ROUTE_POINT_NAME);
 	}
 
@@ -80,9 +81,10 @@ public class HandleStopButtonClick {
 	private SightPresenter CreateSut(City city, 
 			SightView view, AudioPlayer player, ApplicationSettingsStorage prefStorage) {
 		AssetStreamProvider assetStreamProvider = mock(AssetStreamProvider.class);
+		DownscalableBitmapCreator bmpCreator = mock(DownscalableBitmapCreator.class);
 		Logger logger = mock(Logger.class);
 		
 		return new SightPresenter(city, view, assetStreamProvider,
-				player, prefStorage, logger);
+				player, prefStorage, bmpCreator, logger);
 	}
 }

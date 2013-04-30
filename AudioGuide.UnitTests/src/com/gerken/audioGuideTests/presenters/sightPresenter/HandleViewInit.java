@@ -6,6 +6,7 @@ import org.junit.Test;
 
 import com.gerken.audioGuide.interfaces.AssetStreamProvider;
 import com.gerken.audioGuide.interfaces.AudioPlayer;
+import com.gerken.audioGuide.interfaces.DownscalableBitmapCreator;
 import com.gerken.audioGuide.interfaces.Logger;
 import com.gerken.audioGuide.interfaces.ApplicationSettingsStorage;
 import com.gerken.audioGuide.interfaces.views.SightView;
@@ -55,6 +56,6 @@ public class HandleViewInit {
 		return new SightPresenter(city, view, 
 				mock(AssetStreamProvider.class), mock(AudioPlayer.class),
 				prefStorage, 
-				mock(Logger.class));
+				mock(DownscalableBitmapCreator.class), mock(Logger.class));
 	}
 }

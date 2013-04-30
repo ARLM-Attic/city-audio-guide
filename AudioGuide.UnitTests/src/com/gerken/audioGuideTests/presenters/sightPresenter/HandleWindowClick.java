@@ -9,6 +9,7 @@ import org.junit.Test;
 import com.gerken.audioGuide.interfaces.ApplicationSettingsStorage;
 import com.gerken.audioGuide.interfaces.AssetStreamProvider;
 import com.gerken.audioGuide.interfaces.AudioPlayer;
+import com.gerken.audioGuide.interfaces.DownscalableBitmapCreator;
 import com.gerken.audioGuide.interfaces.Logger;
 import com.gerken.audioGuide.interfaces.views.SightView;
 import com.gerken.audioGuide.objectModel.City;
@@ -18,7 +19,7 @@ import com.gerken.audioGuide.objectModel.SightLook;
 import com.gerken.audioGuide.presenters.SightPresenter;
 
 public class HandleWindowClick {
-	private Random random = new Random(System.currentTimeMillis());
+	private Random _random = new Random(System.currentTimeMillis());
 	
 	@Test
 	public void Given_SightIsInRange__Then_PlayerPanelIsDisplayed() throws Exception {
@@ -45,14 +46,15 @@ public class HandleWindowClick {
 		
 		final double EXPECTED_LOCATION_LATITUDE = 12.345;
 		final double EXPECTED_LOCATION_LONGITUDE = 24.567;
-		int expectedRouteId = random.nextInt();
-		short expectedHeadingDeg = (short)random.nextInt(Short.MAX_VALUE);
+		int expectedRouteId = _random.nextInt();
+		short expectedHeadingDeg = (short)_random.nextInt(Short.MAX_VALUE);
+		byte expectedHorizonPerc = (byte)_random.nextInt(Byte.MAX_VALUE);
 		final String EXPECTED_SIGHT_NAME = "Colosseum";
 		final String EXPECTED_NEXT_ROUTE_POINT_NAME = "Eiffel Tower";
 		final boolean ROUTE_IS_CHOSEN = true;
 		
-		NextRoutePoint expectedRoutePoint = 
-				new NextRoutePoint(expectedRouteId, expectedHeadingDeg, EXPECTED_NEXT_ROUTE_POINT_NAME);		
+		NextRoutePoint expectedRoutePoint = new NextRoutePoint(expectedRouteId, 
+				expectedHeadingDeg, expectedHorizonPerc, EXPECTED_NEXT_ROUTE_POINT_NAME);		
 		City city = CreateSingleSightLookModel(
 				EXPECTED_LOCATION_LATITUDE, EXPECTED_LOCATION_LONGITUDE, EXPECTED_SIGHT_NAME);
 		city.getSights().get(0).getSightLooks().get(0).getNextRoutePoints().add(expectedRoutePoint);
@@ -71,7 +73,7 @@ public class HandleWindowClick {
 		
 		// --- Assert
 		verify(view).hideNextSightDirection();
-		verify(view).setInfoPanelCaptionText(EXPECTED_SIGHT_NAME);
+		verify(view, atLeastOnce()).setInfoPanelCaptionText(EXPECTED_SIGHT_NAME);
 	}
 	
 	private City CreateSingleSightLookModel(double latitude, double longitude) {
@@ -84,9 +86,9 @@ public class HandleWindowClick {
 		
 		SightLook expectedSightLook = new SightLook(
 				latitude, longitude, WHATEVER_STRING);
-		Sight expectedSight = new Sight(random.nextInt(), sightName, WHATEVER_STRING);
+		Sight expectedSight = new Sight(_random.nextInt(), sightName, WHATEVER_STRING);
 		expectedSight.addLook(expectedSightLook);
-		City city = new City(random.nextInt(), WHATEVER_STRING, WHATEVER_STRING);
+		City city = new City(_random.nextInt(), WHATEVER_STRING, WHATEVER_STRING);
 		city.getSights().add(expectedSight);
 		
 		return city;
@@ -104,10 +106,11 @@ public class HandleWindowClick {
 	private SightPresenter CreateSut(City city, 
 			SightView view, AudioPlayer player, ApplicationSettingsStorage settingsStorage) {
 		AssetStreamProvider assetStreamProvider = mock(AssetStreamProvider.class);
+		DownscalableBitmapCreator bmpCreator = mock(DownscalableBitmapCreator.class);
 		Logger logger = mock(Logger.class);
 		
 		return new SightPresenter(city, view, assetStreamProvider,
-				player, settingsStorage, logger);
+				player, settingsStorage, bmpCreator, logger);
 	}
 
 }
