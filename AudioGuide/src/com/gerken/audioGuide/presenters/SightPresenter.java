@@ -237,8 +237,8 @@ public class SightPresenter {
 	
 	private void setViewBackgroundImage(InputStream imgStream) {
 		try {
-			DownscalableBitmap bmp = _downscalableBitmapCreator.CreateDownscalableBitmap();
-			bmp.init(imgStream, _sightView.getWidth(), _sightView.getHeight());
+			DownscalableBitmap bmp = _downscalableBitmapCreator.CreateDownscalableBitmap(
+					imgStream, _sightView.getWidth(), _sightView.getHeight());
 			_currentSightLookImageHeight = bmp.getFinalHeight();
 			_currentSightLookImageVerticalPadding = bmp.getFinalVerticalPadding();
 			_sightView.setBackgroundImage(bmp);
