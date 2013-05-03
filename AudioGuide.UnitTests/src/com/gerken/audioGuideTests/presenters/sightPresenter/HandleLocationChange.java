@@ -3,6 +3,7 @@ package com.gerken.audioGuideTests.presenters.sightPresenter;
 import static org.mockito.Mockito.*;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 
 import org.junit.Test;
 
@@ -21,6 +22,9 @@ public class HandleLocationChange {
 		final String EXPECTED_SIGHT_NAME = "Colosseum";
 		final ByteArrayInputStream EXPECTED_SIGHT_LOOK_IMAGE_STREAM = 
 				new ByteArrayInputStream(new byte[]{1,2,3});
+		final int EXPECTED_VIEW_WIDTH = 240;
+		final int EXPECTED_VIEW_HEIGHT = 320;
+		
 		final double WHATEVER_DOUBLE = 111.222;
 		final String WHATEVER_STRING = "whatever";		
 		
@@ -34,22 +38,25 @@ public class HandleLocationChange {
 		Sight unexpectedSight = new Sight(2, "", "audio.mp3");
 		City city = new City(1, "Default", WHATEVER_STRING);
 		city.getSights().add(expectedSight);
-		city.getSights().add(unexpectedSight);	
-		
+		city.getSights().add(unexpectedSight);			
 		
 		SightView view = mock(SightView.class);
+		when(view.getWidth()).thenReturn(EXPECTED_VIEW_WIDTH);
+		when(view.getHeight()).thenReturn(EXPECTED_VIEW_HEIGHT);
 		AssetStreamProvider assetStreamProvider = mock(AssetStreamProvider.class);
 		when(assetStreamProvider.getImageAssetStream(EXPECTED_SIGHT_LOOK_IMAGE_NAME))
 			.thenReturn(EXPECTED_SIGHT_LOOK_IMAGE_STREAM);
+		DownscalableBitmapCreator bmpCreator = mock(DownscalableBitmapCreator.class);
 		
-		SightPresenter sut = CreateSut(city, view, assetStreamProvider);
+		SightPresenter sut = CreateSut(city, view, assetStreamProvider, bmpCreator);
 		
 		// --- Act
 		sut.handleLocationChange(EXPECTED_LOCATION_LATITUDE, EXPECTED_LOCATION_LONGITUDE);
 		
 		// --- Assert
-		//verify(view).acceptNewSightGotInRange(EXPECTED_SIGHT_NAME, EXPECTED_SIGHT_LOOK_IMAGE_STREAM);
 		verify(view).setInfoPanelCaptionText(EXPECTED_SIGHT_NAME);
+		verify(bmpCreator).CreateDownscalableBitmap(EXPECTED_SIGHT_LOOK_IMAGE_STREAM,
+				EXPECTED_VIEW_WIDTH, EXPECTED_VIEW_HEIGHT);
 	}
 	
 	@Test
@@ -88,6 +95,8 @@ public class HandleLocationChange {
 		final String FIRST_SIGHT_LOOK_IMAGE_NAME = "colosseum1.jpg";
 		final String SECOND_SIGHT_LOOK_IMAGE_NAME = "colosseum2.jpg";
 		final String EXPECTED_SIGHT_NAME = "Colosseum";
+		final int EXPECTED_VIEW_WIDTH = 240;
+		final int EXPECTED_VIEW_HEIGHT = 320;
 		ByteArrayInputStream FIRST_SIGHT_LOOK_IMAGE_STREAM = 
 				new ByteArrayInputStream(new byte[]{1,2,3});
 		ByteArrayInputStream SECOND_SIGHT_LOOK_IMAGE_STREAM = 
@@ -109,30 +118,45 @@ public class HandleLocationChange {
 		
 		
 		SightView view = mock(SightView.class);
+		when(view.getWidth()).thenReturn(EXPECTED_VIEW_WIDTH);
+		when(view.getHeight()).thenReturn(EXPECTED_VIEW_HEIGHT);
 		AssetStreamProvider assetStreamProvider = mock(AssetStreamProvider.class);
 		when(assetStreamProvider.getImageAssetStream(FIRST_SIGHT_LOOK_IMAGE_NAME))
 			.thenReturn(FIRST_SIGHT_LOOK_IMAGE_STREAM);
 		when(assetStreamProvider.getImageAssetStream(SECOND_SIGHT_LOOK_IMAGE_NAME))
 			.thenReturn(SECOND_SIGHT_LOOK_IMAGE_STREAM);
+		DownscalableBitmapCreator bmpCreator = mock(DownscalableBitmapCreator.class);
 		
-		SightPresenter sut = CreateSut(city, view, assetStreamProvider);
+		SightPresenter sut = CreateSut(city, view, assetStreamProvider, bmpCreator);
 		sut.handleLocationChange(FIRST_SIGHTLOOK_LATITUDE, FIRST_SIGHTLOOK_LONGITUDE);
 		
 		// --- Act
 		sut.handleLocationChange(SECOND_SIGHTLOOK_LATITUDE, SECOND_SIGHTLOOK_LONGITUDE);
 		
 		// --- Assert
-		//verify(view).acceptNewSightLookGotInRange(SECOND_SIGHT_LOOK_IMAGE_STREAM);
+		verify(bmpCreator).CreateDownscalableBitmap(SECOND_SIGHT_LOOK_IMAGE_STREAM,
+				EXPECTED_VIEW_WIDTH, EXPECTED_VIEW_HEIGHT);
 	}
 	
 	private SightPresenter CreateSut(City city, SightView view, AssetStreamProvider assetStreamProvider) {
-		return CreateSut(city, view, assetStreamProvider, mock(AudioPlayer.class));
+		return CreateSut(city, view, assetStreamProvider, 
+				mock(AudioPlayer.class), mock(DownscalableBitmapCreator.class));
+	}
+	
+	private SightPresenter CreateSut(City city, SightView view, AssetStreamProvider assetStreamProvider, DownscalableBitmapCreator bmpCreator) {		
+		return CreateSut(city, view, assetStreamProvider, 
+				mock(AudioPlayer.class), 
+				bmpCreator);
 	}
 	
 	private SightPresenter CreateSut(City city, SightView view, AssetStreamProvider assetStreamProvider, AudioPlayer player) {		
+		return CreateSut(city, view, assetStreamProvider, player, 
+				mock(DownscalableBitmapCreator.class));
+	}
+	
+	private SightPresenter CreateSut(City city, SightView view, AssetStreamProvider assetStreamProvider, AudioPlayer player, DownscalableBitmapCreator bmpCreator) {		
 		ApplicationSettingsStorage prefStorage = mock(ApplicationSettingsStorage.class);
-		Logger logger = mock(Logger.class);
-		DownscalableBitmapCreator bmpCreator = mock(DownscalableBitmapCreator.class);
+		Logger logger = mock(Logger.class);		
 		
 		return new SightPresenter(city, view, assetStreamProvider,
 				player, prefStorage, bmpCreator, logger);
