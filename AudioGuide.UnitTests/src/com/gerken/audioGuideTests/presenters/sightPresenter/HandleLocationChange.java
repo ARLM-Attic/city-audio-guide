@@ -4,6 +4,7 @@ import static org.mockito.Mockito.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.Random;
 
 import org.junit.Test;
 
@@ -13,6 +14,7 @@ import com.gerken.audioGuide.objectModel.*;
 import com.gerken.audioGuide.presenters.SightPresenter;;
 
 public class HandleLocationChange {
+	private Random _random = new Random(System.currentTimeMillis());
 
 	@Test
 	public void Given_NewSightGotInRange__Then_ViewNotifiedAboutNewSight() throws Exception {
@@ -63,13 +65,8 @@ public class HandleLocationChange {
 	public void Given_NewSightGotInRange__Then_AudioNotificationPalyed() throws Exception {
 		final double EXPECTED_LOCATION_LATITUDE = 12.345;
 		final double EXPECTED_LOCATION_LONGITUDE = 24.567;
-		final String WHATEVER_STRING = "whatever";		
-		
-		Sight expectedSight = new Sight(1, WHATEVER_STRING, "audio.mp3");
-		expectedSight.addLook(new SightLook(
-				EXPECTED_LOCATION_LATITUDE, EXPECTED_LOCATION_LONGITUDE, WHATEVER_STRING));
-		City city = new City(1, "Default", WHATEVER_STRING);
-		city.getSights().add(expectedSight);
+
+		City city = CreateSingleSightLookModel(EXPECTED_LOCATION_LATITUDE, EXPECTED_LOCATION_LONGITUDE);
 		
 		SightView view = mock(SightView.class);
 		AssetStreamProvider assetStreamProvider = mock(AssetStreamProvider.class);
@@ -84,6 +81,27 @@ public class HandleLocationChange {
 		
 		// --- Assert
 		verify(player).signalSightInRange();
+	}
+	
+	@Test
+	public void Given_NewSightGotInRange__Then_NextRoutePointArrowHidden() throws Exception {
+		final double EXPECTED_LOCATION_LATITUDE = 12.345;
+		final double EXPECTED_LOCATION_LONGITUDE = 24.567;
+
+		City city = CreateSingleSightLookModel(EXPECTED_LOCATION_LATITUDE, EXPECTED_LOCATION_LONGITUDE);
+		
+		SightView view = mock(SightView.class);
+		AssetStreamProvider assetStreamProvider = mock(AssetStreamProvider.class);
+		when(assetStreamProvider.getImageAssetStream(anyString()))
+			.thenReturn(new ByteArrayInputStream(new byte[]{1,2,3}));
+		
+		SightPresenter sut = CreateSut(city, view, assetStreamProvider);
+		
+		// --- Act
+		sut.handleLocationChange(EXPECTED_LOCATION_LATITUDE, EXPECTED_LOCATION_LONGITUDE);
+		
+		// --- Assert
+		verify(view).hideNextSightDirection();
 	}
 	
 	@Test
@@ -136,6 +154,24 @@ public class HandleLocationChange {
 		// --- Assert
 		verify(bmpCreator).CreateDownscalableBitmap(SECOND_SIGHT_LOOK_IMAGE_STREAM,
 				EXPECTED_VIEW_WIDTH, EXPECTED_VIEW_HEIGHT);
+	}
+	
+	private City CreateSingleSightLookModel(double latitude, double longitude) {
+		final String WHATEVER_STRING = "whatever";	
+		return CreateSingleSightLookModel(latitude, longitude, WHATEVER_STRING);
+	}
+	
+	private City CreateSingleSightLookModel(double latitude, double longitude, String sightName) {
+		final String WHATEVER_STRING = "whatever";	
+		
+		SightLook expectedSightLook = new SightLook(
+				latitude, longitude, WHATEVER_STRING);
+		Sight expectedSight = new Sight(_random.nextInt(), sightName, WHATEVER_STRING);
+		expectedSight.addLook(expectedSightLook);
+		City city = new City(_random.nextInt(), WHATEVER_STRING, WHATEVER_STRING);
+		city.getSights().add(expectedSight);
+		
+		return city;
 	}
 	
 	private SightPresenter CreateSut(City city, SightView view, AssetStreamProvider assetStreamProvider) {
