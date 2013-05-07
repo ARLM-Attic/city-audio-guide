@@ -222,6 +222,8 @@ public class SightPresenter {
 		InputStream imgStream = getSightLookImageStream(newSightLook);
 		if(imgStream != null)		
 			setViewBackgroundImage(imgStream);
+		
+		_sightView.hideNextSightDirection();
 	}
 	
 	private InputStream getSightLookImageStream(SightLook newSightLook) {

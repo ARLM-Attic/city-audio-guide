@@ -7,7 +7,7 @@
                 <look imageName="st_010_01.jpg" 
                     latitude="50.087666" longitude="14.428493">
                     <nextRoutePoints>
-                        <nextRoutePoint routeId="1" heading="-80" horizon="19"
+                        <nextRoutePoint routeId="1" heading="-35" horizon="26"
                             name="The Powder Tower" />
                     </nextRoutePoints>
                 </look>
@@ -45,7 +45,7 @@
                 <look imageName="st_012_01.jpg" 
                     latitude="50.087213" longitude="14.425939">
                     <nextRoutePoints>
-                        <nextRoutePoint routeId="1" heading="45" horizon="41"
+                        <nextRoutePoint routeId="1" heading="45" horizon="36"
                             name="Ungelt" />
                     </nextRoutePoints>
                 </look>
