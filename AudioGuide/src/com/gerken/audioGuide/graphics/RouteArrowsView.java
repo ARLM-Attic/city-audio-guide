@@ -18,10 +18,10 @@ public class RouteArrowsView extends View {
 	
 	private float _arrowWidth = 40.0f;
 	private float _arrowHeight = 60.0f;
-	private float _paddingBottom = 20.0f;
+	private float _paddingBottom = 22.0f;
 	private float _heading = 0.0f;
 	
-	private float _xRotationAngle = 70.0f;
+	private float _xRotationAngle = 0;
 	
 	private Camera _camera;
 
@@ -75,6 +75,7 @@ public class RouteArrowsView extends View {
 		canvas.save();
 		applyPerspective(canvas);
 		canvas.drawPath(arrow, _arrowPaint);
+		//applyPerspective(canvas);
 		canvas.restore();
 	}
 	
@@ -82,10 +83,16 @@ public class RouteArrowsView extends View {
 		float tx = _tipX * getWidth();
 		float ty = _tipY * getHeight();
 		float left = tx - 0.5f*_arrowWidth;
-		float top = ty;
+		//float top = ty;
 		float right = tx + 0.5f*_arrowWidth;
-		float bottom = (getHeight() - _paddingBottom);///(float)Math.cos(_xRotationAngle*Math.PI/180.0);
-		Log.d("RouteArrowsView", String.format("tip %.1f,%.1f", tx, ty));
+		float bottom = (getHeight() - _paddingBottom);//*1.5f;///(float)Math.cos(_xRotationAngle*Math.PI/180.0);
+		float top = bottom-_arrowHeight;
+		
+		double perspectiveRatio = (bottom-ty)/_arrowHeight;
+		_xRotationAngle = (perspectiveRatio >= 1.0) ? 0 :
+			(float)(180.0*Math.acos(perspectiveRatio)/Math.PI);
+		//float bottom = ty + _arrowHeight;
+		//Log.d("RouteArrowsView", String.format("tip %.1f,%.1f", tx, ty));
 		
 		canvas.translate(left, top);
 		//canvas.clipRect(0, 0, _arrowWidth, _arrowHeight, Region.Op.REPLACE);
@@ -106,8 +113,8 @@ public class RouteArrowsView extends View {
 		*/
 		path.lineTo(w, tipBottomY);
 		path.lineTo(cx+tailHalfWidth, tipBottomY);
-		float tailHeight = h-tipBottomY;
-		float straightTailHeight = h-TIP_HEIGHT_RATIO*h-tailHalfWidth;
+		
+		float straightTailHeight = h-TIP_HEIGHT_RATIO*h-0.5f*tailHalfWidth;
 		path.rLineTo(0, straightTailHeight);
 		path.rQuadTo(-0.5f*TAIL_WIDTH_RATIO*w, 0.5f*TAIL_WIDTH_RATIO*w, -TAIL_WIDTH_RATIO*w, 0);
 		//RectF arcOval= new RectF(0.5f*(w-TAIL_WIDTH_RATIO*w), bottom-tailHalfWidth*2.0f, w-0.5f*(w-TAIL_WIDTH_RATIO*w), bottom);
@@ -134,13 +141,16 @@ public class RouteArrowsView extends View {
 		Matrix m = new Matrix();
 		
 		_camera.save();
-		_camera.rotateY(-(int)(180.0*_heading/Math.PI));
+		//_camera.rotateY(-(int)(180.0*_heading/Math.PI));
+		_camera.rotateY(0);
 		_camera.rotateX(_xRotationAngle);		
-		_camera.rotateZ(0);
+		//_camera.rotateZ(0);
+		_camera.rotateZ(-(int)(180.0*_heading/Math.PI));
 		_camera.getMatrix(m);
 
 		float cx = 0.5f*_arrowWidth;
-		float cy = 0;// 0.5f*_arrowHeight; 
+		//float cy = 0;// 0.5f*_arrowHeight; 
+		float cy = _arrowHeight;
 		m.preTranslate(-cx, -cy);
 		m.postTranslate(cx, cy); 
 		
