@@ -11,6 +11,8 @@ public class RouteArrowsView extends View {
 	private final float TIP_HEIGHT_RATIO = 0.5f;
 	private final float TAIL_WIDTH_RATIO = 0.5f;
 	
+	private final float A_135 = (float)(Math.PI * 135.0 / 180.0);
+	
 	private Paint _arrowPaint;
 	
 	private float _tipX = 0.4f;
@@ -20,6 +22,9 @@ public class RouteArrowsView extends View {
 	private float _arrowHeight = 60.0f;
 	private float _paddingBottom = 22.0f;
 	private float _heading = 0.0f;
+	
+	private float _arrowLeft = 0;
+	private float _arrowTop = 0;
 	
 	private float _xRotationAngle = 0;
 	
@@ -50,20 +55,17 @@ public class RouteArrowsView extends View {
     	_tipX = (float)(0.5+0.375*Math.sin(heading));
     	_tipY = 1.0f-horizon;
     	_heading = heading;
-    }
-    
-    public void setTipX(float v){
-    	validateTipCoordinate(v);
-    	_tipX = v;
-    }
-    public void setTipY(float v){
-    	validateTipCoordinate(v);
-    	_tipY = v;
-    }
-    
-    private void validateTipCoordinate(float coord) {
-    	if(coord<0.0f || coord>1.0f)
-    		throw new IllegalArgumentException("The value must be between 0.0 and 1.0");
+    	
+    	float tx = _tipX * getWidth();
+		float ty = _tipY * getHeight();
+		_arrowLeft = tx - 0.5f*_arrowWidth;
+		_arrowTop = getHeight() - _paddingBottom - _arrowHeight;
+		
+		//float bottom = (getHeight() - _paddingBottom);		
+		//double perspectiveRatio = (bottom-ty)/_arrowHeight;
+		double perspectiveRatio = 1.0 + (_arrowTop - ty)/_arrowHeight;
+		_xRotationAngle = (perspectiveRatio >= 1.0) ? 0 :
+			(float)(180.0*Math.acos(perspectiveRatio)/Math.PI);	
     }
     
 	
@@ -71,58 +73,28 @@ public class RouteArrowsView extends View {
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
 		
-		Path arrow = createArrow(canvas);
+		Path arrow = createArrow(_arrowWidth, _arrowHeight);
 		canvas.save();
-		applyPerspective(canvas);
+		canvas.translate(_arrowLeft, _arrowTop);
+		applyPerspective(canvas);		
 		canvas.drawPath(arrow, _arrowPaint);
-		//applyPerspective(canvas);
 		canvas.restore();
 	}
 	
-	private Path createArrow(Canvas canvas) {
-		float tx = _tipX * getWidth();
-		float ty = _tipY * getHeight();
-		float left = tx - 0.5f*_arrowWidth;
-		//float top = ty;
-		float right = tx + 0.5f*_arrowWidth;
-		float bottom = (getHeight() - _paddingBottom);//*1.5f;///(float)Math.cos(_xRotationAngle*Math.PI/180.0);
-		float top = bottom-_arrowHeight;
-		
-		double perspectiveRatio = (bottom-ty)/_arrowHeight;
-		_xRotationAngle = (perspectiveRatio >= 1.0) ? 0 :
-			(float)(180.0*Math.acos(perspectiveRatio)/Math.PI);
-		//float bottom = ty + _arrowHeight;
-		//Log.d("RouteArrowsView", String.format("tip %.1f,%.1f", tx, ty));
-		
-		canvas.translate(left, top);
-		//canvas.clipRect(0, 0, _arrowWidth, _arrowHeight, Region.Op.REPLACE);
-		Log.d("RouteArrowsView", String.format("%.1f,%.1f-%.1f,%.1f", left, top, right, bottom));
-		
-		float w = _arrowWidth;
-		float h = bottom-top;
-		
+	private Path createArrow(float w, float h) {	
 		float tipBottomY = TIP_HEIGHT_RATIO*h;
 		float tailHalfWidth = 0.5f*TAIL_WIDTH_RATIO*w;
 		float cx = 0.5f*w;
 		Path path = new Path();
 		path.moveTo(0.5f*w, 0);
-		/*
-		path.lineTo(w, tipBottomY);
-		RectF arcOval= new RectF(0, tipBottomY-0.5f*w, 0, tipBottomY+0.5f*w);
-		path.arcTo(arcOval, 0, 180, false);
-		*/
 		path.lineTo(w, tipBottomY);
 		path.lineTo(cx+tailHalfWidth, tipBottomY);
 		
 		float straightTailHeight = h-TIP_HEIGHT_RATIO*h-0.5f*tailHalfWidth;
 		path.rLineTo(0, straightTailHeight);
 		path.rQuadTo(-0.5f*TAIL_WIDTH_RATIO*w, 0.5f*TAIL_WIDTH_RATIO*w, -TAIL_WIDTH_RATIO*w, 0);
-		//RectF arcOval= new RectF(0.5f*(w-TAIL_WIDTH_RATIO*w), bottom-tailHalfWidth*2.0f, w-0.5f*(w-TAIL_WIDTH_RATIO*w), bottom);
-		//path.arcTo(arcOval, 0, 180, false);
-		//path.rLineTo(-TAIL_WIDTH_RATIO*w, 0);
 		path.rLineTo(0, -straightTailHeight);
-		path.lineTo(0, tipBottomY);
-		
+		path.lineTo(0, tipBottomY);		
 		path.close();
 		
 		return path;				
@@ -145,16 +117,35 @@ public class RouteArrowsView extends View {
 		_camera.rotateY(0);
 		_camera.rotateX(_xRotationAngle);		
 		//_camera.rotateZ(0);
-		_camera.rotateZ(-(int)(180.0*_heading/Math.PI));
+		float dZ = -(int)(180.0*_heading/Math.PI);
+		if(_heading > A_135)
+			dZ += 180; 
+		_camera.rotateZ(dZ);
 		_camera.getMatrix(m);
 
 		float cx = 0.5f*_arrowWidth;
-		//float cy = 0;// 0.5f*_arrowHeight; 
 		float cy = _arrowHeight;
 		m.preTranslate(-cx, -cy);
 		m.postTranslate(cx, cy); 
 		
 		canvas.concat(m);
 		_camera.restore();    
+		
+		if(_heading > A_135) {
+			m = new Matrix();
+			
+			_camera.save();
+			_camera.rotateZ(180);
+			_camera.getMatrix(m);
+
+			cx = 0.5f*_arrowWidth;
+			cy = 0.5f*_arrowHeight; 
+
+			m.preTranslate(-cx, -cy);
+			m.postTranslate(cx, cy); 
+			
+			canvas.concat(m);
+			_camera.restore(); 
+		}
 	}
 }
