@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<declare-styleable name="RouteArrowsView">
+		<attr name="arrowWidth" format="dimension" />
+		<attr name="arrowHeight" format="dimension" />
+	</declare-styleable>
+</resources>

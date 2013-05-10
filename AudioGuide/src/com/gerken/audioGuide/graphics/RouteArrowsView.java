@@ -1,6 +1,9 @@
 package com.gerken.audioGuide.graphics;
 
+import com.gerken.audioGuide.R;
+
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.*;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -11,6 +14,9 @@ public class RouteArrowsView extends View {
 	private final float TIP_HEIGHT_RATIO = 0.5f;
 	private final float TAIL_WIDTH_RATIO = 0.5f;
 	
+	private final float DEF_ARROW_WIDTH = 40;
+	private final float DEF_ARROW_HEIGHT = 60;
+	
 	private final float A_135 = (float)(Math.PI * 135.0 / 180.0);
 	
 	private Paint _arrowPaint;
@@ -18,9 +24,9 @@ public class RouteArrowsView extends View {
 	private float _tipX = 0.4f;
 	private float _tipY = 0.4f;
 	
-	private float _arrowWidth = 40.0f;
-	private float _arrowHeight = 60.0f;
-	private float _paddingBottom = 22.0f;
+	private float _arrowWidth = DEF_ARROW_WIDTH;
+	private float _arrowHeight = DEF_ARROW_HEIGHT;
+	
 	private float _heading = 0.0f;
 	
 	private float _arrowLeft = 0;
@@ -40,16 +46,25 @@ public class RouteArrowsView extends View {
 	public RouteArrowsView(Context context, AttributeSet attrs) 
     { 
         super(context, attrs); 
-        _arrowPaint = createArrowPaint();
-        _camera = new Camera();
+        init(context, attrs); 
     } 
 
     public RouteArrowsView(Context context, AttributeSet attrs, int defStyle) 
     { 
         super(context, attrs, defStyle); 
-        _arrowPaint = createArrowPaint();
-        _camera = new Camera();
+        init(context, attrs); 
     } 
+    
+    private void init(Context context, AttributeSet attrs) {
+    	_arrowPaint = createArrowPaint();
+        _camera = new Camera();
+        
+    	TypedArray arr = context.obtainStyledAttributes(attrs, R.styleable.RouteArrowsView);
+    	_arrowWidth = arr.getDimension(R.styleable.RouteArrowsView_arrowWidth, DEF_ARROW_WIDTH);
+    	_arrowHeight = arr.getDimension(R.styleable.RouteArrowsView_arrowHeight, DEF_ARROW_HEIGHT);
+    	
+    	arr.recycle();
+    }
     
     public void setVector(float heading, float horizon) {
     	_tipX = (float)(0.5+0.375*Math.sin(heading));
@@ -59,10 +74,8 @@ public class RouteArrowsView extends View {
     	float tx = _tipX * getWidth();
 		float ty = _tipY * getHeight();
 		_arrowLeft = tx - 0.5f*_arrowWidth;
-		_arrowTop = getHeight() - _paddingBottom - _arrowHeight;
+		_arrowTop = getHeight() - getPaddingBottom() - _arrowHeight;
 		
-		//float bottom = (getHeight() - _paddingBottom);		
-		//double perspectiveRatio = (bottom-ty)/_arrowHeight;
 		double perspectiveRatio = 1.0 + (_arrowTop - ty)/_arrowHeight;
 		_xRotationAngle = (perspectiveRatio >= 1.0) ? 0 :
 			(float)(180.0*Math.acos(perspectiveRatio)/Math.PI);	

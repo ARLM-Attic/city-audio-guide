@@ -11,6 +11,13 @@
                             name="The Powder Tower" />
                     </nextRoutePoints>
                 </look>
+                <look imageName="st_010_02.jpg" 
+                    latitude="50.087464" longitude="14.428571">
+                    <nextRoutePoints>
+                        <nextRoutePoint routeId="1" heading="-60" horizon="21"
+                            name="The Powder Tower" />
+                    </nextRoutePoints>
+                </look>
             </looks>
         </sight>
         <sight id="11" name="The Powder Tower" 
@@ -26,7 +33,7 @@
                 <look imageName="st_011_02.jpg" 
                     latitude="50.087262" longitude="14.427345">
                     <nextRoutePoints>
-                        <nextRoutePoint routeId="1" heading="170" horizon="19"
+                        <nextRoutePoint routeId="1" heading="175" horizon="26"
                             name="House of the Black Madonna" />
                     </nextRoutePoints>
                 </look>
