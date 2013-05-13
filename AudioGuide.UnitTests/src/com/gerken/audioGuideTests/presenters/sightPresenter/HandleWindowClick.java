@@ -22,6 +22,27 @@ public class HandleWindowClick {
 	private Random _random = new Random(System.currentTimeMillis());
 	
 	@Test
+	public void Given_NoSightInRange__Then_PlayerPanelIsNotDisplayed() throws Exception {
+		final double SIGHT_LOCATION_LATITUDE = 12.345;
+		final double SIGHT_LOCATION_LONGITUDE = 24.567;
+		final double CURRENT_LOCATION_LATITUDE = 20 + SIGHT_LOCATION_LATITUDE;
+		final double CURRENT_LOCATION_LONGITUDE = 20 + SIGHT_LOCATION_LONGITUDE;
+		
+		City city = CreateSingleSightLookModel(SIGHT_LOCATION_LATITUDE, SIGHT_LOCATION_LONGITUDE);
+		
+		SightView view = mock(SightView.class);
+		
+		SightPresenter sut = CreateSut(city, view);
+		sut.handleLocationChange(CURRENT_LOCATION_LATITUDE, CURRENT_LOCATION_LONGITUDE);
+		
+		// --- Act
+		sut.handleWindowClick();
+		
+		// --- Assert
+		verify(view, never()).showPlayerPanel();
+	}
+	
+	@Test
 	public void Given_SightIsInRange__Then_PlayerPanelIsDisplayed() throws Exception {
 		final double EXPECTED_LOCATION_LATITUDE = 12.345;
 		final double EXPECTED_LOCATION_LONGITUDE = 24.567;
@@ -42,8 +63,7 @@ public class HandleWindowClick {
 	
 	@Test
 	public void Given_SightIsInRange_AndNextRoutePointIsShown__Then_SightNameIsShown_AndNextRoutePointIsHidden() throws Exception {
-		final String WHATEVER_STRING = "whatever";		
-		
+
 		final double EXPECTED_LOCATION_LATITUDE = 12.345;
 		final double EXPECTED_LOCATION_LONGITUDE = 24.567;
 		int expectedRouteId = _random.nextInt();
@@ -51,7 +71,7 @@ public class HandleWindowClick {
 		byte expectedHorizonPerc = (byte)_random.nextInt(Byte.MAX_VALUE);
 		final String EXPECTED_SIGHT_NAME = "Colosseum";
 		final String EXPECTED_NEXT_ROUTE_POINT_NAME = "Eiffel Tower";
-		final boolean ROUTE_IS_CHOSEN = true;
+		
 		
 		NextRoutePoint expectedRoutePoint = new NextRoutePoint(expectedRouteId, 
 				expectedHeadingDeg, expectedHorizonPerc, EXPECTED_NEXT_ROUTE_POINT_NAME);		
@@ -60,20 +80,20 @@ public class HandleWindowClick {
 		city.getSights().get(0).getSightLooks().get(0).getNextRoutePoints().add(expectedRoutePoint);
 		
 		SightView view = mock(SightView.class);
-		ApplicationSettingsStorage settingsStorage = mock(ApplicationSettingsStorage.class);
-		when(settingsStorage.isRouteChosen()).thenReturn(ROUTE_IS_CHOSEN);
-		when(settingsStorage.getCurrentRouteId()).thenReturn(expectedRouteId);
+		ApplicationSettingsStorage settingsStorage = 
+				CreateApplicationSettingsStorageWithRouteChosen(expectedRouteId);
 		
 		SightPresenter sut = CreateSut(city, view, settingsStorage);
 		sut.handleLocationChange(EXPECTED_LOCATION_LATITUDE, EXPECTED_LOCATION_LONGITUDE);
 		sut.handleStopButtonClick();
 		
 		// --- Act
+		reset(view);
 		sut.handleWindowClick();
 		
 		// --- Assert
 		verify(view).hideNextSightDirection();
-		verify(view, atLeastOnce()).setInfoPanelCaptionText(EXPECTED_SIGHT_NAME);
+		verify(view).setInfoPanelCaptionText(EXPECTED_SIGHT_NAME);
 	}
 	
 	private City CreateSingleSightLookModel(double latitude, double longitude) {
@@ -92,6 +112,14 @@ public class HandleWindowClick {
 		city.getSights().add(expectedSight);
 		
 		return city;
+	}
+	
+	private ApplicationSettingsStorage CreateApplicationSettingsStorageWithRouteChosen(int routeId) {
+		final boolean ROUTE_IS_CHOSEN = true;
+		ApplicationSettingsStorage settingsStorage = mock(ApplicationSettingsStorage.class);
+		when(settingsStorage.isRouteChosen()).thenReturn(ROUTE_IS_CHOSEN);
+		when(settingsStorage.getCurrentRouteId()).thenReturn(routeId);
+		return settingsStorage;
 	}
 	
 	private SightPresenter CreateSut(City city, SightView view) {		
