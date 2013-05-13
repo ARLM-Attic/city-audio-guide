@@ -14,6 +14,7 @@ import com.gerken.audioGuide.interfaces.AssetStreamProvider;
 import com.gerken.audioGuide.interfaces.AudioPlayer;
 import com.gerken.audioGuide.interfaces.DownscalableBitmapCreator;
 import com.gerken.audioGuide.interfaces.Logger;
+import com.gerken.audioGuide.interfaces.SightPresenterDependencyCreator;
 import com.gerken.audioGuide.interfaces.views.SightView;
 import com.gerken.audioGuide.objectModel.City;
 import com.gerken.audioGuide.objectModel.Sight;
@@ -62,15 +63,12 @@ public class HandlePlayButtonClick {
 		verify(view).displayPlayerStopped();
 	}
 	
-	private SightPresenter CreateSut(City city, 
-			SightView view, AudioPlayer player) {
-		ApplicationSettingsStorage prefStorage = mock(ApplicationSettingsStorage.class);
-		AssetStreamProvider assetStreamProvider = mock(AssetStreamProvider.class);
-		DownscalableBitmapCreator bmpCreator = mock(DownscalableBitmapCreator.class);
-		Logger logger = mock(Logger.class);
+	private SightPresenter CreateSut(City city,	SightView view, AudioPlayer player) {		
+		SightPresenterDependencyCreator factory = mock(SightPresenterDependencyCreator.class);
+		when(factory.createApplicationSettingsStorage()).thenReturn(mock(ApplicationSettingsStorage.class));
+		when(factory.createAssetStreamProvider()).thenReturn(mock(AssetStreamProvider.class));
 		
-		return new SightPresenter(city, view, assetStreamProvider,
-				player, prefStorage, bmpCreator, logger);
+		return new SightPresenter(city, view, player, factory);
 	}
 	
 	private City CreateSingleSightLookModel() {

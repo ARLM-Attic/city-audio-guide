@@ -9,6 +9,7 @@ import com.gerken.audioGuide.interfaces.AudioPlayer;
 import com.gerken.audioGuide.interfaces.DownscalableBitmapCreator;
 import com.gerken.audioGuide.interfaces.Logger;
 import com.gerken.audioGuide.interfaces.ApplicationSettingsStorage;
+import com.gerken.audioGuide.interfaces.SightPresenterDependencyCreator;
 import com.gerken.audioGuide.interfaces.views.SightView;
 import com.gerken.audioGuide.objectModel.City;
 import com.gerken.audioGuide.presenters.SightPresenter;
@@ -49,13 +50,13 @@ public class HandleViewInit {
 		verify(view, never()).showHelp();
 	}
 	
-	private SightPresenter CreateSut(SightView view, ApplicationSettingsStorage prefStorage) {	
+	private SightPresenter CreateSut(SightView view, ApplicationSettingsStorage settingsStorage) {	
 		final String WHATEVER_STRING = "whatever";
 		City city = new City(1, "Default", WHATEVER_STRING);
 		
-		return new SightPresenter(city, view, 
-				mock(AssetStreamProvider.class), mock(AudioPlayer.class),
-				prefStorage, 
-				mock(DownscalableBitmapCreator.class), mock(Logger.class));
+		SightPresenterDependencyCreator factory = mock(SightPresenterDependencyCreator.class);
+		when(factory.createApplicationSettingsStorage()).thenReturn(settingsStorage);
+		
+		return new SightPresenter(city, view, mock(AudioPlayer.class), factory);
 	}
 }

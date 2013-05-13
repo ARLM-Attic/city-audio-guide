@@ -79,12 +79,14 @@ public class HandleStopButtonClick {
 	}
 	
 	private SightPresenter CreateSut(City city, 
-			SightView view, AudioPlayer player, ApplicationSettingsStorage prefStorage) {
-		AssetStreamProvider assetStreamProvider = mock(AssetStreamProvider.class);
+			SightView view, AudioPlayer player, ApplicationSettingsStorage settingsStorage) {
 		DownscalableBitmapCreator bmpCreator = mock(DownscalableBitmapCreator.class);
 		Logger logger = mock(Logger.class);
 		
-		return new SightPresenter(city, view, assetStreamProvider,
-				player, prefStorage, bmpCreator, logger);
+		SightPresenterDependencyCreator factory = mock(SightPresenterDependencyCreator.class);
+		when(factory.createApplicationSettingsStorage()).thenReturn(settingsStorage);
+		when(factory.createAssetStreamProvider()).thenReturn(mock(AssetStreamProvider.class));
+		
+		return new SightPresenter(city, view, player, factory);
 	}
 }

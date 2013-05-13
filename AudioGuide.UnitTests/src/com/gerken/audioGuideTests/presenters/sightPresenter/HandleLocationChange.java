@@ -190,11 +190,15 @@ public class HandleLocationChange {
 	}
 	
 	private SightPresenter CreateSut(City city, SightView view, AssetStreamProvider assetStreamProvider, AudioPlayer player, DownscalableBitmapCreator bmpCreator) {		
-		ApplicationSettingsStorage prefStorage = mock(ApplicationSettingsStorage.class);
-		Logger logger = mock(Logger.class);		
+		ApplicationSettingsStorage settingsStorage = mock(ApplicationSettingsStorage.class);
 		
-		return new SightPresenter(city, view, assetStreamProvider,
-				player, prefStorage, bmpCreator, logger);
+		SightPresenterDependencyCreator factory = mock(SightPresenterDependencyCreator.class);
+		when(factory.createApplicationSettingsStorage()).thenReturn(settingsStorage);
+		when(factory.createAssetStreamProvider()).thenReturn(assetStreamProvider);
+		when(factory.createDownscalableBitmapCreator()).thenReturn(bmpCreator);
+		when(factory.createLogger()).thenReturn(mock(Logger.class));
+		
+		return new SightPresenter(city, view, player, factory);
 	}
 
 }
