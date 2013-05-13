@@ -9,7 +9,6 @@ import com.gerken.audioGuide.graphics.DownscalableBitmap;
 import com.gerken.audioGuide.interfaces.*;
 import com.gerken.audioGuide.interfaces.views.SightView;
 import com.gerken.audioGuide.objectModel.*;
-import com.gerken.audioGuide.services.AudioPlayerRewindingHelper;
 
 public class SightPresenter {
 	private final float SIGHT_ACTIVATION_RADIUS = 20.0f;
@@ -23,6 +22,7 @@ public class SightPresenter {
 	private AudioPlayer _audioPlayer;
 	private ApplicationSettingsStorage _prefStorage;
 	private DownscalableBitmapCreator _downscalableBitmapCreator;
+	private AudioPlayerRewinder _audioRewinder;
 	private Logger _logger;
 	
 	private Sight _currentSight = null;
@@ -36,7 +36,7 @@ public class SightPresenter {
 	private int _currentSightLookImageHeight;
 	private int _currentSightLookImageVerticalPadding;
 	
-	private AudioPlayerRewindingHelper _rewindingHelper;
+	
 	private AudioPositionUpdater _audioPositionUpdater;
 	
 	private OnEventListener _mediaPlayerCompletionListener = new OnEventListener() {		
@@ -65,24 +65,25 @@ public class SightPresenter {
 		}
 	};
 	
-	public SightPresenter(City city, SightView sightView, 
-			AssetStreamProvider assetStreamProvider, AudioPlayer audioPlayer,
-			ApplicationSettingsStorage prefStorage, 
-			DownscalableBitmapCreator downscalableBitmapCreator, Logger logger) {
+	public SightPresenter(City city, 
+			SightView sightView, AudioPlayer audioPlayer,
+			SightPresenterDependencyCreator sightPresenterDependencyCreator) {
 		_city = city;
 		_sightView = sightView;
-		_assetStreamProvider = assetStreamProvider;
-		_audioPlayer = audioPlayer;
-		_prefStorage = prefStorage;
-		_downscalableBitmapCreator = downscalableBitmapCreator;
-		_logger = logger;
+		_audioPlayer = audioPlayer;				
+		
+		_assetStreamProvider = sightPresenterDependencyCreator.createAssetStreamProvider();		
+		_prefStorage = sightPresenterDependencyCreator.createApplicationSettingsStorage();
+		_downscalableBitmapCreator = 
+				sightPresenterDependencyCreator.createDownscalableBitmapCreator();
+		_logger = sightPresenterDependencyCreator.createLogger();
+		_audioRewinder = sightPresenterDependencyCreator.createAudioPlayerRewinder();
 				
 		_playerPanelHidingTimer = new Timer();
 		
 		_audioPlayer.addAudioAssetCompletionListener(_mediaPlayerCompletionListener);
 		_prefStorage.setOnCurrentRouteChangedListener(_routeChangeListener);
 		
-		_rewindingHelper = new AudioPlayerRewindingHelper(_audioPlayer);
 		_audioPositionUpdater = new AudioPositionUpdater(_audioPlayer, _sightView);
 	}
 	
@@ -134,7 +135,6 @@ public class SightPresenter {
 				_logger.logError("Unable to play audio track for the sight " + sightName, ex);
 			}
 			_sightView.displayPlayerPlaying();
-			_sightView.hideNextSightDirection();
 			_audioPositionUpdater.startAudioUpdateTimer();
 		}
 	}	
@@ -169,13 +169,13 @@ public class SightPresenter {
 		_logger.logDebug("handleRewindButtonPress");
 		_audioPositionUpdater.startAudioUpdateTimer();
 		resetPlayerPanelHidingTimer();
-		_rewindingHelper.startRewinding();
+		_audioRewinder.startRewinding();
 	}
 	
 	public void handleRewindButtonRelease() {
 		_logger.logDebug("handleRewindButtonRelease");
 		try {
-			_rewindingHelper.stopRewinding();			
+			_audioRewinder.stopRewinding();			
 		}
 		catch(Exception ex) {
 			_logger.logError("Unable to resume playing after rewinding", ex);

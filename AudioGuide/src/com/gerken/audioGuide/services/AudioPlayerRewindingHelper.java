@@ -5,8 +5,9 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import com.gerken.audioGuide.interfaces.AudioPlayer;
+import com.gerken.audioGuide.interfaces.AudioPlayerRewinder;
 
-public class AudioPlayerRewindingHelper {
+public class AudioPlayerRewindingHelper implements AudioPlayerRewinder {
 	private final float REWIND_STEP_RATIO = 0.02f;
 	private final long REWIND_REPEAT_INTERVAL_MS = 500L;
 	

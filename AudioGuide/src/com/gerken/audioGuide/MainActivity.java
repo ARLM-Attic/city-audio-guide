@@ -1,17 +1,16 @@
 package com.gerken.audioGuide;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 import com.gerken.audioGuide.R;
 import com.gerken.audioGuide.controls.ControlUpdater;
 import com.gerken.audioGuide.graphics.*;
+import com.gerken.audioGuide.interfaces.AudioPlayer;
 import com.gerken.audioGuide.interfaces.views.SightView;
 import com.gerken.audioGuide.presenters.SightPresenter;
 import com.gerken.audioGuide.services.*;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
@@ -66,13 +65,11 @@ public class MainActivity extends Activity implements SightView {
         _handler = new Handler();
         
         Context ctx = getApplicationContext();
+        AudioPlayer player = new AndroidMediaPlayerFacade(ctx);
         _presenter = new SightPresenter(
         		((GuideApplication)getApplication()).getCity(), 
-        		this, new GuideAssetManager(ctx),
-        		new AndroidMediaPlayerFacade(ctx),
-        		new SharedPreferenceManager(ctx),
-        		new DownscalableBitmapFactory(),
-        		new DefaultLoggingAdapter("SightPresenter"));
+        		this, player,
+        		new SightPresenterDependencyFactory(ctx, player));
         
         _locationManager = new LocationManagerFacade(ctx, _locationListener);       
         
