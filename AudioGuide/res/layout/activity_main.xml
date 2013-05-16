@@ -44,74 +44,13 @@
 		        android:text="@string/sight_info_none"  />
         </LinearLayout>
         
-	    <RelativeLayout
+	    <com.gerken.audioGuide.controls.AudioPlayerControl
 	        android:id="@+id/playerPanel"
 		    android:layout_width="match_parent"
 		    android:layout_height="108dp"
 		    android:layout_gravity="center"
-		    android:background="#80CCCCCC">
-	        
-	        <ImageButton
-		        android:id="@+id/rewindButton"
-		        android:layout_width="100dp"
-		        android:layout_height="60dp"
-		        android:layout_alignTop="@+id/playButton"
-		        android:layout_toLeftOf="@+id/playButton"
-		        android:background="#00000000"
-		         /> 
-        
-	        <ImageButton
-		        android:id="@+id/playButton"
-		        android:layout_width="80dp"
-		        android:layout_height="80dp"
-		        android:layout_centerHorizontal="true"
-		        android:layout_alignParentTop="true"
-		        android:layout_marginTop="8dp"
-		        android:background="#00000000"
-		         />
-	        
-	        <ImageButton
-		        android:id="@+id/stopButton"
-		        android:layout_width="100dp"
-		        android:layout_height="60dp"
-		        android:layout_alignTop="@+id/playButton"
-		        android:layout_toRightOf="@+id/playButton"
-		        android:background="#00000000"
-		         /> 
-	        
-	        <ProgressBar android:id="@+id/audioProgressBar"
-				android:layout_width="match_parent"
-				android:layout_height="4dp"
-				android:layout_alignParentBottom="true"
-				android:layout_marginBottom="8dp"
-				android:layout_marginLeft="16dp"
-				android:layout_marginRight="16dp"
-				android:progressDrawable="@drawable/audio_progress_drawable"
-				style="@android:style/Widget.ProgressBar.Horizontal" />
-	        
-	        <TextView android:id="@+id/audioDuration"
-	            android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:textColor="#FF75FF3A"
-		        android:textStyle="bold"
-		        android:textSize="16sp"
-		        android:text="0:00"
-		        android:layout_alignRight="@+id/audioProgressBar"
-		        android:layout_alignBottom="@+id/audioProgressBar"
-		        android:layout_marginBottom="4dp" />
-	        
-	        <TextView android:id="@+id/audioPlayed"
-	            android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:textColor="#FF75FF3A"
-		        android:textStyle="bold"
-		        android:textSize="16sp"
-		        android:text="0:00"
-		        android:layout_alignLeft="@+id/audioProgressBar"
-		        android:layout_alignBottom="@+id/audioProgressBar"
-		        android:layout_marginBottom="4dp" />
-	        
-         </RelativeLayout>
+		    android:background="#80CCCCCC" />
+
     </LinearLayout>  
 
 </FrameLayout>

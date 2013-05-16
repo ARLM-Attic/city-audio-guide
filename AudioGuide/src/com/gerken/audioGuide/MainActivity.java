@@ -3,18 +3,17 @@ package com.gerken.audioGuide;
 import java.io.IOException;
 
 import com.gerken.audioGuide.R;
+import com.gerken.audioGuide.controls.AudioPlayerControl;
 import com.gerken.audioGuide.controls.ControlUpdater;
 import com.gerken.audioGuide.graphics.*;
 import com.gerken.audioGuide.interfaces.AudioPlayer;
 import com.gerken.audioGuide.interfaces.views.SightView;
+import com.gerken.audioGuide.presenters.AudioPlayerPresenter;
 import com.gerken.audioGuide.presenters.SightPresenter;
 import com.gerken.audioGuide.services.*;
 
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.location.Location;
-import android.location.LocationListener;
 import android.os.Bundle;
 import android.os.Handler;
 import android.app.Activity;
@@ -22,7 +21,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.view.*;
 import android.view.View.OnClickListener;
-import android.view.View.OnTouchListener;
 import android.view.animation.TranslateAnimation;
 import android.widget.*;
 
@@ -30,63 +28,38 @@ public class MainActivity extends Activity implements SightView {
 	
 	private View _rootView;
 	private View _playerInfoPanel;
-	private View _playerPanel;
-	private ImageButton _playButton;
-	private ImageButton _stopButton;
-	private ImageButton _rewindButton;
-	private ProgressBar _audioProgressBar;
-	private TextView _audioDuration;
-	private TextView _audioPlayed;
+	private AudioPlayerControl _audioPlayerControl;
 	
 	private RouteArrowsView _nextSightPointerArrow;
 	
 	private SightPresenter _presenter;
-	private LocationManagerFacade _locationManager;
+	private AudioPlayerPresenter _audioPlayerPresenter;
+	private AndroidLocationManagerFacade _locationManager;
+	private SightLookFinderByLocation _sightLookFinderByLocation;
 	
-	private PlayerButtonDrawableFactory _buttonDrawableFactory = 
-			new PlayerButtonDrawableFactory();
-	
-	private Drawable _playButtonDefaultDrawable;
-	private Drawable _playButtonPressedDrawable;
-	private Drawable _stopButtonDefaultDrawable;
-	private Drawable _rewindButtonDefaultDrawable;
 	
 	private Bitmap _backgroundBitmap;
 	
 	private Handler _handler;
 	
 	private float _playerPanelHeight = 0.0f;
+	
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         
-        _handler = new Handler();
-        
-        Context ctx = getApplicationContext();
-        AudioPlayer player = new AndroidMediaPlayerFacade(ctx);
-        _presenter = new SightPresenter(
-        		((GuideApplication)getApplication()).getCity(), 
-        		this, player,
-        		new SightPresenterDependencyFactory(ctx, player));
-        
-        _locationManager = new LocationManagerFacade(ctx, _locationListener);       
+        _handler = new Handler();    
         
         _rootView = findViewById(R.id.rootLayout);
         _rootView.setOnClickListener(_rootViewClickListener);
-                
-        initPlayButton();
-        initStopButton();
-        initRewindButton();        
-        
-        _audioProgressBar = findControl(R.id.audioProgressBar);
-        _audioDuration = findControl(R.id.audioDuration);
-        _audioPlayed = findControl(R.id.audioPlayed);
-        
+       
         _nextSightPointerArrow = findControl(R.id.nextSightPointerArrow);
-        _playerPanel = findControl(R.id.playerPanel);
         _playerInfoPanel = findControl(R.id.playerInfoPanel);
+        _audioPlayerControl = findControl(R.id.playerPanel);
+        
+        setupDependencies();
         
         _playerPanelHeight = calculatePlayerPanelHeight();
         playPlayerPanelHidingAnimation(1);
@@ -95,37 +68,24 @@ public class MainActivity extends Activity implements SightView {
         _presenter.handleViewInit();
     }
     
-    private void initPlayButton() {
-    	_playButton = findControl(R.id.playButton);
-        ViewGroup.LayoutParams lp = _playButton.getLayoutParams();      
-		
-		_playButtonDefaultDrawable = 
-				_buttonDrawableFactory.createPlayButtonDefaultDrawable(lp.width, lp.height);
-		_playButtonPressedDrawable = 
-				_buttonDrawableFactory.createPlayButtonPressedDrawable(lp.width, lp.height);
-
-        _playButton.setImageDrawable(_playButtonDefaultDrawable);
-        _playButton.setOnClickListener(_playButtonClickListener);
-    }
-    
-    private void initStopButton() {
-    	_stopButton = findControl(R.id.stopButton);
-    	ViewGroup.LayoutParams lp = _stopButton.getLayoutParams();   
-        _stopButtonDefaultDrawable = 
-        		_buttonDrawableFactory.createStopButtonDrawable(lp.width, lp.height);
-        _stopButton.setImageDrawable(_stopButtonDefaultDrawable);
+    private void setupDependencies() {
+    	Context ctx = getApplicationContext();
+        AudioPlayer player = new AndroidMediaPlayerFacade(ctx);
+        _locationManager = new AndroidLocationManagerFacade(ctx);  
         
-        _stopButton.setOnClickListener(_stopButtonClickListener);
-    }
-    
-    private void initRewindButton() {
-    	_rewindButton = findControl(R.id.rewindButton);
-    	ViewGroup.LayoutParams lp = _stopButton.getLayoutParams();   
-    	_rewindButtonDefaultDrawable = 
-        		_buttonDrawableFactory.createRewindButtonDrawable(lp.width, lp.height);
-    	_rewindButton.setImageDrawable(_rewindButtonDefaultDrawable);
-
-        _rewindButton.setOnTouchListener(_rewindButtonTouchListener);
+        _sightLookFinderByLocation = new SightLookFinderByLocation(
+        		((GuideApplication)getApplication()).getCity(), _locationManager);
+        
+        _presenter = new SightPresenter(this, _audioPlayerControl, player);
+        _presenter.setAssetStreamProvider(new GuideAssetManager(ctx));
+        _presenter.setApplicationSettingsStorage(new SharedPreferenceManager(ctx));
+        _presenter.setNewSightLookGotInRangeRaiser(_sightLookFinderByLocation);
+        _presenter.setDownscalableBitmapCreator(new DownscalableBitmapFactory());
+        _presenter.setLogger(new DefaultLoggingAdapter("SightPresenter"));
+        
+        _audioPlayerPresenter = new AudioPlayerPresenter(
+        		_audioPlayerControl, player, new DefaultLoggingAdapter("AudioPlayerPresenter"));
+        _audioPlayerPresenter.setNewSightLookGotInRangeRaiser(_sightLookFinderByLocation);
     }
     
     private float calculatePlayerPanelHeight() {
@@ -231,40 +191,7 @@ public class MainActivity extends Activity implements SightView {
         caption.setText(text);
 	}	
     
-	@Override
-	public void displayPlayerPlaying() {
-		_playButton.setSelected(true);
-		_playButton.setImageDrawable(_playButtonPressedDrawable);
-	}
 
-	@Override
-	public void displayPlayerStopped() {
-		_playButton.setSelected(false);
-		_playButton.setImageDrawable(_playButtonDefaultDrawable);
-	}
-
-	@Override
-	public void setAudioProgressMaximum(int ms) {
-		_audioProgressBar.setMax(ms);		
-	}
-
-	@Override
-	public void setAudioProgressPosition(int ms) {
-		_audioProgressBarUpdater.setStatus(ms);
-		_handler.post(_audioProgressBarUpdater);
-	}
-
-	@Override
-	public void setAudioDuration(String formattedDuration) {
-		_audioDuration.setText(formattedDuration);		
-	}
-
-	@Override
-	public void setAudioPosition(String formattedPosition) {
-		_audioPlayedUpdater.setStatus(formattedPosition);
-		_handler.post(_audioPlayedUpdater);
-	}
-	
 	@Override
 	public void displayNextSightDirection(float heading, float horizon) {
 		_nextSightPointerArrow.setVector(heading, horizon);
@@ -307,7 +234,7 @@ public class MainActivity extends Activity implements SightView {
 	public void displayError(int messageResourceId) {
 		Toast.makeText(getBaseContext(), messageResourceId, Toast.LENGTH_SHORT).show();
 	}
-	
+
 	private void playPlayerPanelHidingAnimation(long duration) {
 		TranslateAnimation ta = new TranslateAnimation(0, 0, 0, _playerPanelHeight);
         ta.setDuration(duration);
@@ -318,9 +245,7 @@ public class MainActivity extends Activity implements SightView {
 	}
 	
 	private void setPlayerButtonsClickable(boolean clickable) {
-		_playerPanel.setClickable(clickable);
-		_playButton.setClickable(clickable);
-		_stopButton.setClickable(clickable);
+		_audioPlayerControl.setClickable(clickable);
 	}
 
 	private OnClickListener _rootViewClickListener = new OnClickListener() {		
@@ -329,84 +254,6 @@ public class MainActivity extends Activity implements SightView {
 			_presenter.handleWindowClick();
 		}
 	};
-	
-    private OnClickListener _playButtonClickListener = new OnClickListener() {		
-		@Override
-		public void onClick(View v) {
-			_presenter.handlePlayButtonClick();
-		}
-	};
-	
-    private OnClickListener _stopButtonClickListener = new OnClickListener() {		
-		@Override
-		public void onClick(View v) {
-			_presenter.handleStopButtonClick();
-		}
-	};
-	
-
-	private OnTouchListener _rewindButtonTouchListener = new OnTouchListener() {		
-		@Override
-		public boolean onTouch(View v, MotionEvent e) {
-			if(e.getAction() == MotionEvent.ACTION_UP) {
-				_presenter.handleRewindButtonRelease();
-				return true;
-			}
-			else if(e.getAction() == MotionEvent.ACTION_DOWN) {
-				_presenter.handleRewindButtonPress();
-				return true;
-			}
-			return false;
-		}
-	};
-	
-	private LocationListener _locationListener = new LocationListener() {
-		
-		@Override
-		public void onStatusChanged(String provider, int status, Bundle extras) {
-			// TODO Auto-generated method stub
-			
-		}
-		
-		@Override
-		public void onProviderEnabled(String provider) {
-			// TODO Auto-generated method stub
-			
-		}
-		
-		@Override
-		public void onProviderDisabled(String provider) {
-			// TODO Auto-generated method stub
-			
-		}
-		
-		@Override
-		public void onLocationChanged(Location location) {
-			if(location != null) {
-				_presenter.handleLocationChange(location.getLatitude(), location.getLongitude());
-			}			
-		}
-	};
-	
-	private ControlUpdater<String> _audioPlayedUpdater = new ControlUpdater<String>(
-			new ControlUpdater.Updater<String>() {
-				@Override
-				public void Update(String param) {
-					_audioPlayed.setText(param);
-				}
-			}, 
-			"0:00"//MainActivity.this.getString(R.string.audio_formatted_position_default)
-		);
-	
-	private ControlUpdater<Integer> _audioProgressBarUpdater = new ControlUpdater<Integer>(
-			new ControlUpdater.Updater<Integer>() {
-				@Override
-				public void Update(Integer param) {
-					 _audioProgressBar.setProgress(param);
-				}
-			}, 
-			0
-		);
 	
 	private ControlUpdater<Long> _playerPanelHider = new ControlUpdater<Long>(
 			new ControlUpdater.Updater<Long>() {
@@ -418,4 +265,5 @@ public class MainActivity extends Activity implements SightView {
 			}, 
 			500L
 		);
+
 }
