@@ -1,6 +1,7 @@
 package com.gerken.audioGuide.interfaces.views;
 
 import com.gerken.audioGuide.graphics.DownscalableBitmap;
+import com.gerken.audioGuide.interfaces.OnEventListener;
 
 public interface SightView {
 	int getWidth();
@@ -22,4 +23,7 @@ public interface SightView {
 	
 	void displayError(String message);
 	void displayError(int messageResourceId);
+	
+	void addViewInitializedListener(OnEventListener listener);
+	void addViewTouchedListener(OnEventListener listener);
 }

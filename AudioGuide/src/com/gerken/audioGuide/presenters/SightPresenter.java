@@ -44,6 +44,16 @@ public class SightPresenter {
 		}
 	};
 	
+	private OnEventListener _sightViewInitializedListener = new OnEventListener() {		
+		@Override
+		public void onEvent() {
+			if(_prefStorage.showHelpAtStartup()) {
+				_sightView.showHelp();
+				_prefStorage.setShowHelpAtStartup(false);			
+			}
+		}
+	};
+	
 	private OnEventListener _playPressedListener = new OnEventListener() {		
 		@Override
 		public void onEvent() {
@@ -71,6 +81,15 @@ public class SightPresenter {
 			startPlayerPanelHidingTimer();	
 		}
 	};
+	
+	
+	private OnEventListener _sightViewTouchedListener = new OnEventListener() {		
+		@Override
+		public void onEvent() {
+			handleSightViewTouch();	
+		}
+	};
+	
 	
 	private OnEventListener _routeChangeListener = new OnEventListener() {		
 		@Override
@@ -106,6 +125,9 @@ public class SightPresenter {
 		
 		_playerPanelHidingTimer = new Timer();
 		
+		_sightView.addViewInitializedListener(_sightViewInitializedListener);
+		_sightView.addViewTouchedListener(_sightViewTouchedListener);
+		
 		_audioPlayer.addAudioAssetCompletionListener(_mediaPlayerCompletionListener);		
 		
 		_audioPlayerView.addPlayPressedListener(_playPressedListener);
@@ -137,13 +159,6 @@ public class SightPresenter {
 		_logger = logger;
 	}
 	
-	public void handleViewInit() {
-		if(_prefStorage.showHelpAtStartup()) {
-			_sightView.showHelp();
-			_prefStorage.setShowHelpAtStartup(false);			
-		}		
-	}
-	
 	private void handleSightLookIsInRange(SightLook sightLook) {
 		if(sightLook != null) {
 			if(!sightLook.equals(_currentSightLook)) {
@@ -167,7 +182,7 @@ public class SightPresenter {
 		_isNextRoutePointInfoShown = false;
 	}
 
-	public void handleStopButtonClick() {
+	private void handleStopButtonClick() {
 		resetPlayerPanelHidingTimer();
 
 		if(_prefStorage.isRouteChosen()) {
@@ -185,7 +200,7 @@ public class SightPresenter {
 		return (float)(originalHorizon - _currentSightLookImageVerticalPadding)/(float)_currentSightLookImageHeight;
 	}
 	
-	public void handleWindowClick() {
+	private void handleSightViewTouch() {
 		if(isSightInRange() && !_isPlayerPanelVisible) {
 			_sightView.showPlayerPanel();
 			_isPlayerPanelVisible = true;
@@ -248,11 +263,7 @@ public class SightPresenter {
 		catch(Exception ex){
 			_logger.logError("Unable to set the background image", ex);
         }
-	}
-	
-
-	
-	
+	}	
 	
 	private NextRoutePoint getNextRoutePoint() {
 		if(_currentSightLook == null)

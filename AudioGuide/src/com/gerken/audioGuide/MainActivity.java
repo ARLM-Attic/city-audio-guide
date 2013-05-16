@@ -1,12 +1,14 @@
 package com.gerken.audioGuide;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import com.gerken.audioGuide.R;
 import com.gerken.audioGuide.controls.AudioPlayerControl;
 import com.gerken.audioGuide.controls.ControlUpdater;
 import com.gerken.audioGuide.graphics.*;
 import com.gerken.audioGuide.interfaces.AudioPlayer;
+import com.gerken.audioGuide.interfaces.OnEventListener;
 import com.gerken.audioGuide.interfaces.views.SightView;
 import com.gerken.audioGuide.presenters.AudioPlayerPresenter;
 import com.gerken.audioGuide.presenters.SightPresenter;
@@ -44,6 +46,8 @@ public class MainActivity extends Activity implements SightView {
 	
 	private float _playerPanelHeight = 0.0f;
 	
+	private ArrayList<OnEventListener> _viewInitializedListeners = new ArrayList<OnEventListener>();
+	private ArrayList<OnEventListener> _viewTouchedListeners = new ArrayList<OnEventListener>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +69,8 @@ public class MainActivity extends Activity implements SightView {
         playPlayerPanelHidingAnimation(1);
         setPlayerButtonsClickable(false);
         
-        _presenter.handleViewInit();
+        for(OnEventListener l : _viewInitializedListeners)
+        	l.onEvent();
     }
     
     private void setupDependencies() {
@@ -235,6 +240,16 @@ public class MainActivity extends Activity implements SightView {
 		Toast.makeText(getBaseContext(), messageResourceId, Toast.LENGTH_SHORT).show();
 	}
 
+	@Override
+	public void addViewInitializedListener(OnEventListener listener) {
+		_viewInitializedListeners.add(listener);
+	}
+
+	@Override
+	public void addViewTouchedListener(OnEventListener listener) {
+		_viewTouchedListeners.add(listener);		
+	}
+
 	private void playPlayerPanelHidingAnimation(long duration) {
 		TranslateAnimation ta = new TranslateAnimation(0, 0, 0, _playerPanelHeight);
         ta.setDuration(duration);
@@ -251,7 +266,8 @@ public class MainActivity extends Activity implements SightView {
 	private OnClickListener _rootViewClickListener = new OnClickListener() {		
 		@Override
 		public void onClick(View v) {
-			_presenter.handleWindowClick();
+			for(OnEventListener l : _viewTouchedListeners)
+	        	l.onEvent();
 		}
 	};
 	

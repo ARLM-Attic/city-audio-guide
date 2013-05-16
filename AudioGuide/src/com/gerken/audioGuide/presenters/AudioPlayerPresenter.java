@@ -69,10 +69,19 @@ public class AudioPlayerPresenter {
 		}
 	};
 	
+	private OnEventListener _mediaPlayerCompletionListener = new OnEventListener() {		
+		@Override
+		public void onEvent() {
+			_audioPlayerView.displayPlayerStopped();	
+		}
+	};
+	
 	public AudioPlayerPresenter(AudioPlayerView audioPlayerView, AudioPlayer audioPlayer, Logger logger) {
 		_audioPlayer = audioPlayer;
 		_audioPlayerView = audioPlayerView;
 		_logger = logger;
+		
+		_audioPlayer.addAudioAssetCompletionListener(_mediaPlayerCompletionListener);
 		
 		_audioPlayerView.addPlayPressedListener(_playPressedListener);
 		_audioPlayerView.addStopPressedListener(_stopPressedListener);
