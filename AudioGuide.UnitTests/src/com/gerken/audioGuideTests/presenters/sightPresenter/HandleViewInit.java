@@ -3,33 +3,39 @@ package com.gerken.audioGuideTests.presenters.sightPresenter;
 import static org.mockito.Mockito.*;
 
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 
 import com.gerken.audioGuide.interfaces.AssetStreamProvider;
 import com.gerken.audioGuide.interfaces.AudioPlayer;
 import com.gerken.audioGuide.interfaces.DownscalableBitmapCreator;
 import com.gerken.audioGuide.interfaces.Logger;
 import com.gerken.audioGuide.interfaces.ApplicationSettingsStorage;
-import com.gerken.audioGuide.interfaces.SightPresenterDependencyCreator;
+import com.gerken.audioGuide.interfaces.OnEventListener;
+import com.gerken.audioGuide.interfaces.views.AudioPlayerView;
 import com.gerken.audioGuide.interfaces.views.SightView;
 import com.gerken.audioGuide.objectModel.City;
 import com.gerken.audioGuide.presenters.SightPresenter;
 
 public class HandleViewInit {
+
 	@Test
 	public void Given_ApplicationStartsForThe1stTime__Then_ShowHelp_SetHelpHasBeenShownPreference() {
 		final boolean HELP_SHOW = true;
 		ApplicationSettingsStorage prefStorage = mock(ApplicationSettingsStorage.class);
 		when(prefStorage.showHelpAtStartup()).thenReturn(HELP_SHOW);
 		
-		SightView view = mock(SightView.class);
+		SightView sightView = mock(SightView.class);
+		ArgumentCaptor<OnEventListener> sightViewInitializedListenerCaptor = 
+				ArgumentCaptor.forClass(OnEventListener.class);
+		doNothing().when(sightView).addViewInitializedListener(sightViewInitializedListenerCaptor.capture());
 		
-		SightPresenter sut = CreateSut(view, prefStorage);
+		OnEventListener presenterHandlerForViewInit = SetupSut(sightView, prefStorage);
 		
 		// --- Act
-		sut.handleViewInit();
+		presenterHandlerForViewInit.onEvent();
 				
 		// --- Assert
-		verify(view).showHelp();
+		verify(sightView).showHelp();
 		verify(prefStorage).setShowHelpAtStartup(false);
 	}
 	
@@ -39,24 +45,31 @@ public class HandleViewInit {
 		ApplicationSettingsStorage prefStorage = mock(ApplicationSettingsStorage.class);
 		when(prefStorage.showHelpAtStartup()).thenReturn(HELP_DONT_SHOW);
 		
-		SightView view = mock(SightView.class);
+		SightView sightView = mock(SightView.class);
+		ArgumentCaptor<OnEventListener> sightViewInitializedListenerCaptor = 
+				ArgumentCaptor.forClass(OnEventListener.class);
+		doNothing().when(sightView).addViewInitializedListener(sightViewInitializedListenerCaptor.capture());
 		
-		SightPresenter sut = CreateSut(view, prefStorage);
+		OnEventListener presenterHandlerForViewInit = SetupSut(sightView, prefStorage);
 		
 		// --- Act
-		sut.handleViewInit();
+		presenterHandlerForViewInit.onEvent();
 				
 		// --- Assert
-		verify(view, never()).showHelp();
+		verify(sightView, never()).showHelp();
 	}
 	
-	private SightPresenter CreateSut(SightView view, ApplicationSettingsStorage settingsStorage) {	
-		final String WHATEVER_STRING = "whatever";
-		City city = new City(1, "Default", WHATEVER_STRING);
+	private OnEventListener SetupSut(SightView sightView, ApplicationSettingsStorage settingsStorage) {	
+		ArgumentCaptor<OnEventListener> sightViewInitializedListenerCaptor = 
+				ArgumentCaptor.forClass(OnEventListener.class);
+		doNothing().when(sightView).addViewInitializedListener(sightViewInitializedListenerCaptor.capture());
 		
-		SightPresenterDependencyCreator factory = mock(SightPresenterDependencyCreator.class);
-		when(factory.createApplicationSettingsStorage()).thenReturn(settingsStorage);
+		SightPresenter sut = 
+				new SightPresenter(sightView, mock(AudioPlayerView.class), mock(AudioPlayer.class));
+		sut.setApplicationSettingsStorage(settingsStorage);
 		
-		return new SightPresenter(city, view, mock(AudioPlayer.class), factory);
+		return sightViewInitializedListenerCaptor.getValue();
 	}
+	
+
 }
