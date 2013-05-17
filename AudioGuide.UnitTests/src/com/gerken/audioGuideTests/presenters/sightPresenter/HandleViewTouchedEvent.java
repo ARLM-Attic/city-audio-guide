@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 import java.util.Random;
 
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
@@ -27,11 +28,11 @@ public class HandleViewTouchedEvent {
 	private Random _random = new Random(System.currentTimeMillis());
 	
 	
-	private class ArgumentRetrievingAnswer<TArg> implements Answer {		
+	private class ArgumentRetrievingAnswer<TArg> implements Answer<Void> {		
 		private TArg _arg;
 
 		@Override
-		public Object answer(InvocationOnMock invocation) {
+		public Void answer(InvocationOnMock invocation) {
 			Object[] args = invocation.getArguments();
 			_arg = (TArg)args[0];
 			return null;
@@ -47,32 +48,14 @@ public class HandleViewTouchedEvent {
 	public void Given_NoSightInRange__Then_PlayerPanelIsNotDisplayed() throws Exception {
 		
 		SightView sightView = mock(SightView.class);
-		ArgumentRetrievingAnswer<OnEventListener> sightViewTouchedListenerInterceptor = 
-				new ArgumentRetrievingAnswer<OnEventListener>();
-		doAnswer(sightViewTouchedListenerInterceptor)
-			.when(sightView).addViewTouchedListener(any(OnEventListener.class));
-		
-		
 		NewSightLookGotInRangeRaiser sightLookFinder = mock(NewSightLookGotInRangeRaiser.class);
-		ArgumentRetrievingAnswer<OnSightLookGotInRangeListener> sightLookGotInRangeListenerInterceptor = 
-				new ArgumentRetrievingAnswer<OnSightLookGotInRangeListener>();
-		doAnswer(sightLookGotInRangeListenerInterceptor)
-			.when(sightLookFinder).addSightLookGotInRangeListener(any(OnSightLookGotInRangeListener.class));
-		
 
+		SutSetupResult sutSetupResult = setupSut(sightView, sightLookFinder);
 		
-		SightPresenter sut = new SightPresenter(sightView, 
-				mock(AudioPlayerView.class), mock(AudioPlayer.class));
-		sut.setNewSightLookGotInRangeRaiser(sightLookFinder);
-		
-		OnEventListener sightViewTouchListener = sightViewTouchedListenerInterceptor.getArg();
-		OnSightLookGotInRangeListener sightLookGotInRangeListener = 
-				sightLookGotInRangeListenerInterceptor.getArg();
-		
-		sightLookGotInRangeListener.onSightLookGotInRange(null);
+		sutSetupResult.sightLookGotInRangeListener.onSightLookGotInRange(null);
 		
 		// --- Act
-		sightViewTouchListener.onEvent();
+		sutSetupResult.sightViewTouchListener.onEvent();
 		
 		// --- Assert
 		verify(sightView, never()).showPlayerPanel();
@@ -80,36 +63,19 @@ public class HandleViewTouchedEvent {
 	
 	@Test
 	public void Given_SightIsInRange__Then_PlayerPanelIsDisplayed() throws Exception {
-		final double EXPECTED_LOCATION_LATITUDE = 12.345;
-		final double EXPECTED_LOCATION_LONGITUDE = 24.567;
-		
-		City city = CreateSingleSightLookModel(EXPECTED_LOCATION_LATITUDE, EXPECTED_LOCATION_LONGITUDE);
 		
 		SightView sightView = mock(SightView.class);
-		ArgumentRetrievingAnswer<OnEventListener> sightViewTouchedListenerInterceptor = 
-				new ArgumentRetrievingAnswer<OnEventListener>();
-		doAnswer(sightViewTouchedListenerInterceptor)
-			.when(sightView).addViewTouchedListener(any(OnEventListener.class));
-		
 		NewSightLookGotInRangeRaiser sightLookFinder = mock(NewSightLookGotInRangeRaiser.class);
-		ArgumentRetrievingAnswer<OnSightLookGotInRangeListener> sightLookGotInRangeListenerInterceptor = 
-				new ArgumentRetrievingAnswer<OnSightLookGotInRangeListener>();
-		doAnswer(sightLookGotInRangeListenerInterceptor)
-			.when(sightLookFinder).addSightLookGotInRangeListener(any(OnSightLookGotInRangeListener.class));
 		
-		SightPresenter sut = new SightPresenter(sightView, 
-				mock(AudioPlayerView.class), mock(AudioPlayer.class));
-		sut.setNewSightLookGotInRangeRaiser(sightLookFinder);
-		sut.setAssetStreamProvider(mock(AssetStreamProvider.class));
+		SutSetupResult sutSetupResult = setupSut(sightView, sightLookFinder);
 		
-		OnEventListener sightViewTouchListener = sightViewTouchedListenerInterceptor.getArg();
-		OnSightLookGotInRangeListener sightLookGotInRangeListener = 
-				sightLookGotInRangeListenerInterceptor.getArg();
+		// set to locate a sight look
+		sutSetupResult.sightLookGotInRangeListener.onSightLookGotInRange(
+				CreateSightWithSingleSightLook().getSightLooks().get(0));
+		reset(sightView);
 		
-		sightLookGotInRangeListener.onSightLookGotInRange(city.getSights().get(0).getSightLooks().get(0));
-		
-		// --- Act
-		sightViewTouchListener.onEvent();
+		// --- Act		
+		sutSetupResult.sightViewTouchListener.onEvent();
 		
 		// --- Assert
 		verify(sightView).showPlayerPanel();
@@ -121,77 +87,53 @@ public class HandleViewTouchedEvent {
 		final double EXPECTED_LOCATION_LATITUDE = 12.345;
 		final double EXPECTED_LOCATION_LONGITUDE = 24.567;
 		int expectedRouteId = _random.nextInt();
-		short expectedHeadingDeg = (short)_random.nextInt(Short.MAX_VALUE);
-		byte expectedHorizonPerc = (byte)_random.nextInt(Byte.MAX_VALUE);
+		short someHeadingDeg = (short)_random.nextInt(Short.MAX_VALUE);
+		byte someHorizonPerc = (byte)_random.nextInt(Byte.MAX_VALUE);
 		final String EXPECTED_SIGHT_NAME = "Colosseum";
 		final String EXPECTED_NEXT_ROUTE_POINT_NAME = "Eiffel Tower";		
 		
 		NextRoutePoint expectedRoutePoint = new NextRoutePoint(expectedRouteId, 
-				expectedHeadingDeg, expectedHorizonPerc, EXPECTED_NEXT_ROUTE_POINT_NAME);		
-		City city = CreateSingleSightLookModel(
+				someHeadingDeg, someHorizonPerc, EXPECTED_NEXT_ROUTE_POINT_NAME);		
+		Sight sight = CreateSightWithSingleSightLook(
 				EXPECTED_LOCATION_LATITUDE, EXPECTED_LOCATION_LONGITUDE, EXPECTED_SIGHT_NAME);
-		city.getSights().get(0).getSightLooks().get(0).getNextRoutePoints().add(expectedRoutePoint);
+		sight.getSightLooks().get(0).getNextRoutePoints().add(expectedRoutePoint);
 		
 		SightView sightView = mock(SightView.class);
-		ArgumentRetrievingAnswer<OnEventListener> sightViewTouchedListenerInterceptor = 
-				new ArgumentRetrievingAnswer<OnEventListener>();
-		doAnswer(sightViewTouchedListenerInterceptor)
-			.when(sightView).addViewTouchedListener(any(OnEventListener.class));
-		
 		AudioPlayerView playerView = mock(AudioPlayerView.class);
-		ArgumentRetrievingAnswer<OnEventListener> stopButtonPressedListenerInterceptor = 
-				new ArgumentRetrievingAnswer<OnEventListener>();
-		doAnswer(stopButtonPressedListenerInterceptor)
-			.when(playerView).addStopPressedListener(any(OnEventListener.class));
-		
 		NewSightLookGotInRangeRaiser sightLookFinder = mock(NewSightLookGotInRangeRaiser.class);
-		ArgumentRetrievingAnswer<OnSightLookGotInRangeListener> sightLookGotInRangeListenerInterceptor = 
-				new ArgumentRetrievingAnswer<OnSightLookGotInRangeListener>();
-		doAnswer(sightLookGotInRangeListenerInterceptor)
-			.when(sightLookFinder).addSightLookGotInRangeListener(any(OnSightLookGotInRangeListener.class));
 
 		ApplicationSettingsStorage settingsStorage = 
 				CreateApplicationSettingsStorageWithRouteChosen(expectedRouteId);
 		
 		// --- SUT
-		SightPresenter sut = new SightPresenter(sightView, playerView, mock(AudioPlayer.class));
-		sut.setNewSightLookGotInRangeRaiser(sightLookFinder);
-		sut.setAssetStreamProvider(mock(AssetStreamProvider.class));
-		sut.setApplicationSettingsStorage(settingsStorage);
-		
-		OnEventListener sightViewTouchListener = sightViewTouchedListenerInterceptor.getArg();
-		OnEventListener stopButtonPressedListener = stopButtonPressedListenerInterceptor.getArg();
-		OnSightLookGotInRangeListener sightLookGotInRangeListener = 
-				sightLookGotInRangeListenerInterceptor.getArg();
-		
-		sightLookGotInRangeListener.onSightLookGotInRange(city.getSights().get(0).getSightLooks().get(0));
-		stopButtonPressedListener.onEvent();
-
-		// --- Act
+		SutSetupResult sutSetupResult = setupSut(sightView, playerView, sightLookFinder, settingsStorage);
+		sutSetupResult.sightLookGotInRangeListener.onSightLookGotInRange(sight.getSightLooks().get(0));
+		sutSetupResult.stopButtonPressedListener.onEvent();
 		reset(sightView);
-		sightViewTouchListener.onEvent();
+
+		// --- Act		
+		sutSetupResult.sightViewTouchListener.onEvent();
 		
 		// --- Assert
 		verify(sightView).hideNextSightDirection();
 		verify(sightView).setInfoPanelCaptionText(EXPECTED_SIGHT_NAME);
 	}
 
-	private City CreateSingleSightLookModel(double latitude, double longitude) {
+	private Sight CreateSightWithSingleSightLook() {
 		final String WHATEVER_STRING = "whatever";	
-		return CreateSingleSightLookModel(latitude, longitude, WHATEVER_STRING);
+		final double WHATEVER_DOUBLE = 12.3456;
+		return CreateSightWithSingleSightLook(WHATEVER_DOUBLE, WHATEVER_DOUBLE, WHATEVER_STRING);
 	}
 	
-	private City CreateSingleSightLookModel(double latitude, double longitude, String sightName) {
+	private Sight CreateSightWithSingleSightLook(double latitude, double longitude, String sightName) {
 		final String WHATEVER_STRING = "whatever";	
 		
 		SightLook expectedSightLook = new SightLook(
 				latitude, longitude, WHATEVER_STRING);
 		Sight expectedSight = new Sight(_random.nextInt(), sightName, WHATEVER_STRING);
 		expectedSight.addLook(expectedSightLook);
-		City city = new City(_random.nextInt(), WHATEVER_STRING, WHATEVER_STRING);
-		city.getSights().add(expectedSight);
 		
-		return city;
+		return expectedSight;
 	}
 	
 	private ApplicationSettingsStorage CreateApplicationSettingsStorageWithRouteChosen(int routeId) {
@@ -200,5 +142,48 @@ public class HandleViewTouchedEvent {
 		when(settingsStorage.isRouteChosen()).thenReturn(ROUTE_IS_CHOSEN);
 		when(settingsStorage.getCurrentRouteId()).thenReturn(routeId);
 		return settingsStorage;
+	}
+	
+	private SutSetupResult setupSut(SightView sightView, NewSightLookGotInRangeRaiser sightLookFinder) {
+		return setupSut(sightView, mock(AudioPlayerView.class), 
+				sightLookFinder, mock(ApplicationSettingsStorage.class));
+	}
+	
+	private SutSetupResult setupSut(SightView sightView, AudioPlayerView playerView, 
+			NewSightLookGotInRangeRaiser sightLookFinder,
+			ApplicationSettingsStorage settingsStorage) {
+		SutSetupResult result = new SutSetupResult();
+		
+		ArgumentCaptor<OnEventListener> sightViewTouchedListenerCaptor = 
+				ArgumentCaptor.forClass(OnEventListener.class);
+		doNothing().when(sightView).addViewTouchedListener(sightViewTouchedListenerCaptor.capture());
+		
+		ArgumentCaptor<OnEventListener> stopButtonPressedListenerCaptor = 
+				ArgumentCaptor.forClass(OnEventListener.class);
+		doNothing().when(playerView).addStopPressedListener(stopButtonPressedListenerCaptor.capture());
+		
+		ArgumentCaptor<OnSightLookGotInRangeListener> sightLookGotInRangeListenerCaptor = 
+				ArgumentCaptor.forClass(OnSightLookGotInRangeListener.class);
+		doNothing().when(sightLookFinder)
+			.addSightLookGotInRangeListener(sightLookGotInRangeListenerCaptor.capture());
+		
+		SightPresenter sut = new SightPresenter(sightView, playerView, mock(AudioPlayer.class));
+		sut.setNewSightLookGotInRangeRaiser(sightLookFinder);
+		sut.setAssetStreamProvider(mock(AssetStreamProvider.class));
+		sut.setApplicationSettingsStorage(settingsStorage);
+		
+		result.sut = sut;
+		result.sightViewTouchListener = sightViewTouchedListenerCaptor.getValue();
+		result.sightLookGotInRangeListener = sightLookGotInRangeListenerCaptor.getValue();
+		result.stopButtonPressedListener = stopButtonPressedListenerCaptor.getValue();
+		
+		return result;
+	}
+	
+	private class SutSetupResult {
+		public SightPresenter sut;
+		public OnEventListener sightViewTouchListener;
+		public OnSightLookGotInRangeListener sightLookGotInRangeListener;
+		public OnEventListener stopButtonPressedListener;
 	}
 }
