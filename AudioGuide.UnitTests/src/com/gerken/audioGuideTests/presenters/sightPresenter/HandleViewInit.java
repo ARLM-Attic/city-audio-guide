@@ -4,6 +4,8 @@ import static org.mockito.Mockito.*;
 
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.Mock;
 
 import com.gerken.audioGuide.interfaces.AssetStreamProvider;
 import com.gerken.audioGuide.interfaces.AudioPlayer;
@@ -70,6 +72,4 @@ public class HandleViewInit {
 		
 		return sightViewInitializedListenerCaptor.getValue();
 	}
-	
-
 }
