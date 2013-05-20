@@ -8,11 +8,9 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
 import com.gerken.audioGuide.interfaces.LocationTracker;
-import com.gerken.audioGuide.interfaces.OnEventListener;
 import com.gerken.audioGuide.interfaces.OnLocationChangedListener;
 import com.gerken.audioGuide.interfaces.OnSightLookGotInRangeListener;
 import com.gerken.audioGuide.objectModel.*;
-import com.gerken.audioGuide.presenters.AudioPlayerPresenter;
 import com.gerken.audioGuide.services.SightLookFinderByLocation;
 
 public class HandleLocationChangedEvent {
@@ -39,7 +37,7 @@ public class HandleLocationChangedEvent {
 		
 		// --- Assert
 		verify(sightLookInRangeListener).onSightLookGotInRange(expectedSightLook);
-		
+		verify(sightLookInRangeListener, never()).onSightLookGotInRange(unexpectedSightLook);
 	}
 	
 	@Test
