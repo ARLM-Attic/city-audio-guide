@@ -184,6 +184,8 @@ public class SightPresenter {
 
 	private void handleStopButtonClick() {
 		resetPlayerPanelHidingTimer();
+		_sightView.hidePlayerPanel();
+		_isPlayerPanelVisible = false;
 
 		if(_prefStorage.isRouteChosen()) {
 			NextRoutePoint nrp = getNextRoutePoint();

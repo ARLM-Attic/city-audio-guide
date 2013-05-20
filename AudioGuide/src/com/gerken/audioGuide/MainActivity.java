@@ -174,6 +174,7 @@ public class MainActivity extends Activity implements SightView {
 	public void acceptNoSightInRange() {
 		setInfoPanelCaptionText(getString(R.string.sight_info_none));
 		_rootView.setBackgroundResource(R.drawable.prague_silhouette);
+		_nextSightPointerArrow.setVisibility(View.INVISIBLE);
 	}
 
 	@Override
