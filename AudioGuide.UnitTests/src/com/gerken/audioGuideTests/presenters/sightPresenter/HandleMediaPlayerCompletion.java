@@ -1,6 +1,12 @@
 package com.gerken.audioGuideTests.presenters.sightPresenter;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.anyFloat;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.Random;
 import java.util.UUID;
@@ -8,13 +14,20 @@ import java.util.UUID;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
-import com.gerken.audioGuide.interfaces.*;
+import com.gerken.audioGuide.interfaces.ApplicationSettingsStorage;
+import com.gerken.audioGuide.interfaces.AssetStreamProvider;
+import com.gerken.audioGuide.interfaces.AudioPlayer;
+import com.gerken.audioGuide.interfaces.NewSightLookGotInRangeRaiser;
+import com.gerken.audioGuide.interfaces.OnEventListener;
+import com.gerken.audioGuide.interfaces.OnSightLookGotInRangeListener;
 import com.gerken.audioGuide.interfaces.views.AudioPlayerView;
 import com.gerken.audioGuide.interfaces.views.SightView;
-import com.gerken.audioGuide.objectModel.*;
+import com.gerken.audioGuide.objectModel.NextRoutePoint;
+import com.gerken.audioGuide.objectModel.Sight;
+import com.gerken.audioGuide.objectModel.SightLook;
 import com.gerken.audioGuide.presenters.SightPresenter;
 
-public class HandleStopButtonClick {
+public class HandleMediaPlayerCompletion {
 	private Random _random = new Random(System.currentTimeMillis());
 
 	
@@ -36,7 +49,7 @@ public class HandleStopButtonClick {
 		SutSetupResult sutSetupResult = setupSut(sightView, sightLookFinder, settingsStorage);
 		
 		// --- Act
-		sutSetupResult.stopButtonPressedListener.onEvent();
+		sutSetupResult.audioAssetCompletionListener.onEvent();
 		
 		// --- Assert
 		verify(sightView, never()).displayNextSightDirection(anyFloat(), anyFloat());
@@ -63,7 +76,7 @@ public class HandleStopButtonClick {
 		sutSetupResult.sightLookGotInRangeListener.onSightLookGotInRange(sight.getSightLooks().get(0));
 		
 		// --- Act
-		sutSetupResult.stopButtonPressedListener.onEvent();
+		sutSetupResult.audioAssetCompletionListener.onEvent();
 		
 		// --- Assert
 		float expectedHeadingRad = (float)(Math.PI*expectedRoutePoint.getHeading()/180.0);
@@ -112,13 +125,9 @@ public class HandleStopButtonClick {
 			ApplicationSettingsStorage settingsStorage) {
 		SutSetupResult result = new SutSetupResult();
 		
-		ArgumentCaptor<OnEventListener> sightViewTouchedListenerCaptor = 
+		ArgumentCaptor<OnEventListener> audioAssetCompletionListenerCaptor = 
 				ArgumentCaptor.forClass(OnEventListener.class);
-		doNothing().when(sightView).addViewTouchedListener(sightViewTouchedListenerCaptor.capture());
-		
-		ArgumentCaptor<OnEventListener> stopButtonPressedListenerCaptor = 
-				ArgumentCaptor.forClass(OnEventListener.class);
-		doNothing().when(playerView).addStopPressedListener(stopButtonPressedListenerCaptor.capture());
+		doNothing().when(player).addAudioAssetCompletionListener(audioAssetCompletionListenerCaptor.capture());
 		
 		ArgumentCaptor<OnSightLookGotInRangeListener> sightLookGotInRangeListenerCaptor = 
 				ArgumentCaptor.forClass(OnSightLookGotInRangeListener.class);
@@ -131,17 +140,15 @@ public class HandleStopButtonClick {
 		sut.setApplicationSettingsStorage(settingsStorage);
 		
 		result.sut = sut;
-		result.sightViewTouchListener = sightViewTouchedListenerCaptor.getValue();
 		result.sightLookGotInRangeListener = sightLookGotInRangeListenerCaptor.getValue();
-		result.stopButtonPressedListener = stopButtonPressedListenerCaptor.getValue();
+		result.audioAssetCompletionListener = audioAssetCompletionListenerCaptor.getValue();
 		
 		return result;
 	}
 	
 	private class SutSetupResult {
 		public SightPresenter sut;
-		public OnEventListener sightViewTouchListener;
 		public OnSightLookGotInRangeListener sightLookGotInRangeListener;
-		public OnEventListener stopButtonPressedListener;
+		public OnEventListener audioAssetCompletionListener;
 	}
 }

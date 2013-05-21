@@ -1,35 +1,22 @@
 package com.gerken.audioGuideTests.presenters.audioPlayerPresenter;
 
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.Random;
+import java.util.TimerTask;
 
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
-import com.gerken.audioGuide.interfaces.ApplicationSettingsStorage;
-import com.gerken.audioGuide.interfaces.AssetStreamProvider;
 import com.gerken.audioGuide.interfaces.AudioPlayer;
-import com.gerken.audioGuide.interfaces.DownscalableBitmapCreator;
-import com.gerken.audioGuide.interfaces.Logger;
-import com.gerken.audioGuide.interfaces.NewSightLookGotInRangeRaiser;
 import com.gerken.audioGuide.interfaces.OnEventListener;
-import com.gerken.audioGuide.interfaces.OnSightLookGotInRangeListener;
+import com.gerken.audioGuide.interfaces.Scheduler;
 import com.gerken.audioGuide.interfaces.views.AudioPlayerView;
-import com.gerken.audioGuide.interfaces.views.SightView;
-import com.gerken.audioGuide.objectModel.City;
-import com.gerken.audioGuide.objectModel.Sight;
-import com.gerken.audioGuide.objectModel.SightLook;
 import com.gerken.audioGuide.presenters.AudioPlayerPresenter;
 
 public class HandlePlayButtonClick {
-	
 	private Random _random = new Random(System.currentTimeMillis());
-
+	
 	@Test
 	public void Given_PlayerIsNotPlaying__Then_PlayerRequestedToPlay_ShownAsPlaying() throws Exception {
 
@@ -69,8 +56,38 @@ public class HandlePlayButtonClick {
 		verify(playerView, never()).displayPlayerPlaying();
 	}
 
+	@Test
+	public void Given_PlayerIsNotPlaying__Then_AudioPositionUpdateScheduled() throws Exception {
+
+		final boolean PLAYER_IS_NOT_PLAYING = false;	
+		final int expectedPlayerPosition = _random.nextInt(); 
+		
+		AudioPlayerView playerView = mock(AudioPlayerView.class);
+		AudioPlayer player = mock(AudioPlayer.class);
+		when(player.getCurrentPosition()).thenReturn(expectedPlayerPosition);
+		when(player.isPlaying()).thenReturn(PLAYER_IS_NOT_PLAYING);
+		
+		Scheduler scheduler = mock(Scheduler.class);
+		ArgumentCaptor<TimerTask> timerTaskCaptor = 
+				ArgumentCaptor.forClass(TimerTask.class);
+		doNothing().when(scheduler).scheduleAtFixedRate(timerTaskCaptor.capture(), anyLong(), anyLong());
+		
+		SutSetupResult sutSetupResult = setupSut(playerView, player, scheduler);
+		
+		// --- Act
+		sutSetupResult.playButtonPressedListener.onEvent();
+		timerTaskCaptor.getValue().run();
+		
+		// --- Assert
+		verify(playerView).setAudioProgressPosition(expectedPlayerPosition);
+	}
 	
 	private SutSetupResult setupSut(AudioPlayerView playerView, AudioPlayer audioPlayer) {
+		return setupSut(playerView, audioPlayer, mock(Scheduler.class));
+	}
+	
+	private SutSetupResult setupSut(AudioPlayerView playerView, 
+			AudioPlayer audioPlayer, Scheduler scheduler) {
 		SutSetupResult result = new SutSetupResult();
 
 		ArgumentCaptor<OnEventListener> playButtonPressedListenerCaptor = 
@@ -78,7 +95,8 @@ public class HandlePlayButtonClick {
 		doNothing().when(playerView).addPlayPressedListener(playButtonPressedListenerCaptor.capture());
 		
 		
-		AudioPlayerPresenter sut = new AudioPlayerPresenter(playerView, audioPlayer, mock(Logger.class));
+		AudioPlayerPresenter sut = new AudioPlayerPresenter(playerView, audioPlayer);
+		sut.setAudioUpdateScheduler(scheduler);
 		
 		result.sut = sut;
 		result.playButtonPressedListener = playButtonPressedListenerCaptor.getValue();

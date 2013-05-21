@@ -38,7 +38,7 @@ public class HandleStopButtonClick {
 		doNothing().when(playerView).addStopPressedListener(stopButtonPressedListenerCaptor.capture());
 		
 		
-		AudioPlayerPresenter sut = new AudioPlayerPresenter(playerView, audioPlayer, mock(Logger.class));
+		AudioPlayerPresenter sut = new AudioPlayerPresenter(playerView, audioPlayer);
 		
 		result.sut = sut;
 		result.stopButtonPressedListener = stopButtonPressedListenerCaptor.getValue();
