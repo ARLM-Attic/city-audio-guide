@@ -1,7 +1,6 @@
 package com.gerken.audioGuide.presenters;
 
 import java.io.IOException;
-import java.util.Timer;
 import java.util.TimerTask;
 
 import com.gerken.audioGuide.R;
@@ -10,6 +9,7 @@ import com.gerken.audioGuide.interfaces.Logger;
 import com.gerken.audioGuide.interfaces.NewSightLookGotInRangeRaiser;
 import com.gerken.audioGuide.interfaces.OnEventListener;
 import com.gerken.audioGuide.interfaces.OnSightLookGotInRangeListener;
+import com.gerken.audioGuide.interfaces.Scheduler;
 import com.gerken.audioGuide.interfaces.views.AudioPlayerView;
 import com.gerken.audioGuide.objectModel.Sight;
 import com.gerken.audioGuide.objectModel.SightLook;
@@ -24,11 +24,9 @@ public class AudioPlayerPresenter {
 	private AudioPlayerView _audioPlayerView;
 	private NewSightLookGotInRangeRaiser _newSightLookGotInRangeRaiser;
 	private Logger _logger;
+	private Scheduler _audioUpdateScheduler;
+	private Scheduler _rewindScheduler;
 	
-	private Timer _audioUpdateTimer;
-	private Timer _rewindTimer;
-	
-	private boolean _isTimerStarted = false;
 	private boolean _resumePlayerAfterRewinding = false;
 	
 	private Sight _currentSight = null;
@@ -76,10 +74,9 @@ public class AudioPlayerPresenter {
 		}
 	};
 	
-	public AudioPlayerPresenter(AudioPlayerView audioPlayerView, AudioPlayer audioPlayer, Logger logger) {
+	public AudioPlayerPresenter(AudioPlayerView audioPlayerView, AudioPlayer audioPlayer) {
 		_audioPlayer = audioPlayer;
-		_audioPlayerView = audioPlayerView;
-		_logger = logger;
+		_audioPlayerView = audioPlayerView;		
 		
 		_audioPlayer.addAudioAssetCompletionListener(_mediaPlayerCompletionListener);
 		
@@ -93,6 +90,18 @@ public class AudioPlayerPresenter {
 			NewSightLookGotInRangeRaiser newSightLookGotInRangeRaiser) {
 		_newSightLookGotInRangeRaiser = newSightLookGotInRangeRaiser;
 		_newSightLookGotInRangeRaiser.addSightLookGotInRangeListener(_sightLookGotInRangeListener);
+	}
+	
+	public void setLogger(Logger logger) {
+		_logger = logger;
+	}
+	
+	public void setAudioUpdateScheduler(Scheduler scheduler) {
+		_audioUpdateScheduler = scheduler;
+	}
+	
+	public void setAudioRewindScheduler(Scheduler scheduler) {
+		_rewindScheduler = scheduler;
 	}
 	
 	private void handleSightLookIsInRange(SightLook sightLook) {
@@ -164,28 +173,23 @@ public class AudioPlayerPresenter {
 	}
 
 	private void startAudioUpdateTimer() {
-		if(!_isTimerStarted) {
-			_audioUpdateTimer = new Timer();
-			_audioUpdateTimer.scheduleAtFixedRate(
-				new TimerTask() {				
-					@Override
-					public void run() {
-						int pos = _audioPlayer.getCurrentPosition();
-						_audioPlayerView.setAudioProgressPosition(pos);
-						_audioPlayerView.setAudioPosition(MsToString(pos));
-						
-					}
-				},
-				0, AUDIO_PLAYER_POLLING_INTERVAL_MS
-			);
-			_isTimerStarted = true;
-		}
+		_audioUpdateScheduler.scheduleAtFixedRate(
+			new TimerTask() {				
+				@Override
+				public void run() {
+					int pos = _audioPlayer.getCurrentPosition();
+					_audioPlayerView.setAudioProgressPosition(pos);
+					_audioPlayerView.setAudioPosition(MsToString(pos));
+					
+				}
+			},
+			0, AUDIO_PLAYER_POLLING_INTERVAL_MS
+		);
 	}
 	
 	private void stopAudioUpdateTimer() {
-		if(_audioUpdateTimer != null)
-			_audioUpdateTimer.cancel();
-		_isTimerStarted = false;
+		if(_audioUpdateScheduler != null)
+			_audioUpdateScheduler.cancel();
 	}
 	
 	private void initPlayerDisplayedDuration() {
@@ -211,14 +215,15 @@ public class AudioPlayerPresenter {
 		_audioPlayer.pause();
 		int step = (int)(REWIND_STEP_RATIO * (float)_audioPlayer.getDuration());
 		
-		_rewindTimer = new Timer();
-		_rewindTimer.scheduleAtFixedRate(
-				new RewindTimerTask(step), 0, REWIND_REPEAT_INTERVAL_MS);
-		
+		if(_rewindScheduler != null) {
+			_rewindScheduler.scheduleAtFixedRate(
+					new RewindTimerTask(step), 0, REWIND_REPEAT_INTERVAL_MS);
+		}		
 	}
 	
 	private void stopRewinding() throws IOException {
-		_rewindTimer.cancel();
+		if(_rewindScheduler != null)
+			_rewindScheduler.cancel();
 		if(_resumePlayerAfterRewinding)
 			_audioPlayer.play();
 	}	

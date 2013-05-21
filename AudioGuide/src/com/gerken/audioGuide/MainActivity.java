@@ -89,7 +89,10 @@ public class MainActivity extends Activity implements SightView {
         _presenter.setLogger(new DefaultLoggingAdapter("SightPresenter"));
         
         _audioPlayerPresenter = new AudioPlayerPresenter(
-        		_audioPlayerControl, player, new DefaultLoggingAdapter("AudioPlayerPresenter"));
+        		_audioPlayerControl, player);
+        _audioPlayerPresenter.setLogger(new DefaultLoggingAdapter("AudioPlayerPresenter"));
+        _audioPlayerPresenter.setAudioUpdateScheduler(new SchedulerService());
+        _audioPlayerPresenter.setAudioRewindScheduler(new SchedulerService());
         _audioPlayerPresenter.setNewSightLookGotInRangeRaiser(_sightLookFinderByLocation);
     }
     
