@@ -40,7 +40,7 @@ public class SightPresenter {
 	private OnEventListener _mediaPlayerCompletionListener = new OnEventListener() {		
 		@Override
 		public void onEvent() {
-			//_sightView.displayPlayerStopped();	
+			showNextRoutePointDirection();	
 		}
 	};
 	
@@ -187,6 +187,10 @@ public class SightPresenter {
 		_sightView.hidePlayerPanel();
 		_isPlayerPanelVisible = false;
 
+		showNextRoutePointDirection();
+	}
+	
+	private void showNextRoutePointDirection() {
 		if(_prefStorage.isRouteChosen()) {
 			NextRoutePoint nrp = getNextRoutePoint();
 			float heading = (float)(Math.PI*nrp.getHeading()/180.0);

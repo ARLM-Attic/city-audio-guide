@@ -58,6 +58,18 @@
                 </look>
             </looks>
         </sight>
+        <sight id="13" name="Holy Cross Rotunda"
+            audioName="aud_011.mp3">
+            <looks>
+                <look imageName="st_013_01.jpg"
+                    latitude="50.082973" longitude="14.414507">
+                    <nextRoutePoints>
+                        <nextRoutePoint routeId="1" heading="-55" horizon="30"
+                            name="TBD" />
+                    </nextRoutePoints>
+                </look>
+            </looks>
+        </sight>
     </sights>
     <routes>
         <route id="1" name="The Old Town" />

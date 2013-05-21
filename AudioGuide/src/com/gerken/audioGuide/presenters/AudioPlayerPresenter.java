@@ -139,31 +139,17 @@ public class AudioPlayerPresenter {
 	}
 	
 	private void handleStopButtonClick() {
-		//resetPlayerPanelHidingTimer();
 		if(_audioPlayer.isPlaying())		
 			_audioPlayer.stop();
 		
 		stopAudioUpdateTimer();
 		resetPlayerDisplayedPosition();
 		_audioPlayerView.displayPlayerStopped();	
-		/*
-		_sightView.hidePlayerPanel();
-		_isPlayerPanelVisible = false;
-		
-		if(_prefStorage.isRouteChosen()) {
-			NextRoutePoint nrp = getNextRoutePoint();
-			float heading = (float)(Math.PI*nrp.getHeading()/180.0);
-			_sightView.displayNextSightDirection(heading, getAdjustedHorizon(nrp.getHorizon()));
-			_sightView.setInfoPanelCaptionText(nrp.getName());
-			_isNextRoutePointInfoShown = true;
-		}
-		*/
 	}
 	
 	private void handleRewindButtonPress() {
 		_logger.logDebug("handleRewindButtonPress");
 		startAudioUpdateTimer();
-		//resetPlayerPanelHidingTimer();
 		startRewinding();
 	}
 	
@@ -175,7 +161,6 @@ public class AudioPlayerPresenter {
 		catch(Exception ex) {
 			_logger.logError("Unable to resume playing after rewinding", ex);
 		}
-		//startPlayerPanelHidingTimer();
 	}
 
 	private void startAudioUpdateTimer() {
