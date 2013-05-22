@@ -3,6 +3,7 @@ package com.gerken.audioGuide.services;
 import java.util.ArrayList;
 
 import com.gerken.audioGuide.interfaces.LocationTracker;
+import com.gerken.audioGuide.interfaces.Logger;
 import com.gerken.audioGuide.interfaces.OnLocationChangedListener;
 
 import android.content.Context;
@@ -16,6 +17,7 @@ public class AndroidLocationManagerFacade implements LocationTracker {
 	private final float UPDATE_DISTANCE_MIN_M = 5.0f;
 	
 	private LocationManager _manager;	
+	private Logger _logger;
 	
 	private ArrayList<OnLocationChangedListener> _locationChangedListeners = 
 			new ArrayList<OnLocationChangedListener>();
@@ -36,6 +38,8 @@ public class AndroidLocationManagerFacade implements LocationTracker {
 		
 		@Override
 		public void onLocationChanged(Location location) {
+			logDebug(String.format("Location changed: lat=%.5f long=%.5f",  
+					location.getLatitude(), location.getLongitude()));
 			for(OnLocationChangedListener l : _locationChangedListeners)
 				l.onLocationChanged(location.getLatitude(), location.getLongitude());			
 		}
@@ -47,18 +51,29 @@ public class AndroidLocationManagerFacade implements LocationTracker {
 				ctx.getSystemService(Context.LOCATION_SERVICE);
 	}
 	
+	public void setLogger(Logger logger) {
+		_logger = logger;
+	}
+	
 	public void startTracking() {
+		logDebug("Starting location tracking");
 		_manager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
 			UPDATE_FREQ_MIN_MS, UPDATE_DISTANCE_MIN_M,
 			_locationListener);
 	}
 	
 	public void stopTracking() {
+		logDebug("Stopping location tracking");
 		_manager.removeUpdates(_locationListener);
 	}
 
 	@Override
 	public void addLocationChangedListener(OnLocationChangedListener listener) {
 		_locationChangedListeners.add(listener);		
+	}
+	
+	private void logDebug(String message) {
+		if(_logger != null)
+			_logger.logDebug(message);
 	}
 }

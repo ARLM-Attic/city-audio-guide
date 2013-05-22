@@ -219,15 +219,7 @@ public class SightPresenter {
 			}
 		}
 	}
-	
-	public void handleActivityPause() {
-		
-	}
-	
-	public void handleActivityResume() {
-		
-	}
-	
+
 	private boolean isSightInRange() {
 		return (_currentSightLook != null);
 	}

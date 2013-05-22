@@ -76,7 +76,8 @@ public class MainActivity extends Activity implements SightView {
     private void setupDependencies() {
     	Context ctx = getApplicationContext();
         AudioPlayer player = new AndroidMediaPlayerFacade(ctx);
-        _locationManager = new AndroidLocationManagerFacade(ctx);  
+        _locationManager = new AndroidLocationManagerFacade(ctx); 
+        _locationManager.setLogger(new DefaultLoggingAdapter("AndroidLocationManagerFacade"));
         
         _sightLookFinderByLocation = new SightLookFinderByLocation(
         		((GuideApplication)getApplication()).getCity(), _locationManager);
@@ -108,17 +109,15 @@ public class MainActivity extends Activity implements SightView {
     }
     
     @Override
-    protected void onResume() {
-    	super.onResume();
+    protected void onStart() {
+    	super.onStart();
     	_locationManager.startTracking();
-    	_presenter.handleActivityResume();
     }
     
     @Override
-    protected void onPause() {
+    protected void onStop() {
     	super.onPause();
     	_locationManager.stopTracking();
-    	_presenter.handleActivityPause();
     }
 
 
