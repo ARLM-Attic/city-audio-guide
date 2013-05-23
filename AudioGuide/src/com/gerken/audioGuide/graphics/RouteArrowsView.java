@@ -17,7 +17,7 @@ public class RouteArrowsView extends View {
 	private final float DEF_ARROW_WIDTH = 40;
 	private final float DEF_ARROW_HEIGHT = 60;
 	
-	private final float A_135 = (float)(Math.PI * 135.0 / 180.0);
+	private final float A_125 = (float)(Math.PI * 125.0 / 180.0);
 	
 	private Paint _arrowPaint;
 	
@@ -131,8 +131,10 @@ public class RouteArrowsView extends View {
 		_camera.rotateX(_xRotationAngle);		
 		//_camera.rotateZ(0);
 		float dZ = -(int)(180.0*_heading/Math.PI);
-		if(_heading > A_135)
+		if(_heading >= A_125)
 			dZ += 180; 
+		else if(_heading <= -A_125)
+			dZ -= 180; 
 		_camera.rotateZ(dZ);
 		_camera.getMatrix(m);
 
@@ -144,7 +146,7 @@ public class RouteArrowsView extends View {
 		canvas.concat(m);
 		_camera.restore();    
 		
-		if(_heading > A_135) {
+		if(_heading >= A_125 || _heading <= -A_125) {
 			m = new Matrix();
 			
 			_camera.save();

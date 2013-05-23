@@ -122,7 +122,7 @@ public class AudioPlayerPresenter {
 		}
 		catch(Exception ex){ 
         	String logMsg=String.format("Error when setting %s as the new MediaPlayer datasource", audioFileName);
-        	_logger.logError(logMsg, ex);
+        	logError(logMsg, ex);
         	_audioPlayerView.displayError(R.string.error_invalid_sight_audio);
     	}
 	}
@@ -140,7 +140,7 @@ public class AudioPlayerPresenter {
 			catch(Exception ex) {
 				//String sightName = (_currentSight != null) ?
 				//	_currentSight.getName() : "[unknown]";
-				_logger.logError("Unable to play audio track for the current sight ", ex);// + sightName, ex);
+				logError("Unable to play audio track for the current sight ", ex);// + sightName, ex);
 			}
 			_audioPlayerView.displayPlayerPlaying();
 			startAudioUpdateTimer();
@@ -168,7 +168,7 @@ public class AudioPlayerPresenter {
 			stopRewinding();			
 		}
 		catch(Exception ex) {
-			_logger.logError("Unable to resume playing after rewinding", ex);
+			logError("Unable to resume playing after rewinding", ex);
 		}
 	}
 
@@ -231,6 +231,11 @@ public class AudioPlayerPresenter {
 	private void doRewindStep(int step) {
 		int newPosition = Math.max(0, _audioPlayer.getCurrentPosition()-step);
 		_audioPlayer.seekTo(newPosition);
+	}
+	
+	private void logError(String message, Throwable ex) {
+		if(_logger != null)
+			_logger.logError(message, ex);
 	}
 	
 	private class RewindTimerTask extends TimerTask {
