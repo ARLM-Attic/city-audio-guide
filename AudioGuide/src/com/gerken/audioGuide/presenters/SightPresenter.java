@@ -245,7 +245,7 @@ public class SightPresenter {
 			imgStream = _assetStreamProvider.getImageAssetStream(newSightLook.getImageName());
 		}
 		catch(Exception ex) {
-			_logger.logError("Unable to get the sight image " + newSightLook.getImageName(), ex);
+			logError("Unable to get the sight image " + newSightLook.getImageName(), ex);
 		}
 		return imgStream;
 	}
@@ -259,7 +259,7 @@ public class SightPresenter {
 			_sightView.setBackgroundImage(bmp);
 		}
 		catch(Exception ex){
-			_logger.logError("Unable to set the background image", ex);
+			logError("Unable to set the background image", ex);
         }
 	}	
 	
@@ -300,4 +300,8 @@ public class SightPresenter {
 		startPlayerPanelHidingTimer();
 	}
 	
+	private void logError(String message, Throwable ex) {
+		if(_logger != null)
+			_logger.logError(message, ex);
+	}
 }
