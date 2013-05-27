@@ -6,13 +6,15 @@ import java.io.ByteArrayInputStream;
 import java.util.Random;
 
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 
 import com.gerken.audioGuide.interfaces.*;
+import com.gerken.audioGuide.interfaces.views.AudioPlayerView;
 import com.gerken.audioGuide.interfaces.views.SightView;
 import com.gerken.audioGuide.objectModel.*;
 import com.gerken.audioGuide.presenters.SightPresenter;;
 
-public class HandleLocationChange {
+public class HandleSightLookChange {
 	private Random _random = new Random(System.currentTimeMillis());
 
 	@Test
@@ -26,40 +28,29 @@ public class HandleLocationChange {
 		final int EXPECTED_VIEW_WIDTH = 240;
 		final int EXPECTED_VIEW_HEIGHT = 320;
 		
-		final double WHATEVER_DOUBLE = 111.222;
-		final String WHATEVER_STRING = "whatever";		
+		Sight sight = createSightWithSingleSightLook(
+				EXPECTED_LOCATION_LATITUDE, EXPECTED_LOCATION_LONGITUDE, EXPECTED_SIGHT_NAME, EXPECTED_SIGHT_LOOK_IMAGE_NAME);	
+		SightLook expectedSightLook = sight.getSightLooks().get(0);
 		
-		SightLook expectedSightLook = new SightLook(
-				EXPECTED_LOCATION_LATITUDE, EXPECTED_LOCATION_LONGITUDE, EXPECTED_SIGHT_LOOK_IMAGE_NAME);
-		SightLook unexpectedSightLook = new SightLook(
-				WHATEVER_DOUBLE, WHATEVER_DOUBLE, WHATEVER_STRING);
-		Sight expectedSight = new Sight(1, EXPECTED_SIGHT_NAME, "audio.mp3");
-		expectedSight.addLook(expectedSightLook);
-		expectedSight.addLook(unexpectedSightLook);
-		Sight unexpectedSight = new Sight(2, "", "audio.mp3");
-		City city = new City(1, "Default", WHATEVER_STRING);
-		city.getSights().add(expectedSight);
-		city.getSights().add(unexpectedSight);			
-		
-		SightView view = mock(SightView.class);
-		when(view.getWidth()).thenReturn(EXPECTED_VIEW_WIDTH);
-		when(view.getHeight()).thenReturn(EXPECTED_VIEW_HEIGHT);
+		SightView sightView = mock(SightView.class);
+		when(sightView.getWidth()).thenReturn(EXPECTED_VIEW_WIDTH);
+		when(sightView.getHeight()).thenReturn(EXPECTED_VIEW_HEIGHT);
 		AssetStreamProvider assetStreamProvider = mock(AssetStreamProvider.class);
 		when(assetStreamProvider.getImageAssetStream(EXPECTED_SIGHT_LOOK_IMAGE_NAME))
 			.thenReturn(EXPECTED_SIGHT_LOOK_IMAGE_STREAM);
 		DownscalableBitmapCreator bmpCreator = mock(DownscalableBitmapCreator.class);
 		
-		SightPresenter sut = CreateSut(city, view, assetStreamProvider, bmpCreator);
+		SutSetupResult sutSetupResult = setupSut(sightView, assetStreamProvider, bmpCreator);
 		
 		// --- Act
-		sut.handleLocationChange(EXPECTED_LOCATION_LATITUDE, EXPECTED_LOCATION_LONGITUDE);
+		sutSetupResult.sightLookGotInRangeListener.onSightLookGotInRange(expectedSightLook);
 		
 		// --- Assert
-		verify(view).setInfoPanelCaptionText(EXPECTED_SIGHT_NAME);
+		verify(sightView).setInfoPanelCaptionText(EXPECTED_SIGHT_NAME);
 		verify(bmpCreator).CreateDownscalableBitmap(EXPECTED_SIGHT_LOOK_IMAGE_STREAM,
 				EXPECTED_VIEW_WIDTH, EXPECTED_VIEW_HEIGHT);
 	}
-	
+	/*
 	@Test
 	public void Given_NewSightGotInRange__Then_AudioNotificationPalyed() throws Exception {
 		final double EXPECTED_LOCATION_LATITUDE = 12.345;
@@ -200,5 +191,54 @@ public class HandleLocationChange {
 		
 		return new SightPresenter(city, view, player, factory);
 	}
-
+*/
+	private Sight createSightWithSingleSightLook() {
+		final String WHATEVER_STRING = "whatever";	
+		final double WHATEVER_DOUBLE = 12.3456;
+		return createSightWithSingleSightLook(WHATEVER_DOUBLE, WHATEVER_DOUBLE, WHATEVER_STRING, WHATEVER_STRING);
+	}
+	
+	private Sight createSightWithSingleSightLook(double latitude, double longitude, 
+			String sightName, String lookImageName) {
+		final String WHATEVER_STRING = "whatever";	
+		
+		SightLook expectedSightLook = new SightLook(
+				latitude, longitude, lookImageName);
+		Sight expectedSight = new Sight(_random.nextInt(), sightName, WHATEVER_STRING);
+		expectedSight.addLook(expectedSightLook);
+		
+		return expectedSight;
+	}
+	
+	private SutSetupResult setupSut(SightView sightView,
+			AssetStreamProvider assetStreamProvider, DownscalableBitmapCreator bmpCreator) {
+		return setupSut(sightView, mock(AudioPlayerView.class), mock(AudioPlayer.class),
+				mock(NewSightLookGotInRangeRaiser.class), assetStreamProvider, bmpCreator);
+	}
+	
+	private SutSetupResult setupSut(SightView sightView, AudioPlayerView playerView, AudioPlayer player, 
+			NewSightLookGotInRangeRaiser sightLookFinder, AssetStreamProvider assetStreamProvider,
+			DownscalableBitmapCreator bmpCreator) {
+		SutSetupResult result = new SutSetupResult();
+		
+		ArgumentCaptor<OnSightLookGotInRangeListener> sightLookGotInRangeListenerCaptor = 
+				ArgumentCaptor.forClass(OnSightLookGotInRangeListener.class);
+		doNothing().when(sightLookFinder)
+			.addSightLookGotInRangeListener(sightLookGotInRangeListenerCaptor.capture());
+		
+		SightPresenter sut = new SightPresenter(sightView, playerView, player);
+		sut.setNewSightLookGotInRangeRaiser(sightLookFinder);
+		sut.setAssetStreamProvider(assetStreamProvider);
+		sut.setDownscalableBitmapCreator(bmpCreator);
+		
+		result.sut = sut;
+		result.sightLookGotInRangeListener = sightLookGotInRangeListenerCaptor.getValue();
+		
+		return result;
+	}
+	
+	private class SutSetupResult {
+		public SightPresenter sut;
+		public OnSightLookGotInRangeListener sightLookGotInRangeListener;
+	}
 }
