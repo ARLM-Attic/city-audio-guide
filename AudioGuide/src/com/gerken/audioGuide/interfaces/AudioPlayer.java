@@ -2,9 +2,7 @@ package com.gerken.audioGuide.interfaces;
 
 import java.io.IOException;
 
-public interface AudioPlayer {
-	void signalSightInRange();
-	
+public interface AudioPlayer {	
 	void prepareAudioAsset(String asetFileName) throws IOException;
 	
 	void play() throws IOException;

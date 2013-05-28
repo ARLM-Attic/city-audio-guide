@@ -1,19 +1,15 @@
 package com.gerken.audioGuide.presenters;
 
 import java.io.InputStream;
-import java.util.Timer;
 import java.util.TimerTask;
 
-import com.gerken.audioGuide.R;
 import com.gerken.audioGuide.graphics.DownscalableBitmap;
 import com.gerken.audioGuide.interfaces.*;
 import com.gerken.audioGuide.interfaces.views.AudioPlayerView;
 import com.gerken.audioGuide.interfaces.views.SightView;
 import com.gerken.audioGuide.objectModel.*;
 
-public class SightPresenter {
-	
-	
+public class SightPresenter {	
 	private final long PLAYER_PANEL_HIDING_DELAY_MS = 5000L;
 	
 	private City _city;
@@ -21,21 +17,21 @@ public class SightPresenter {
 	private AudioPlayerView _audioPlayerView;
 	private AssetStreamProvider _assetStreamProvider;
 	private AudioPlayer _audioPlayer;
+	private AudioNotifier _audioNotifier;
 	private ApplicationSettingsStorage _prefStorage;
 	private DownscalableBitmapCreator _downscalableBitmapCreator;
 	private NewSightLookGotInRangeRaiser _newSightLookGotInRangeRaiser;
+	private Scheduler _playerPanelHidingScheduler;
 	private Logger _logger;
 	
 	private Sight _currentSight = null;
 	private SightLook _currentSightLook = null;	
-	
-	private Timer _playerPanelHidingTimer;
+
 	private boolean _isPlayerPanelVisible = false;
 	private boolean _isNextRoutePointInfoShown = false;
 	
 	private int _currentSightLookImageHeight;
-	private int _currentSightLookImageVerticalPadding;
-	
+	private int _currentSightLookImageVerticalPadding;	
 	
 	private OnEventListener _mediaPlayerCompletionListener = new OnEventListener() {		
 		@Override
@@ -57,7 +53,7 @@ public class SightPresenter {
 	private OnEventListener _playPressedListener = new OnEventListener() {		
 		@Override
 		public void onEvent() {
-			restartPlayerPanelHidingTimer();	
+			reschedulePlayerPanelHiding();	
 		}
 	};
 	
@@ -71,14 +67,14 @@ public class SightPresenter {
 	private OnEventListener _rewindPressedListener = new OnEventListener() {		
 		@Override
 		public void onEvent() {
-			resetPlayerPanelHidingTimer();
+			unschedulePlayerPanelHiding();
 		}
 	};
 	
 	private OnEventListener _rewindReleasedListener = new OnEventListener() {		
 		@Override
 		public void onEvent() {
-			startPlayerPanelHidingTimer();	
+			schedulePlayerPanelHiding();	
 		}
 	};
 	
@@ -118,22 +114,25 @@ public class SightPresenter {
 		}
 	};
 	
-	public SightPresenter(SightView sightView, AudioPlayerView audioPlayerView, AudioPlayer audioPlayer) {
+	public SightPresenter(SightView sightView, AudioPlayerView audioPlayerView) {
 		_sightView = sightView;
-		_audioPlayerView = audioPlayerView;
-		_audioPlayer = audioPlayer;
-		
-		_playerPanelHidingTimer = new Timer();
-		
 		_sightView.addViewInitializedListener(_sightViewInitializedListener);
 		_sightView.addViewTouchedListener(_sightViewTouchedListener);
 		
-		_audioPlayer.addAudioAssetCompletionListener(_mediaPlayerCompletionListener);		
-		
+		_audioPlayerView = audioPlayerView;
 		_audioPlayerView.addPlayPressedListener(_playPressedListener);
 		_audioPlayerView.addStopPressedListener(_stopPressedListener);
 		_audioPlayerView.addRewindPressedListener(_rewindPressedListener);
 		_audioPlayerView.addRewindReleasedListener(_rewindReleasedListener);
+	}
+	
+	public void setAudioPlayer(AudioPlayer audioPlayer) {
+		_audioPlayer = audioPlayer;
+		_audioPlayer.addAudioAssetCompletionListener(_mediaPlayerCompletionListener);
+	}
+		
+	public void setAudioNotifier(AudioNotifier audioNotifier) {
+		_audioNotifier = audioNotifier;
 	}
 	
 	public void setAssetStreamProvider(AssetStreamProvider assetStreamProvider) {
@@ -155,6 +154,10 @@ public class SightPresenter {
 		_newSightLookGotInRangeRaiser.addSightLookGotInRangeListener(_sightLookGotInRangeListener);
 	}
 	
+	public void setPlayerPanelHidingScheduler(Scheduler scheduler) {
+		_playerPanelHidingScheduler = scheduler;
+	}
+	
 	public void setLogger(Logger logger) {
 		_logger = logger;
 	}
@@ -164,7 +167,8 @@ public class SightPresenter {
 			if(!sightLook.equals(_currentSightLook)) {
 				if(!sightLook.getSight().equals(_currentSight)) {
 					notifyViewAboutNewSight(sightLook);
-					_audioPlayer.signalSightInRange();
+					if(_audioNotifier != null)
+						_audioNotifier.signalSightInRange();
 					_currentSight = sightLook.getSight();
 				}					
 				else
@@ -174,8 +178,9 @@ public class SightPresenter {
 			}
 		}
 		else if(_currentSightLook != null) {
-			_sightView.acceptNoSightInRange();					
-			_audioPlayer.stop();
+			_sightView.acceptNoSightInRange();	
+			if(_audioPlayer != null)
+				_audioPlayer.stop();
 			_currentSight = null;
 			_currentSightLook = null;
 		}
@@ -183,7 +188,7 @@ public class SightPresenter {
 	}
 
 	private void handleStopButtonClick() {
-		resetPlayerPanelHidingTimer();
+		unschedulePlayerPanelHiding();
 		_sightView.hidePlayerPanel();
 		_isPlayerPanelVisible = false;
 
@@ -210,7 +215,7 @@ public class SightPresenter {
 		if(isSightInRange() && !_isPlayerPanelVisible) {
 			_sightView.showPlayerPanel();
 			_isPlayerPanelVisible = true;
-			startPlayerPanelHidingTimer();
+			schedulePlayerPanelHiding();
 			
 			if(_isNextRoutePointInfoShown) {
 				_sightView.hideNextSightDirection();
@@ -277,27 +282,28 @@ public class SightPresenter {
 	}	
 
 	
-	private void startPlayerPanelHidingTimer() {
-		_playerPanelHidingTimer.schedule(
-			new TimerTask() {				
-				@Override
-				public void run() {
-					_sightView.hidePlayerPanel();
-					_isPlayerPanelVisible = false;
-				}
-			},
-			PLAYER_PANEL_HIDING_DELAY_MS
-		);
+	private void schedulePlayerPanelHiding() {
+		if(_playerPanelHidingScheduler != null)
+			_playerPanelHidingScheduler.schedule(
+				new TimerTask() {				
+					@Override
+					public void run() {
+						_sightView.hidePlayerPanel();
+						_isPlayerPanelVisible = false;
+					}
+				},
+				PLAYER_PANEL_HIDING_DELAY_MS
+			);
 	}
 	
-	private void resetPlayerPanelHidingTimer() {
-		_playerPanelHidingTimer.cancel();
-		_playerPanelHidingTimer = new Timer();
+	private void unschedulePlayerPanelHiding() {
+		if(_playerPanelHidingScheduler != null)
+			_playerPanelHidingScheduler.cancel();
 	}
 	
-	private void restartPlayerPanelHidingTimer() {
-		resetPlayerPanelHidingTimer();
-		startPlayerPanelHidingTimer();
+	private void reschedulePlayerPanelHiding() {
+		unschedulePlayerPanelHiding();
+		schedulePlayerPanelHiding();
 	}
 	
 	private void logError(String message, Throwable ex) {

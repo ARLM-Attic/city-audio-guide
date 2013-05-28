@@ -39,13 +39,6 @@ public class AndroidMediaPlayerFacade implements AudioPlayer {
 		_completionListeners = new ArrayList<OnEventListener>();
 		_mediaPlayer.setOnCompletionListener(_audioAssetCompletionListener);
 	}
-	
-	@Override
-	public void signalSightInRange() {
-		MediaPlayer player = MediaPlayer.create(_context, R.raw.inrange);
-		player.start();
-		//player.release();		
-	}
 
 	@Override
 	public void prepareAudioAsset(String asetFileName) throws IOException {

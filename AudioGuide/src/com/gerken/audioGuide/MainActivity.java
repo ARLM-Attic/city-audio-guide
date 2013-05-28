@@ -82,11 +82,14 @@ public class MainActivity extends Activity implements SightView {
         _sightLookFinderByLocation = new SightLookFinderByLocation(
         		((GuideApplication)getApplication()).getCity(), _locationManager);
         
-        _presenter = new SightPresenter(this, _audioPlayerControl, player);
+        _presenter = new SightPresenter(this, _audioPlayerControl);
+        _presenter.setAudioPlayer(player);
+        _presenter.setAudioNotifier(new AndroidMediaPlayerNotifier(ctx));
         _presenter.setAssetStreamProvider(new GuideAssetManager(ctx));
         _presenter.setApplicationSettingsStorage(new SharedPreferenceManager(ctx));
         _presenter.setNewSightLookGotInRangeRaiser(_sightLookFinderByLocation);
         _presenter.setDownscalableBitmapCreator(new DownscalableBitmapFactory());
+        _presenter.setPlayerPanelHidingScheduler(new SchedulerService());
         _presenter.setLogger(new DefaultLoggingAdapter("SightPresenter"));
         
         _audioPlayerPresenter = new AudioPlayerPresenter(

@@ -24,23 +24,23 @@
 	        audioName="aud_011.mp3">
             <looks>
                 <look imageName="st_011_01.jpg" 
-                    latitude="50.087131" longitude="14.428262">
+                      latitude="50.087131" longitude="14.428262">
                     <nextRoutePoints>
                         <nextRoutePoint routeId="1" heading="0" horizon="23"
                             name="House of the Black Madonna" />
                     </nextRoutePoints>             
                 </look>
                 <look imageName="st_011_02.jpg" 
-                    latitude="50.087262" longitude="14.427345">
+                      latitude="50.087262" longitude="14.427345">
                     <nextRoutePoints>
                         <nextRoutePoint routeId="1" heading="175" horizon="26"
                             name="House of the Black Madonna" />
                     </nextRoutePoints>
                 </look>
                 <look imageName="st_011_03.jpg" 
-                    latitude="50.086877" longitude="14.427942">
+                      latitude="50.086877" longitude="14.427942">
                     <nextRoutePoints>
-                        <nextRoutePoint routeId="1" heading="-50" horizon="16"
+                        <nextRoutePoint routeId="1" heading="-35" horizon="20"
                             name="House of the Black Madonna" />
                     </nextRoutePoints>
                 </look>
@@ -50,18 +50,102 @@
             audioName="aud_012.mp3">
             <looks>
                 <look imageName="st_012_01.jpg" 
-                    latitude="50.087213" longitude="14.425939">
+                      latitude="50.087213" longitude="14.425939">
                     <nextRoutePoints>
-                        <nextRoutePoint routeId="1" heading="45" horizon="36"
-                            name="Ungelt" />
+                        <nextRoutePoint routeId="1" heading="50" horizon="30"
+                            name="Caretto-Millesimo Palace" />
+                    </nextRoutePoints>
+                </look>
+                <look imageName="st_012_02.jpg" 
+                      latitude="50.08675" longitude="14.425358">                    
+                </look>
+            </looks>
+        </sight>
+        <sight id="13" name="Caretto-Millesimo Palace"
+            audioName="aud_011.mp3">
+            <looks>
+                <look imageName="st_013_01.jpg"
+                      latitude="50.087153" longitude="14.42423">
+                    <nextRoutePoints>
+                        <nextRoutePoint routeId="1" heading="-55" horizon="27"
+                            name="Church of Our Lady before Týn" />
                     </nextRoutePoints>
                 </look>
             </looks>
         </sight>
-        <sight id="13" name="Holy Cross Rotunda"
+        <sight id="14" name="Church of Our Lady before Týn"
             audioName="aud_011.mp3">
             <looks>
-                <look imageName="st_013_01.jpg"
+                <look imageName="st_014_01.jpg"
+                      latitude="50.087245" longitude="14.423018">
+                    <nextRoutePoints>
+                        <nextRoutePoint routeId="1" heading="-55" horizon="18"
+                            name="Jan Hus Monument" />
+                    </nextRoutePoints>
+                </look>
+                <look imageName="st_014_02.jpg"
+                      latitude="50.087553" longitude="14.421613">
+                    <nextRoutePoints>
+                        <nextRoutePoint routeId="1" heading="-130" horizon="26"
+                            name="Jan Hus Monument" />
+                    </nextRoutePoints>
+                </look>
+            </looks>
+        </sight>
+        <sight id="15" name="Jan Hus Monument"
+            audioName="aud_011.mp3">
+            <looks>
+                <look imageName="st_015_01.jpg"
+                      latitude="50.087527" longitude="14.421103">
+                    <nextRoutePoints>
+                        <nextRoutePoint routeId="1" heading="-170" horizon="30"
+                            name="Old Town City Hall" />
+                    </nextRoutePoints>
+                </look>
+                <look imageName="st_015_02.jpg"
+                      latitude="50.087675" longitude="14.421471">
+                    <nextRoutePoints>
+                        <nextRoutePoint routeId="1" heading="-55" horizon="30"
+                            name="Old Town City Hall" />
+                    </nextRoutePoints>
+                </look>
+            </looks>
+        </sight>
+        <sight id="16" name="Old Town City Hall"
+            audioName="aud_011.mp3">
+            <looks>
+                <look imageName="st_016_01.jpg"
+                      latitude="50.087412" longitude="14.42098">
+                    <nextRoutePoints>
+                        <nextRoutePoint routeId="1" heading="-30" horizon="22"
+                            name="The Astronomical Clock" />
+                    </nextRoutePoints>
+                </look>
+                <look imageName="st_016_02.jpg"
+                      latitude="50.087153" longitude="14.421355">
+                    <nextRoutePoints>
+                        <nextRoutePoint routeId="1" heading="-50" horizon="20"
+                            name="The Astronomical Clock" />
+                    </nextRoutePoints>
+                </look>
+            </looks>
+        </sight>
+        <sight id="17" name="The Astronomical Clock"
+            audioName="aud_011.mp3">
+            <looks>
+                <look imageName="st_017_01.jpg"
+                      latitude="50.086864" longitude="14.420865">
+                    <nextRoutePoints>
+                        <nextRoutePoint routeId="1" heading="-55" horizon="26"
+                            name="TBD" />
+                    </nextRoutePoints>
+                </look>
+            </looks>
+        </sight>
+        <sight id="30" name="Holy Cross Rotunda"
+            audioName="aud_011.mp3">
+            <looks>
+                <look imageName="st_030_01.jpg"
                     latitude="50.082973" longitude="14.414507">
                     <nextRoutePoints>
                         <nextRoutePoint routeId="1" heading="-55" horizon="30"

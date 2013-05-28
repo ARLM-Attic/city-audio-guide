@@ -9,6 +9,15 @@ public class SchedulerService implements Scheduler {
 	private Timer _timer;
 	
 	private boolean _isTimerStarted = false;
+	
+	@Override
+	public void schedule(TimerTask task, long delay) {
+		if(!_isTimerStarted) {
+			_timer = new Timer();
+			_timer.schedule(task, delay);
+			_isTimerStarted = true;
+		}
+	}
 
 	@Override
 	public void scheduleAtFixedRate(TimerTask task, long delay, long period) {
