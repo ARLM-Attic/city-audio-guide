@@ -134,7 +134,8 @@ public class HandleMediaPlayerCompletion {
 		doNothing().when(sightLookFinder)
 			.addSightLookGotInRangeListener(sightLookGotInRangeListenerCaptor.capture());
 		
-		SightPresenter sut = new SightPresenter(sightView, playerView, player);
+		SightPresenter sut = new SightPresenter(sightView, playerView);
+		sut.setAudioPlayer(player);
 		sut.setNewSightLookGotInRangeRaiser(sightLookFinder);
 		sut.setAssetStreamProvider(mock(AssetStreamProvider.class));
 		sut.setApplicationSettingsStorage(settingsStorage);

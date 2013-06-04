@@ -50,29 +50,24 @@ public class HandleSightLookChange {
 		verify(bmpCreator).CreateDownscalableBitmap(EXPECTED_SIGHT_LOOK_IMAGE_STREAM,
 				EXPECTED_VIEW_WIDTH, EXPECTED_VIEW_HEIGHT);
 	}
-	/*
+
 	@Test
 	public void Given_NewSightGotInRange__Then_AudioNotificationPalyed() throws Exception {
-		final double EXPECTED_LOCATION_LATITUDE = 12.345;
-		final double EXPECTED_LOCATION_LONGITUDE = 24.567;
-
-		City city = CreateSingleSightLookModel(EXPECTED_LOCATION_LATITUDE, EXPECTED_LOCATION_LONGITUDE);
+		Sight sight = createSightWithSingleSightLook();
+		SightLook expectedSightLook = sight.getSightLooks().get(0);
 		
-		SightView view = mock(SightView.class);
-		AssetStreamProvider assetStreamProvider = mock(AssetStreamProvider.class);
-		AudioPlayer player = mock(AudioPlayer.class);
-		when(assetStreamProvider.getImageAssetStream(anyString()))
-			.thenReturn(new ByteArrayInputStream(new byte[]{1,2,3}));
+		SightView sightView = mock(SightView.class);
+		AudioNotifier audioNotifier = mock(AudioNotifier.class);
 		
-		SightPresenter sut = CreateSut(city, view, assetStreamProvider, player);
+		SutSetupResult sutSetupResult = setupSut(sightView, audioNotifier);
 		
 		// --- Act
-		sut.handleLocationChange(EXPECTED_LOCATION_LATITUDE, EXPECTED_LOCATION_LONGITUDE);
+		sutSetupResult.sightLookGotInRangeListener.onSightLookGotInRange(expectedSightLook);
 		
 		// --- Assert
-		verify(player).signalSightInRange();
+		verify(audioNotifier).signalSightInRange();
 	}
-	
+	/*
 	@Test
 	public void Given_NewSightGotInRange__Then_NextRoutePointArrowHidden() throws Exception {
 		final double EXPECTED_LOCATION_LATITUDE = 12.345;
@@ -212,11 +207,19 @@ public class HandleSightLookChange {
 	
 	private SutSetupResult setupSut(SightView sightView,
 			AssetStreamProvider assetStreamProvider, DownscalableBitmapCreator bmpCreator) {
-		return setupSut(sightView, mock(AudioPlayerView.class), mock(AudioPlayer.class),
+		return setupSut(sightView, mock(AudioPlayerView.class), 
+				mock(AudioPlayer.class), mock(AudioNotifier.class),
 				mock(NewSightLookGotInRangeRaiser.class), assetStreamProvider, bmpCreator);
 	}
 	
-	private SutSetupResult setupSut(SightView sightView, AudioPlayerView playerView, AudioPlayer player, 
+	private SutSetupResult setupSut(SightView sightView, AudioNotifier notifier) {
+		return setupSut(sightView, mock(AudioPlayerView.class), mock(AudioPlayer.class), notifier,
+				mock(NewSightLookGotInRangeRaiser.class), mock(AssetStreamProvider.class), 
+				mock(DownscalableBitmapCreator.class));
+	}
+	
+	private SutSetupResult setupSut(SightView sightView, AudioPlayerView playerView, 
+			AudioPlayer player, AudioNotifier notifier,
 			NewSightLookGotInRangeRaiser sightLookFinder, AssetStreamProvider assetStreamProvider,
 			DownscalableBitmapCreator bmpCreator) {
 		SutSetupResult result = new SutSetupResult();
@@ -226,7 +229,9 @@ public class HandleSightLookChange {
 		doNothing().when(sightLookFinder)
 			.addSightLookGotInRangeListener(sightLookGotInRangeListenerCaptor.capture());
 		
-		SightPresenter sut = new SightPresenter(sightView, playerView, player);
+		SightPresenter sut = new SightPresenter(sightView, playerView);
+		sut.setAudioPlayer(player);
+		sut.setAudioNotifier(notifier);
 		sut.setNewSightLookGotInRangeRaiser(sightLookFinder);
 		sut.setAssetStreamProvider(assetStreamProvider);
 		sut.setDownscalableBitmapCreator(bmpCreator);

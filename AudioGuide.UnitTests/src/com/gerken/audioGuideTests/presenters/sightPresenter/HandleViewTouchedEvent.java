@@ -6,43 +6,21 @@ import java.util.Random;
 
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 
 import com.gerken.audioGuide.interfaces.ApplicationSettingsStorage;
 import com.gerken.audioGuide.interfaces.AssetStreamProvider;
-import com.gerken.audioGuide.interfaces.AudioPlayer;
 import com.gerken.audioGuide.interfaces.NewSightLookGotInRangeRaiser;
 import com.gerken.audioGuide.interfaces.OnEventListener;
 import com.gerken.audioGuide.interfaces.OnSightLookGotInRangeListener;
 import com.gerken.audioGuide.interfaces.views.AudioPlayerView;
 import com.gerken.audioGuide.interfaces.views.SightView;
-import com.gerken.audioGuide.objectModel.City;
 import com.gerken.audioGuide.objectModel.NextRoutePoint;
 import com.gerken.audioGuide.objectModel.Sight;
 import com.gerken.audioGuide.objectModel.SightLook;
 import com.gerken.audioGuide.presenters.SightPresenter;
 
-public class HandleViewTouchedEvent {
-	
+public class HandleViewTouchedEvent {	
 	private Random _random = new Random(System.currentTimeMillis());
-	
-	
-	private class ArgumentRetrievingAnswer<TArg> implements Answer<Void> {		
-		private TArg _arg;
-
-		@Override
-		public Void answer(InvocationOnMock invocation) {
-			Object[] args = invocation.getArguments();
-			_arg = (TArg)args[0];
-			return null;
-		}
-		
-		public TArg getArg() {
-			return _arg;
-		}
-		
-	}
 
 	@Test
 	public void Given_NoSightInRange__Then_PlayerPanelIsNotDisplayed() throws Exception {
@@ -167,7 +145,7 @@ public class HandleViewTouchedEvent {
 		doNothing().when(sightLookFinder)
 			.addSightLookGotInRangeListener(sightLookGotInRangeListenerCaptor.capture());
 		
-		SightPresenter sut = new SightPresenter(sightView, playerView, mock(AudioPlayer.class));
+		SightPresenter sut = new SightPresenter(sightView, playerView);
 		sut.setNewSightLookGotInRangeRaiser(sightLookFinder);
 		sut.setAssetStreamProvider(mock(AssetStreamProvider.class));
 		sut.setApplicationSettingsStorage(settingsStorage);

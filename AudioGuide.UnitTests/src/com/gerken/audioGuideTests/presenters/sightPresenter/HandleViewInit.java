@@ -67,7 +67,7 @@ public class HandleViewInit {
 		doNothing().when(sightView).addViewInitializedListener(sightViewInitializedListenerCaptor.capture());
 		
 		SightPresenter sut = 
-				new SightPresenter(sightView, mock(AudioPlayerView.class), mock(AudioPlayer.class));
+				new SightPresenter(sightView, mock(AudioPlayerView.class));
 		sut.setApplicationSettingsStorage(settingsStorage);
 		
 		return sightViewInitializedListenerCaptor.getValue();
