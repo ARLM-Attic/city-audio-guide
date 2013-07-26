@@ -23,8 +23,6 @@ public class HandleSightLookChange {
 		final double EXPECTED_LOCATION_LONGITUDE = 24.567;
 		final String EXPECTED_SIGHT_LOOK_IMAGE_NAME = "colosseum.jpg";
 		final String EXPECTED_SIGHT_NAME = "Colosseum";
-		final ByteArrayInputStream EXPECTED_SIGHT_LOOK_IMAGE_STREAM = 
-				new ByteArrayInputStream(new byte[]{1,2,3});
 		final int EXPECTED_VIEW_WIDTH = 240;
 		final int EXPECTED_VIEW_HEIGHT = 320;
 		
@@ -35,19 +33,16 @@ public class HandleSightLookChange {
 		SightView sightView = mock(SightView.class);
 		when(sightView.getWidth()).thenReturn(EXPECTED_VIEW_WIDTH);
 		when(sightView.getHeight()).thenReturn(EXPECTED_VIEW_HEIGHT);
-		AssetStreamProvider assetStreamProvider = mock(AssetStreamProvider.class);
-		when(assetStreamProvider.getImageAssetStream(EXPECTED_SIGHT_LOOK_IMAGE_NAME))
-			.thenReturn(EXPECTED_SIGHT_LOOK_IMAGE_STREAM);
-		DownscalableBitmapCreator bmpCreator = mock(DownscalableBitmapCreator.class);
+		DownscalingBitmapLoader bmpLoader = mock(DownscalingBitmapLoader.class);
 		
-		SutSetupResult sutSetupResult = setupSut(sightView, assetStreamProvider, bmpCreator);
+		SutSetupResult sutSetupResult = setupSut(sightView, bmpLoader);
 		
 		// --- Act
 		sutSetupResult.sightLookGotInRangeListener.onSightLookGotInRange(expectedSightLook);
 		
 		// --- Assert
 		verify(sightView).setInfoPanelCaptionText(EXPECTED_SIGHT_NAME);
-		verify(bmpCreator).CreateDownscalableBitmap(EXPECTED_SIGHT_LOOK_IMAGE_STREAM,
+		verify(bmpLoader).load(EXPECTED_SIGHT_LOOK_IMAGE_NAME,
 				EXPECTED_VIEW_WIDTH, EXPECTED_VIEW_HEIGHT);
 	}
 
@@ -205,23 +200,21 @@ public class HandleSightLookChange {
 		return expectedSight;
 	}
 	
-	private SutSetupResult setupSut(SightView sightView,
-			AssetStreamProvider assetStreamProvider, DownscalableBitmapCreator bmpCreator) {
+	private SutSetupResult setupSut(SightView sightView, DownscalingBitmapLoader bmpLoader) {
 		return setupSut(sightView, mock(AudioPlayerView.class), 
 				mock(AudioPlayer.class), mock(AudioNotifier.class),
-				mock(NewSightLookGotInRangeRaiser.class), assetStreamProvider, bmpCreator);
+				mock(NewSightLookGotInRangeRaiser.class), bmpLoader);
 	}
 	
 	private SutSetupResult setupSut(SightView sightView, AudioNotifier notifier) {
 		return setupSut(sightView, mock(AudioPlayerView.class), mock(AudioPlayer.class), notifier,
-				mock(NewSightLookGotInRangeRaiser.class), mock(AssetStreamProvider.class), 
-				mock(DownscalableBitmapCreator.class));
+				mock(NewSightLookGotInRangeRaiser.class), mock(DownscalingBitmapLoader.class));
 	}
 	
 	private SutSetupResult setupSut(SightView sightView, AudioPlayerView playerView, 
 			AudioPlayer player, AudioNotifier notifier,
-			NewSightLookGotInRangeRaiser sightLookFinder, AssetStreamProvider assetStreamProvider,
-			DownscalableBitmapCreator bmpCreator) {
+			NewSightLookGotInRangeRaiser sightLookFinder,
+			DownscalingBitmapLoader bmpLoader) {
 		SutSetupResult result = new SutSetupResult();
 		
 		ArgumentCaptor<OnSightLookGotInRangeListener> sightLookGotInRangeListenerCaptor = 
@@ -233,8 +226,7 @@ public class HandleSightLookChange {
 		sut.setAudioPlayer(player);
 		sut.setAudioNotifier(notifier);
 		sut.setNewSightLookGotInRangeRaiser(sightLookFinder);
-		sut.setAssetStreamProvider(assetStreamProvider);
-		sut.setDownscalableBitmapCreator(bmpCreator);
+		sut.setBitmapLoader(bmpLoader);
 		
 		result.sut = sut;
 		result.sightLookGotInRangeListener = sightLookGotInRangeListenerCaptor.getValue();

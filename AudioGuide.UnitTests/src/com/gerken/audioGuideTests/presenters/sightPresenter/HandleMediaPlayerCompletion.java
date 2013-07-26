@@ -15,7 +15,7 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
 import com.gerken.audioGuide.interfaces.ApplicationSettingsStorage;
-import com.gerken.audioGuide.interfaces.AssetStreamProvider;
+import com.gerken.audioGuide.interfaces.DownscalingBitmapLoader;
 import com.gerken.audioGuide.interfaces.AudioPlayer;
 import com.gerken.audioGuide.interfaces.NewSightLookGotInRangeRaiser;
 import com.gerken.audioGuide.interfaces.OnEventListener;
@@ -137,7 +137,7 @@ public class HandleMediaPlayerCompletion {
 		SightPresenter sut = new SightPresenter(sightView, playerView);
 		sut.setAudioPlayer(player);
 		sut.setNewSightLookGotInRangeRaiser(sightLookFinder);
-		sut.setAssetStreamProvider(mock(AssetStreamProvider.class));
+		sut.setBitmapLoader(mock(DownscalingBitmapLoader.class));
 		sut.setApplicationSettingsStorage(settingsStorage);
 		
 		result.sut = sut;

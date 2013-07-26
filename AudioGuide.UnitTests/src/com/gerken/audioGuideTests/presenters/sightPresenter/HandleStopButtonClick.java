@@ -128,7 +128,7 @@ public class HandleStopButtonClick {
 		SightPresenter sut = new SightPresenter(sightView, playerView);
 		sut.setAudioPlayer(player);
 		sut.setNewSightLookGotInRangeRaiser(sightLookFinder);
-		sut.setAssetStreamProvider(mock(AssetStreamProvider.class));
+		sut.setBitmapLoader(mock(DownscalingBitmapLoader.class));
 		sut.setApplicationSettingsStorage(settingsStorage);
 		
 		result.sut = sut;

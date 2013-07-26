@@ -8,7 +8,7 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
 import com.gerken.audioGuide.interfaces.ApplicationSettingsStorage;
-import com.gerken.audioGuide.interfaces.AssetStreamProvider;
+import com.gerken.audioGuide.interfaces.DownscalingBitmapLoader;
 import com.gerken.audioGuide.interfaces.NewSightLookGotInRangeRaiser;
 import com.gerken.audioGuide.interfaces.OnEventListener;
 import com.gerken.audioGuide.interfaces.OnSightLookGotInRangeListener;
@@ -147,7 +147,7 @@ public class HandleViewTouchedEvent {
 		
 		SightPresenter sut = new SightPresenter(sightView, playerView);
 		sut.setNewSightLookGotInRangeRaiser(sightLookFinder);
-		sut.setAssetStreamProvider(mock(AssetStreamProvider.class));
+		sut.setBitmapLoader(mock(DownscalingBitmapLoader.class));
 		sut.setApplicationSettingsStorage(settingsStorage);
 		
 		result.sut = sut;

@@ -4,18 +4,11 @@ import static org.mockito.Mockito.*;
 
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.Mock;
 
-import com.gerken.audioGuide.interfaces.AssetStreamProvider;
-import com.gerken.audioGuide.interfaces.AudioPlayer;
-import com.gerken.audioGuide.interfaces.DownscalableBitmapCreator;
-import com.gerken.audioGuide.interfaces.Logger;
 import com.gerken.audioGuide.interfaces.ApplicationSettingsStorage;
 import com.gerken.audioGuide.interfaces.OnEventListener;
 import com.gerken.audioGuide.interfaces.views.AudioPlayerView;
 import com.gerken.audioGuide.interfaces.views.SightView;
-import com.gerken.audioGuide.objectModel.City;
 import com.gerken.audioGuide.presenters.SightPresenter;
 
 public class HandleViewInit {
