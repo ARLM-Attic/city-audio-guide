@@ -1,9 +1,10 @@
 package com.gerken.audioGuide.presenters;
 
-import java.io.InputStream;
 import java.util.TimerTask;
 
-import com.gerken.audioGuide.graphics.DownscalableBitmap;
+import android.graphics.Bitmap;
+
+import com.gerken.audioGuide.graphics.DownscaledBitmap;
 import com.gerken.audioGuide.interfaces.*;
 import com.gerken.audioGuide.interfaces.views.AudioPlayerView;
 import com.gerken.audioGuide.interfaces.views.SightView;
@@ -15,11 +16,10 @@ public class SightPresenter {
 	private City _city;
 	private SightView _sightView;
 	private AudioPlayerView _audioPlayerView;
-	private AssetStreamProvider _assetStreamProvider;
+	private BitmapLoader _bitmapLoader;
 	private AudioPlayer _audioPlayer;
 	private AudioNotifier _audioNotifier;
 	private ApplicationSettingsStorage _prefStorage;
-	private DownscalableBitmapCreator _downscalableBitmapCreator;
 	private NewSightLookGotInRangeRaiser _newSightLookGotInRangeRaiser;
 	private Scheduler _playerPanelHidingScheduler;
 	private Logger _logger;
@@ -135,19 +135,15 @@ public class SightPresenter {
 		_audioNotifier = audioNotifier;
 	}
 	
-	public void setAssetStreamProvider(AssetStreamProvider assetStreamProvider) {
-		_assetStreamProvider = assetStreamProvider;
+	public void setBitmapLoader(BitmapLoader bitmapLoader) {
+		_bitmapLoader = bitmapLoader;
 	}
 	
 	public void setApplicationSettingsStorage(ApplicationSettingsStorage storage) {
 		_prefStorage = storage;
 		_prefStorage.setOnCurrentRouteChangedListener(_routeChangeListener);
 	}
-	
-	public void setDownscalableBitmapCreator(DownscalableBitmapCreator downscalableBitmapCreator) {
-		_downscalableBitmapCreator = downscalableBitmapCreator;
-	}
-	
+
 	public void setNewSightLookGotInRangeRaiser(
 			NewSightLookGotInRangeRaiser newSightLookGotInRangeRaiser) {
 		_newSightLookGotInRangeRaiser = newSightLookGotInRangeRaiser;
@@ -237,37 +233,28 @@ public class SightPresenter {
 	}
 	
 	private void notifyViewAboutNewSightLook(SightLook newSightLook) {
-		InputStream imgStream = getSightLookImageStream(newSightLook);
-		if(imgStream != null)		
-			setViewBackgroundImage(imgStream);
+		Bitmap sightLookImage = getSightLookImage(newSightLook);
+		if(sightLookImage != null)		
+			_sightView.setBackgroundImage(sightLookImage);
 		
 		_sightView.hideNextSightDirection();
 	}
 	
-	private InputStream getSightLookImageStream(SightLook newSightLook) {
-		InputStream imgStream = null;
+	private Bitmap getSightLookImage(SightLook newSightLook) {
+		Bitmap sightLookImage = null;
 		try{
-			imgStream = _assetStreamProvider.getImageAssetStream(newSightLook.getImageName());
+			DownscaledBitmap bmp = _bitmapLoader.load(newSightLook.getImageName(), 
+					_sightView.getWidth(), _sightView.getHeight());
+			_currentSightLookImageHeight = bmp.getFinalHeight();
+			_currentSightLookImageVerticalPadding = bmp.getFinalVerticalPadding();
+			sightLookImage = bmp.getFinalBitmap();
 		}
 		catch(Exception ex) {
 			logError("Unable to get the sight image " + newSightLook.getImageName(), ex);
 		}
-		return imgStream;
+		return sightLookImage;
 	}
-	
-	private void setViewBackgroundImage(InputStream imgStream) {
-		try {
-			DownscalableBitmap bmp = _downscalableBitmapCreator.CreateDownscalableBitmap(
-					imgStream, _sightView.getWidth(), _sightView.getHeight());
-			_currentSightLookImageHeight = bmp.getFinalHeight();
-			_currentSightLookImageVerticalPadding = bmp.getFinalVerticalPadding();
-			_sightView.setBackgroundImage(bmp);
-		}
-		catch(Exception ex){
-			logError("Unable to set the background image", ex);
-        }
-	}	
-	
+
 	private NextRoutePoint getNextRoutePoint() {
 		if(_currentSightLook == null)
 			return null;
@@ -280,7 +267,6 @@ public class SightPresenter {
 		
 		return null;
 	}	
-
 	
 	private void schedulePlayerPanelHiding() {
 		if(_playerPanelHidingScheduler != null)

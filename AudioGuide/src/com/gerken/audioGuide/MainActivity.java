@@ -1,6 +1,5 @@
 package com.gerken.audioGuide;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 import com.gerken.audioGuide.R;
@@ -85,10 +84,9 @@ public class MainActivity extends Activity implements SightView {
         _presenter = new SightPresenter(this, _audioPlayerControl);
         _presenter.setAudioPlayer(player);
         _presenter.setAudioNotifier(new AndroidMediaPlayerNotifier(ctx));
-        _presenter.setAssetStreamProvider(new GuideAssetManager(ctx));
+        _presenter.setBitmapLoader(new DownscalingBitmapLoader(new GuideAssetManager(ctx)));
         _presenter.setApplicationSettingsStorage(new SharedPreferenceManager(ctx));
         _presenter.setNewSightLookGotInRangeRaiser(_sightLookFinderByLocation);
-        _presenter.setDownscalableBitmapCreator(new DownscalableBitmapFactory());
         _presenter.setPlayerPanelHidingScheduler(new SchedulerService());
         _presenter.setLogger(new DefaultLoggingAdapter("SightPresenter"));
         
@@ -188,11 +186,11 @@ public class MainActivity extends Activity implements SightView {
 	}
 	
 	@Override
-	public void setBackgroundImage(DownscalableBitmap bitmap) throws IOException {
+	public void setBackgroundImage(Bitmap bitmap) {
 		if(_backgroundBitmap != null)
 			_backgroundBitmap.recycle();
 		
-		_backgroundBitmap = bitmap.getFinalBitmap();
+		_backgroundBitmap = bitmap;
 		_rootView.setBackgroundDrawable(new BitmapDrawable(_backgroundBitmap));
 	}
 	
