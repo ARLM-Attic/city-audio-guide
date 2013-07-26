@@ -5,19 +5,19 @@ import java.io.InputStream;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
-import com.gerken.audioGuide.graphics.DownscaledBitmap;
+import com.gerken.audioGuide.graphics.BitmapDownscalingResult;
 import com.gerken.audioGuide.interfaces.AssetStreamProvider;
-import com.gerken.audioGuide.interfaces.BitmapLoader;
+import com.gerken.audioGuide.interfaces.DownscalingBitmapLoader;
 
-public class DownscalingBitmapLoader implements BitmapLoader {
+public class AndroidDownscalingBitmapLoader implements DownscalingBitmapLoader {
 	private AssetStreamProvider _assetStreamProvider;	
 	
-	public DownscalingBitmapLoader(AssetStreamProvider assetStreamProvider){
+	public AndroidDownscalingBitmapLoader(AssetStreamProvider assetStreamProvider){
 		_assetStreamProvider = assetStreamProvider;
 	}
 
 	@Override
-	public DownscaledBitmap load(String imageName, int targetWidth, int targetHeight) throws Exception {
+	public BitmapDownscalingResult load(String imageName, int targetWidth, int targetHeight) throws Exception {
 		int originalWidth;
 		int originalHeight;
 		InputStream imageStream = null;
@@ -91,7 +91,7 @@ public class DownscalingBitmapLoader implements BitmapLoader {
 		}
     	
     	if(finalBitmap != null)
-    		return new DownscaledBitmap(finalBitmap, finalWidth, finalHeight, 
+    		return new BitmapDownscalingResult(finalBitmap, finalWidth, finalHeight, 
     				finalHorizontalPadding, finalVerticalPadding);
     	
 		return null;		

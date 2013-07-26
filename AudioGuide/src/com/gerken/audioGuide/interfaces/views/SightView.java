@@ -1,7 +1,6 @@
 package com.gerken.audioGuide.interfaces.views;
 
-import android.graphics.Bitmap;
-
+import com.gerken.audioGuide.interfaces.BitmapContainer;
 import com.gerken.audioGuide.interfaces.OnEventListener;
 
 public interface SightView {
@@ -10,7 +9,7 @@ public interface SightView {
 	
 	void acceptNoSightInRange();
 	void setInfoPanelCaptionText(String text);
-	void setBackgroundImage(Bitmap bitmap);
+	void setBackgroundImage(BitmapContainer bitmap);
 	
 	void acceptNewRouteSelected(String sightName, String routeName);
 

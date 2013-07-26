@@ -1,8 +1,10 @@
 package com.gerken.audioGuide.graphics;
 
+import com.gerken.audioGuide.interfaces.BitmapContainer;
+
 import android.graphics.Bitmap;
 
-public class DownscaledBitmap {
+public class BitmapDownscalingResult implements BitmapContainer {
 	private Bitmap _finalBitmap;
 	
 	private int _x0 = 0;
@@ -10,7 +12,7 @@ public class DownscaledBitmap {
 	private int _finalWidth = 0;
 	private int _finalHeight= 0;
 	
-	public DownscaledBitmap(Bitmap finalBitmap,
+	public BitmapDownscalingResult(Bitmap finalBitmap,
 			int finalWidth, int finalHeight,
 			int finalHorizontalPadding, int finalVerticalPadding) {
 		_finalBitmap = finalBitmap;
@@ -20,7 +22,7 @@ public class DownscaledBitmap {
 		_y0 = finalVerticalPadding;
 	}
 	
-	public Bitmap getFinalBitmap() {
+	public Bitmap getBitmap() {
 		return _finalBitmap;
 	}
 	

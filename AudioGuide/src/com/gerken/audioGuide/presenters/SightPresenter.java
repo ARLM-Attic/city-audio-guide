@@ -2,9 +2,7 @@ package com.gerken.audioGuide.presenters;
 
 import java.util.TimerTask;
 
-import android.graphics.Bitmap;
-
-import com.gerken.audioGuide.graphics.DownscaledBitmap;
+import com.gerken.audioGuide.graphics.BitmapDownscalingResult;
 import com.gerken.audioGuide.interfaces.*;
 import com.gerken.audioGuide.interfaces.views.AudioPlayerView;
 import com.gerken.audioGuide.interfaces.views.SightView;
@@ -16,7 +14,7 @@ public class SightPresenter {
 	private City _city;
 	private SightView _sightView;
 	private AudioPlayerView _audioPlayerView;
-	private BitmapLoader _bitmapLoader;
+	private DownscalingBitmapLoader _bitmapLoader;
 	private AudioPlayer _audioPlayer;
 	private AudioNotifier _audioNotifier;
 	private ApplicationSettingsStorage _prefStorage;
@@ -135,7 +133,7 @@ public class SightPresenter {
 		_audioNotifier = audioNotifier;
 	}
 	
-	public void setBitmapLoader(BitmapLoader bitmapLoader) {
+	public void setBitmapLoader(DownscalingBitmapLoader bitmapLoader) {
 		_bitmapLoader = bitmapLoader;
 	}
 	
@@ -233,21 +231,21 @@ public class SightPresenter {
 	}
 	
 	private void notifyViewAboutNewSightLook(SightLook newSightLook) {
-		Bitmap sightLookImage = getSightLookImage(newSightLook);
+		BitmapDownscalingResult sightLookImage = getSightLookImage(newSightLook);
 		if(sightLookImage != null)		
 			_sightView.setBackgroundImage(sightLookImage);
 		
 		_sightView.hideNextSightDirection();
 	}
 	
-	private Bitmap getSightLookImage(SightLook newSightLook) {
-		Bitmap sightLookImage = null;
+	private BitmapDownscalingResult getSightLookImage(SightLook newSightLook) {
+		BitmapDownscalingResult sightLookImage = null;
 		try{
-			DownscaledBitmap bmp = _bitmapLoader.load(newSightLook.getImageName(), 
+			BitmapDownscalingResult bmp = _bitmapLoader.load(newSightLook.getImageName(), 
 					_sightView.getWidth(), _sightView.getHeight());
 			_currentSightLookImageHeight = bmp.getFinalHeight();
 			_currentSightLookImageVerticalPadding = bmp.getFinalVerticalPadding();
-			sightLookImage = bmp.getFinalBitmap();
+			sightLookImage = bmp;
 		}
 		catch(Exception ex) {
 			logError("Unable to get the sight image " + newSightLook.getImageName(), ex);
