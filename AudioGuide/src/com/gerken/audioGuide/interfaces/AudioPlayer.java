@@ -3,7 +3,7 @@ package com.gerken.audioGuide.interfaces;
 import java.io.IOException;
 
 public interface AudioPlayer {	
-	void prepareAudioAsset(String asetFileName) throws IOException;
+	void prepareAudioAsset(String asetFileName) throws Exception;
 	
 	void play() throws IOException;
 	void pause();

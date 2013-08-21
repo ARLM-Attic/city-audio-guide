@@ -8,6 +8,7 @@ import com.gerken.audioGuide.controls.ControlUpdater;
 import com.gerken.audioGuide.graphics.*;
 import com.gerken.audioGuide.interfaces.AudioPlayer;
 import com.gerken.audioGuide.interfaces.BitmapContainer;
+import com.gerken.audioGuide.interfaces.MediaAssetManager;
 import com.gerken.audioGuide.interfaces.OnEventListener;
 import com.gerken.audioGuide.interfaces.views.SightView;
 import com.gerken.audioGuide.presenters.AudioPlayerPresenter;
@@ -75,7 +76,8 @@ public class MainActivity extends Activity implements SightView {
     
     private void setupDependencies() {
     	Context ctx = getApplicationContext();
-        AudioPlayer player = new AndroidMediaPlayerFacade(ctx);
+    	MediaAssetManager assetManager = new AndroidMediaAssetManager(ctx);
+        AudioPlayer player = new AndroidMediaPlayerFacade(ctx, assetManager);
         _locationManager = new AndroidLocationManagerFacade(ctx); 
         _locationManager.setLogger(new DefaultLoggingAdapter("AndroidLocationManagerFacade"));
         
@@ -85,7 +87,7 @@ public class MainActivity extends Activity implements SightView {
         _presenter = new SightPresenter(this, _audioPlayerControl);
         _presenter.setAudioPlayer(player);
         _presenter.setAudioNotifier(new AndroidMediaPlayerNotifier(ctx));
-        _presenter.setBitmapLoader(new AndroidDownscalingBitmapLoader(new GuideAssetManager(ctx)));
+        _presenter.setBitmapLoader(new AndroidDownscalingBitmapLoader(assetManager));
         _presenter.setApplicationSettingsStorage(new SharedPreferenceManager(ctx));
         _presenter.setNewSightLookGotInRangeRaiser(_sightLookFinderByLocation);
         _presenter.setPlayerPanelHidingScheduler(new SchedulerService());

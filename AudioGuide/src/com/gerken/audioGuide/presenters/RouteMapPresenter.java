@@ -10,7 +10,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.gerken.audioGuide.R;
-import com.gerken.audioGuide.interfaces.AssetStreamProvider;
+import com.gerken.audioGuide.interfaces.MediaAssetManager;
 import com.gerken.audioGuide.interfaces.Logger;
 import com.gerken.audioGuide.interfaces.views.RouteMapView;
 import com.gerken.audioGuide.util.IntentExtraManager;
@@ -18,11 +18,11 @@ import com.gerken.audioGuide.util.IntentExtraManager;
 public class RouteMapPresenter {
 	
 	private RouteMapView _view;
-	private AssetStreamProvider _assetStreamProvider;
+	private MediaAssetManager _assetStreamProvider;
 	private Logger _logger;
 	
 	public RouteMapPresenter(RouteMapView view, 
-			AssetStreamProvider assetStreamProvider, Logger logger) {
+			MediaAssetManager assetStreamProvider, Logger logger) {
 		_view = view;
 		_assetStreamProvider = assetStreamProvider;
 		_logger = logger;

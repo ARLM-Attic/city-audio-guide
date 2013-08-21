@@ -4,8 +4,8 @@ import java.io.InputStream;
 
 import com.gerken.audioGuide.interfaces.views.RouteMapView;
 import com.gerken.audioGuide.presenters.RouteMapPresenter;
+import com.gerken.audioGuide.services.AndroidMediaAssetManager;
 import com.gerken.audioGuide.services.DefaultLoggingAdapter;
-import com.gerken.audioGuide.services.GuideAssetManager;
 
 import android.os.Bundle;
 import android.app.Activity;
@@ -26,7 +26,7 @@ public class RouteMapActivity extends Activity implements RouteMapView {
 		setContentView(R.layout.activity_route_map);
 		
 		_presenter = new RouteMapPresenter(this, 
-				new GuideAssetManager(getApplicationContext()), 
+				new AndroidMediaAssetManager(getApplicationContext()), 
 				new DefaultLoggingAdapter("RouteMapPresenter"));
 		
 		_presenter.init();	

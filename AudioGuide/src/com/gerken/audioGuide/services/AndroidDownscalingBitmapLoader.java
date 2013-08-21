@@ -6,13 +6,13 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
 import com.gerken.audioGuide.graphics.BitmapDownscalingResult;
-import com.gerken.audioGuide.interfaces.AssetStreamProvider;
+import com.gerken.audioGuide.interfaces.MediaAssetManager;
 import com.gerken.audioGuide.interfaces.DownscalingBitmapLoader;
 
 public class AndroidDownscalingBitmapLoader implements DownscalingBitmapLoader {
-	private AssetStreamProvider _assetStreamProvider;	
+	private MediaAssetManager _assetStreamProvider;	
 	
-	public AndroidDownscalingBitmapLoader(AssetStreamProvider assetStreamProvider){
+	public AndroidDownscalingBitmapLoader(MediaAssetManager assetStreamProvider){
 		_assetStreamProvider = assetStreamProvider;
 	}
 
