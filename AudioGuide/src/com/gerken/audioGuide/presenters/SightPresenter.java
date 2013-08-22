@@ -20,6 +20,7 @@ public class SightPresenter {
 	private ApplicationSettingsStorage _prefStorage;
 	private NewSightLookGotInRangeRaiser _newSightLookGotInRangeRaiser;
 	private Scheduler _playerPanelHidingScheduler;
+	private MediaAssetManager _mediaAssetManager;
 	private Logger _logger;
 	
 	private Sight _currentSight = null;
@@ -84,6 +85,12 @@ public class SightPresenter {
 		}
 	};
 	
+	private OnEventListener _sightViewStoppedListener = new OnEventListener() {		
+		@Override
+		public void onEvent() {
+			handleSightViewStop();	
+		}
+	};
 	
 	private OnEventListener _routeChangeListener = new OnEventListener() {		
 		@Override
@@ -116,6 +123,7 @@ public class SightPresenter {
 		_sightView = sightView;
 		_sightView.addViewInitializedListener(_sightViewInitializedListener);
 		_sightView.addViewTouchedListener(_sightViewTouchedListener);
+		_sightView.addViewStoppedListener(_sightViewStoppedListener);
 		
 		_audioPlayerView = audioPlayerView;
 		_audioPlayerView.addPlayPressedListener(_playPressedListener);
@@ -152,6 +160,10 @@ public class SightPresenter {
 		_playerPanelHidingScheduler = scheduler;
 	}
 	
+	public void setMediaAssetManager(MediaAssetManager mediaAssetManager) {
+		_mediaAssetManager = mediaAssetManager;
+	}
+		
 	public void setLogger(Logger logger) {
 		_logger = logger;
 	}
@@ -217,6 +229,11 @@ public class SightPresenter {
 				_isNextRoutePointInfoShown = false;
 			}
 		}
+	}
+	
+	private void handleSightViewStop() {
+		if(_mediaAssetManager != null)
+			_mediaAssetManager.cleanupAudioAsset();
 	}
 
 	private boolean isSightInRange() {

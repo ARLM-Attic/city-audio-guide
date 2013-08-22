@@ -49,6 +49,7 @@ public class MainActivity extends Activity implements SightView {
 	
 	private ArrayList<OnEventListener> _viewInitializedListeners = new ArrayList<OnEventListener>();
 	private ArrayList<OnEventListener> _viewTouchedListeners = new ArrayList<OnEventListener>();
+	private ArrayList<OnEventListener> _viewStoppedListeners = new ArrayList<OnEventListener>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +92,7 @@ public class MainActivity extends Activity implements SightView {
         _presenter.setApplicationSettingsStorage(new SharedPreferenceManager(ctx));
         _presenter.setNewSightLookGotInRangeRaiser(_sightLookFinderByLocation);
         _presenter.setPlayerPanelHidingScheduler(new SchedulerService());
+        _presenter.setMediaAssetManager(assetManager);
         //_presenter.setLogger(new DefaultLoggingAdapter("SightPresenter"));
         _presenter.setLogger(new Log4JAdapter(SightPresenter.class));
         
@@ -123,8 +125,10 @@ public class MainActivity extends Activity implements SightView {
     
     @Override
     protected void onStop() {
-    	super.onPause();
+    	super.onStop();
     	_locationManager.stopTracking();
+    	for(OnEventListener l : _viewStoppedListeners)
+        	l.onEvent();
     }
 
 
@@ -259,6 +263,11 @@ public class MainActivity extends Activity implements SightView {
 	public void addViewTouchedListener(OnEventListener listener) {
 		_viewTouchedListeners.add(listener);		
 	}
+	
+	@Override
+	public void addViewStoppedListener(OnEventListener listener) {
+		_viewStoppedListeners.add(listener);		
+	}	
 
 	private void playPlayerPanelHidingAnimation(long duration) {
 		TranslateAnimation ta = new TranslateAnimation(0, 0, 0, _playerPanelHeight);
