@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.util.TimerTask;
 
 import com.gerken.audioGuide.R;
+import com.gerken.audioGuide.containers.FileInfo;
 import com.gerken.audioGuide.interfaces.AudioPlayer;
 import com.gerken.audioGuide.interfaces.Logger;
+import com.gerken.audioGuide.interfaces.MediaAssetManager;
 import com.gerken.audioGuide.interfaces.NewSightLookGotInRangeRaiser;
 import com.gerken.audioGuide.interfaces.OnEventListener;
 import com.gerken.audioGuide.interfaces.OnSightLookGotInRangeListener;
@@ -18,10 +20,11 @@ public class AudioPlayerPresenter {
 	private final int AUDIO_PLAYER_POLLING_INTERVAL_MS = 250;
 	private final float REWIND_STEP_RATIO = 0.02f;
 	private final long REWIND_REPEAT_INTERVAL_MS = 500L;
-	private final String AUDIO_FOLDER = "audio";
+	
 	
 	private AudioPlayer _audioPlayer;
 	private AudioPlayerView _audioPlayerView;
+	private MediaAssetManager _mediaAssetManager;
 	private NewSightLookGotInRangeRaiser _newSightLookGotInRangeRaiser;
 	private Logger _logger;
 	private Scheduler _audioUpdateScheduler;
@@ -86,6 +89,10 @@ public class AudioPlayerPresenter {
 		_audioPlayerView.addRewindReleasedListener(_rewindReleasedListener);
 	}
 	
+	public void setMediaAssetManager(MediaAssetManager mediaAssetManager) {
+		_mediaAssetManager = mediaAssetManager;
+	}
+	
 	public void setNewSightLookGotInRangeRaiser(
 			NewSightLookGotInRangeRaiser newSightLookGotInRangeRaiser) {
 		_newSightLookGotInRangeRaiser = newSightLookGotInRangeRaiser;
@@ -116,8 +123,9 @@ public class AudioPlayerPresenter {
 	
 	private void prepareNewAudio(String audioFileName) {
 		try {
-			_audioPlayer.prepareAudioAsset(
-					String.format("%s/%s", AUDIO_FOLDER, audioFileName));
+			FileInfo fi = _mediaAssetManager.prepareAudioAsset(audioFileName);
+			_audioPlayer.prepareAudioAsset(fi);
+			fi.close();
 			initPlayerDisplayedDuration();
 		}
 		catch(Exception ex){ 
@@ -150,7 +158,7 @@ public class AudioPlayerPresenter {
 	private void handleStopButtonClick() {
 		if(_audioPlayer.isPlaying())		
 			_audioPlayer.stop();
-		
+		_mediaAssetManager.cleanupAudioAsset();
 		stopAudioUpdateTimer();
 		resetPlayerDisplayedPosition();
 		_audioPlayerView.displayPlayerStopped();	

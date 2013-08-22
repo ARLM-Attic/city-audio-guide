@@ -3,23 +3,16 @@ package com.gerken.audioGuide.services;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import android.content.Context;
-import android.content.res.AssetFileDescriptor;
-import android.content.res.AssetManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 
-import com.gerken.audioGuide.R;
 import com.gerken.audioGuide.containers.FileInfo;
 import com.gerken.audioGuide.interfaces.AudioPlayer;
-import com.gerken.audioGuide.interfaces.MediaAssetManager;
 import com.gerken.audioGuide.interfaces.OnEventListener;
 
 public class AndroidMediaPlayerFacade implements AudioPlayer {	
 
-	private Context _context;
 	private MediaPlayer _mediaPlayer;
-	private MediaAssetManager _mediaAssetManager;
 	
 	private boolean _isPlaying = false;
 	private boolean _needsPreparation = false;
@@ -34,9 +27,7 @@ public class AndroidMediaPlayerFacade implements AudioPlayer {
 		}
 	};
 	
-	public AndroidMediaPlayerFacade(Context context, MediaAssetManager mediaAssetManager) {
-		_context = context;
-		_mediaAssetManager = mediaAssetManager;
+	public AndroidMediaPlayerFacade() {
 		_mediaPlayer = new MediaPlayer();
 		
 		_completionListeners = new ArrayList<OnEventListener>();
@@ -44,13 +35,11 @@ public class AndroidMediaPlayerFacade implements AudioPlayer {
 	}
 
 	@Override
-	public void prepareAudioAsset(String assetFileName) throws Exception {
-		FileInfo fi = _mediaAssetManager.prepareAudioAsset(assetFileName);
-        _mediaPlayer.reset();
-       _mediaPlayer.setDataSource(fi.getFileDescriptor(), 0, fi.getLength() );       
-       _mediaPlayer.prepare();	
-       fi.close();
-       _needsPreparation = false;
+	public void prepareAudioAsset(FileInfo assetFileInfo) throws Exception {
+		_mediaPlayer.reset();
+		_mediaPlayer.setDataSource(assetFileInfo.getFileDescriptor(), 0, assetFileInfo.getLength());		
+		_mediaPlayer.prepare();
+		_needsPreparation = false;
 	}
 
 	@Override
@@ -77,8 +66,7 @@ public class AndroidMediaPlayerFacade implements AudioPlayer {
 	@Override
 	public void stop() {
 		_mediaPlayer.seekTo(0);
-		_mediaPlayer.stop();
-		_mediaAssetManager.cleanupAudioAsset();
+		_mediaPlayer.stop();		
 		_needsPreparation = true;
 		_isPlaying = false;
 	}

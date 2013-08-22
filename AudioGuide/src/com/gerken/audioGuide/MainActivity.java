@@ -77,7 +77,7 @@ public class MainActivity extends Activity implements SightView {
     private void setupDependencies() {
     	Context ctx = getApplicationContext();
     	MediaAssetManager assetManager = new AndroidMediaAssetManager(ctx);
-        AudioPlayer player = new AndroidMediaPlayerFacade(ctx, assetManager);
+        AudioPlayer player = new AndroidMediaPlayerFacade();
         _locationManager = new AndroidLocationManagerFacade(ctx); 
         _locationManager.setLogger(new DefaultLoggingAdapter("AndroidLocationManagerFacade"));
         
@@ -91,11 +91,14 @@ public class MainActivity extends Activity implements SightView {
         _presenter.setApplicationSettingsStorage(new SharedPreferenceManager(ctx));
         _presenter.setNewSightLookGotInRangeRaiser(_sightLookFinderByLocation);
         _presenter.setPlayerPanelHidingScheduler(new SchedulerService());
-        _presenter.setLogger(new DefaultLoggingAdapter("SightPresenter"));
+        //_presenter.setLogger(new DefaultLoggingAdapter("SightPresenter"));
+        _presenter.setLogger(new Log4JAdapter(SightPresenter.class));
         
         _audioPlayerPresenter = new AudioPlayerPresenter(
         		_audioPlayerControl, player);
-        _audioPlayerPresenter.setLogger(new DefaultLoggingAdapter("AudioPlayerPresenter"));
+        //_audioPlayerPresenter.setLogger(new DefaultLoggingAdapter("AudioPlayerPresenter"));
+        _audioPlayerPresenter.setMediaAssetManager(assetManager);
+        _audioPlayerPresenter.setLogger(new Log4JAdapter(AudioPlayerPresenter.class));
         _audioPlayerPresenter.setAudioUpdateScheduler(new SchedulerService());
         _audioPlayerPresenter.setAudioRewindScheduler(new SchedulerService());
         _audioPlayerPresenter.setNewSightLookGotInRangeRaiser(_sightLookFinderByLocation);

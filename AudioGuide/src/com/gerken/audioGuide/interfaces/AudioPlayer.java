@@ -2,8 +2,10 @@ package com.gerken.audioGuide.interfaces;
 
 import java.io.IOException;
 
+import com.gerken.audioGuide.containers.FileInfo;
+
 public interface AudioPlayer {	
-	void prepareAudioAsset(String asetFileName) throws Exception;
+	void prepareAudioAsset(FileInfo assetFileInfo) throws Exception;
 	
 	void play() throws IOException;
 	void pause();
