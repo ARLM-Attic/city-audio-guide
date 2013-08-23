@@ -35,7 +35,8 @@ public class SightPresenter {
 	private OnEventListener _mediaPlayerCompletionListener = new OnEventListener() {		
 		@Override
 		public void onEvent() {
-			showNextRoutePointDirection();	
+			if(_currentSightLook != null)
+				showNextRoutePointDirection();	
 		}
 	};
 	
@@ -185,7 +186,7 @@ public class SightPresenter {
 		}
 		else if(_currentSightLook != null) {
 			_sightView.acceptNoSightInRange();	
-			if(_audioPlayer != null)
+			if(_audioPlayer != null && _audioPlayer.isPlaying())
 				_audioPlayer.stop();
 			_currentSight = null;
 			_currentSightLook = null;
