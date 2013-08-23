@@ -38,7 +38,7 @@ public class GuideApplication extends Application {
 	private void configureLog4J() {
 		final LogConfigurator logConfigurator = new LogConfigurator();
         
-		String logFileName = getApplicationContext().getFilesDir() +
+		String logFileName = getApplicationContext().getExternalFilesDir(null) +
 				java.io.File.separator + "AudioGuide.log";
         logConfigurator.setFileName(logFileName);
         logConfigurator.setRootLevel(Level.DEBUG);

@@ -37,7 +37,8 @@ public class AndroidMediaPlayerFacade implements AudioPlayer {
 	@Override
 	public void prepareAudioAsset(FileInfo assetFileInfo) throws Exception {
 		_mediaPlayer.reset();
-		_mediaPlayer.setDataSource(assetFileInfo.getFileDescriptor(), 0, assetFileInfo.getLength());		
+		_mediaPlayer.setDataSource(assetFileInfo.getFileDescriptor(), 
+				assetFileInfo.getStartOffset(), assetFileInfo.getLength());		
 		_mediaPlayer.prepare();
 		_needsPreparation = false;
 	}

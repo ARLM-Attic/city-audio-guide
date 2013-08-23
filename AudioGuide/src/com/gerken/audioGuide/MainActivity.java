@@ -77,7 +77,7 @@ public class MainActivity extends Activity implements SightView {
     
     private void setupDependencies() {
     	Context ctx = getApplicationContext();
-    	MediaAssetManager assetManager = new AndroidMediaAssetManager(ctx);
+    	MediaAssetManager assetManager = new PlainMediaAssetManager(ctx);
         AudioPlayer player = new AndroidMediaPlayerFacade();
         _locationManager = new AndroidLocationManagerFacade(ctx); 
         _locationManager.setLogger(new DefaultLoggingAdapter("AndroidLocationManagerFacade"));
