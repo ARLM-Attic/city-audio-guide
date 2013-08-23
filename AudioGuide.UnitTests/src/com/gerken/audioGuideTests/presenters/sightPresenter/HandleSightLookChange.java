@@ -62,6 +62,58 @@ public class HandleSightLookChange {
 		// --- Assert
 		verify(audioNotifier).signalSightInRange();
 	}
+	
+	@Test
+	public void Given_SightGotOutOfRange_PlayerIsPlaying__Then_PlayerIsStopped() throws Exception {
+		final double EXPECTED_LOCATION_LATITUDE = 12.345;
+		final double EXPECTED_LOCATION_LONGITUDE = 24.567;
+		final String EXPECTED_SIGHT_LOOK_IMAGE_NAME = "colosseum.jpg";
+		final String EXPECTED_SIGHT_NAME = "Colosseum";
+		final boolean PLAYER_IS_PLAYING = true;
+		
+		Sight sight = createSightWithSingleSightLook(
+				EXPECTED_LOCATION_LATITUDE, EXPECTED_LOCATION_LONGITUDE, EXPECTED_SIGHT_NAME, EXPECTED_SIGHT_LOOK_IMAGE_NAME);	
+		SightLook previousSightLook = sight.getSightLooks().get(0);
+		
+		SightView sightView = mock(SightView.class);
+		AudioPlayer audioPlayer = mock(AudioPlayer.class);
+		when(audioPlayer.isPlaying()).thenReturn(PLAYER_IS_PLAYING);
+		
+		SutSetupResult sutSetupResult = setupSut(sightView, audioPlayer);
+		sutSetupResult.sightLookGotInRangeListener.onSightLookGotInRange(previousSightLook);
+		
+		// --- Act
+		sutSetupResult.sightLookGotInRangeListener.onSightLookGotInRange(null);
+		
+		// --- Assert
+		verify(audioPlayer).stop();
+	}
+	
+	@Test
+	public void Given_SightGotOutOfRange_PlayerIsNotPlaying__Then_PlayerIsNotStopped() throws Exception {
+		final double EXPECTED_LOCATION_LATITUDE = 12.345;
+		final double EXPECTED_LOCATION_LONGITUDE = 24.567;
+		final String EXPECTED_SIGHT_LOOK_IMAGE_NAME = "colosseum.jpg";
+		final String EXPECTED_SIGHT_NAME = "Colosseum";
+		final boolean PLAYER_IS_NOT_PLAYING = false;
+		
+		Sight sight = createSightWithSingleSightLook(
+				EXPECTED_LOCATION_LATITUDE, EXPECTED_LOCATION_LONGITUDE, EXPECTED_SIGHT_NAME, EXPECTED_SIGHT_LOOK_IMAGE_NAME);	
+		SightLook previousSightLook = sight.getSightLooks().get(0);
+		
+		SightView sightView = mock(SightView.class);
+		AudioPlayer audioPlayer = mock(AudioPlayer.class);
+		when(audioPlayer.isPlaying()).thenReturn(PLAYER_IS_NOT_PLAYING);
+		
+		SutSetupResult sutSetupResult = setupSut(sightView, audioPlayer);
+		sutSetupResult.sightLookGotInRangeListener.onSightLookGotInRange(previousSightLook);
+		
+		// --- Act
+		sutSetupResult.sightLookGotInRangeListener.onSightLookGotInRange(null);
+		
+		// --- Assert
+		verify(audioPlayer, never()).stop();
+	}
 	/*
 	@Test
 	public void Given_NewSightGotInRange__Then_NextRoutePointArrowHidden() throws Exception {
@@ -211,6 +263,12 @@ public class HandleSightLookChange {
 				mock(NewSightLookGotInRangeRaiser.class), mock(DownscalingBitmapLoader.class));
 	}
 	
+	private SutSetupResult setupSut(SightView sightView, AudioPlayer audioPlayer) {
+		return setupSut(sightView, mock(AudioPlayerView.class), 
+				audioPlayer, mock(AudioNotifier.class),
+				mock(NewSightLookGotInRangeRaiser.class), mock(DownscalingBitmapLoader.class));
+	}
+	
 	private SutSetupResult setupSut(SightView sightView, AudioPlayerView playerView, 
 			AudioPlayer player, AudioNotifier notifier,
 			NewSightLookGotInRangeRaiser sightLookFinder,
@@ -227,6 +285,7 @@ public class HandleSightLookChange {
 		sut.setAudioNotifier(notifier);
 		sut.setNewSightLookGotInRangeRaiser(sightLookFinder);
 		sut.setBitmapLoader(bmpLoader);
+		sut.setMediaAssetManager(mock(MediaAssetManager.class));
 		
 		result.sut = sut;
 		result.sightLookGotInRangeListener = sightLookGotInRangeListenerCaptor.getValue();
