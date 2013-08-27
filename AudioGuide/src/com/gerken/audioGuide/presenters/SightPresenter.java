@@ -28,6 +28,7 @@ public class SightPresenter {
 
 	private boolean _isPlayerPanelVisible = false;
 	private boolean _isNextRoutePointInfoShown = false;
+	private boolean _hasPlayerBeenPausedOnViewStop = false;
 	
 	private int _currentSightLookImageHeight;
 	private int _currentSightLookImageVerticalPadding;	
@@ -93,6 +94,20 @@ public class SightPresenter {
 		}
 	};
 	
+	private OnEventListener _sightViewDestroyedListener = new OnEventListener() {		
+		@Override
+		public void onEvent() {
+			handleSightViewDestroy();	
+		}
+	};
+	
+	private OnEventListener _sightViewRestartedListener = new OnEventListener() {		
+		@Override
+		public void onEvent() {
+			handleSightViewRestart();	
+		}
+	};
+	
 	private OnEventListener _routeChangeListener = new OnEventListener() {		
 		@Override
 		public void onEvent() {
@@ -125,6 +140,8 @@ public class SightPresenter {
 		_sightView.addViewInitializedListener(_sightViewInitializedListener);
 		_sightView.addViewTouchedListener(_sightViewTouchedListener);
 		_sightView.addViewStoppedListener(_sightViewStoppedListener);
+		_sightView.addViewDestroyedListener(_sightViewDestroyedListener);
+		_sightView.addViewRestartedListener(_sightViewRestartedListener);
 		
 		_audioPlayerView = audioPlayerView;
 		_audioPlayerView.addPlayPressedListener(_playPressedListener);
@@ -233,8 +250,27 @@ public class SightPresenter {
 	}
 	
 	private void handleSightViewStop() {
+		if(_audioPlayer.isPlaying()) {
+			_audioPlayer.pause();
+			_hasPlayerBeenPausedOnViewStop = true;
+		}
+	}
+	
+	private void handleSightViewDestroy() {
 		if(_mediaAssetManager != null)
 			_mediaAssetManager.cleanupAudioAsset();
+	}
+	
+	private void handleSightViewRestart() {
+		if(_hasPlayerBeenPausedOnViewStop) {
+			try {
+				_audioPlayer.play();
+				_hasPlayerBeenPausedOnViewStop = false;
+			}
+			catch(Exception ex) {
+				logError("Unable to play audio track for the current sight ", ex);
+			}			
+		}
 	}
 
 	private boolean isSightInRange() {

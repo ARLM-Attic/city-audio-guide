@@ -27,4 +27,6 @@ public interface SightView {
 	void addViewInitializedListener(OnEventListener listener);
 	void addViewTouchedListener(OnEventListener listener);
 	void addViewStoppedListener(OnEventListener listener);
+	void addViewDestroyedListener(OnEventListener listener);
+	void addViewRestartedListener(OnEventListener listener);
 }

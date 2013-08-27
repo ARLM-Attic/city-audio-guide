@@ -50,6 +50,8 @@ public class MainActivity extends Activity implements SightView {
 	private ArrayList<OnEventListener> _viewInitializedListeners = new ArrayList<OnEventListener>();
 	private ArrayList<OnEventListener> _viewTouchedListeners = new ArrayList<OnEventListener>();
 	private ArrayList<OnEventListener> _viewStoppedListeners = new ArrayList<OnEventListener>();
+	private ArrayList<OnEventListener> _viewDestroyedListeners = new ArrayList<OnEventListener>();
+	private ArrayList<OnEventListener> _viewRestartedListeners = new ArrayList<OnEventListener>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,6 +133,19 @@ public class MainActivity extends Activity implements SightView {
         	l.onEvent();
     }
 
+    @Override
+    protected void onDestroy() {
+    	super.onDestroy();
+    	for(OnEventListener l : _viewDestroyedListeners)
+        	l.onEvent();
+    }
+    
+    @Override
+    protected void onRestart() {
+    	super.onRestart();
+    	for(OnEventListener l : _viewRestartedListeners)
+        	l.onEvent();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -267,7 +282,17 @@ public class MainActivity extends Activity implements SightView {
 	@Override
 	public void addViewStoppedListener(OnEventListener listener) {
 		_viewStoppedListeners.add(listener);		
-	}	
+	}
+	
+	@Override
+	public void addViewDestroyedListener(OnEventListener listener) {
+		_viewDestroyedListeners.add(listener);		
+	}
+	
+	@Override
+	public void addViewRestartedListener(OnEventListener listener) {
+		_viewRestartedListeners.add(listener);		
+	}
 
 	private void playPlayerPanelHidingAnimation(long duration) {
 		TranslateAnimation ta = new TranslateAnimation(0, 0, 0, _playerPanelHeight);
