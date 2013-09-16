@@ -4,9 +4,9 @@
         android:angle="270"
         android:centerX="0.1"
         android:centerY="0.1"
-        android:startColor="#80EEEEEE"
-        android:centerColor="#80909090"
-        android:endColor="#80666666"        
+        android:startColor="#B4D37ED3"
+        android:centerColor="#B4802B80"
+        android:endColor="#B4802B80"        
         android:type="linear"
 	 />  
 </shape>

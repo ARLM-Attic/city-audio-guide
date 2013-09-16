@@ -38,7 +38,7 @@
 		        android:layout_width="wrap_content"
 		        android:layout_height="wrap_content"
 		        android:layout_gravity="center"
-		        android:textColor="#FF75FF3A"
+		        android:textColor="#FFFFE633"
 		        android:textStyle="bold"
 		        android:textSize="16sp"
 		        android:text="@string/sight_info_none"  />
@@ -49,7 +49,7 @@
 		    android:layout_width="match_parent"
 		    android:layout_height="108dp"
 		    android:layout_gravity="center"
-		    android:background="#80CCCCCC" />
+		     />
 
     </LinearLayout>  
 
