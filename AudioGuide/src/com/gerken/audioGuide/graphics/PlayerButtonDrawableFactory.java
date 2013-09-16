@@ -13,8 +13,9 @@ import android.graphics.drawable.shapes.RectShape;
 import android.graphics.drawable.shapes.Shape;
 
 public class PlayerButtonDrawableFactory {	
-	private final int BUTTON_SIGN_MAIN_COLOR = 0xE000FF33;
-	private final int BUTTON_SIGN_STROKE_COLOR = 0xCCCC00CC;
+	private final int BUTTON_SIGN_MAIN_COLOR = 0xFF00FF33;
+	private final int BUTTON_SIGN_HIGHLIGHT_COLOR = 0xFF6AF26A;
+	private final int BUTTON_SIGN_STROKE_COLOR = 0xE6925891;
 	private final float PLAY_SIGN_SIZE_RATIO = 0.8f;
 	private final float STOP_SIGN_SIZE_RATIO = 0.5f;
 	
@@ -45,48 +46,34 @@ public class PlayerButtonDrawableFactory {
 	public Drawable createRewindButtonDrawable(int width, int height) {		
 		
 		int signSize = (int)(STOP_SIGN_SIZE_RATIO * (float)Math.min(width, height));
-		ShapeDrawable sign1 = new ShapeDrawable(
-				new RegularConvexShape(3, (float)Math.PI));		
-		sign1.setIntrinsicHeight(signSize);
-		sign1.setIntrinsicWidth(signSize);
-		sign1.setShaderFactory(
-				new ButtonSignShaderFactory(signSize, signSize));
+		
+		Shape triangle = new RegularConvexShape(3, (float)Math.PI);
+		Drawable sign1 = createButtonFillDrawable(triangle, signSize, signSize);		
+		Drawable outline1 = createButtonOutlineDrawable(triangle, signSize, signSize);
 		
 		Drawable sign2 = sign1.getConstantState().newDrawable();
+		Drawable outline2 = outline1.getConstantState().newDrawable();
 		
-		Drawable[] layers = new Drawable[]{ sign1, sign2 };
+		Drawable[] layers = new Drawable[]{ outline1, outline2, sign1, sign2 };
 		LayerDrawable ld = new LayerDrawable(layers);
 		ld.setBounds(0, 0, width, height);
 		
 		int signDy = (int)( (height - signSize)/2.0f );
 		int hwidth = (int)(0.5f*width);
-		int corr = (int)(0.25f*signSize);
+		int corr = (int)(0.4f*signSize);
 		ld.setLayerInset(0, hwidth-signSize+corr, signDy+1, hwidth-corr, signDy+1);
 		ld.setLayerInset(1, hwidth, signDy+1, hwidth-signSize, signDy+1);
+		ld.setLayerInset(2, hwidth-signSize+corr, signDy+1, hwidth-corr, signDy+1);		
+		ld.setLayerInset(3, hwidth, signDy+1, hwidth-signSize, signDy+1);
 		return ld;
 	}
 	
 	private Drawable createButtonDrawable(int buttonWidth, int buttonHeight,
 			Shape shape, int signWidth, int signHeight) {
-		ShapeDrawable sign = new ShapeDrawable(shape);
-		sign.setIntrinsicHeight(signHeight);
-		sign.setIntrinsicWidth(signWidth);
-		sign.setShaderFactory(
-				new ButtonSignShaderFactory(signWidth, signHeight));
+		Drawable sign = createButtonFillDrawable(shape, signWidth, signHeight);		
+		Drawable outline = createButtonOutlineDrawable(shape, signWidth, signHeight);
 		
-		ShapeDrawable sign2 = new ShapeDrawable(shape);
-		sign2.setIntrinsicHeight(signHeight);
-		sign2.setIntrinsicWidth(signWidth);
-		Paint psPaint = sign2.getPaint();
-		psPaint.setStyle(Style.STROKE);
-		psPaint.setColor(BUTTON_SIGN_STROKE_COLOR);
-		psPaint.setAntiAlias(true);
-		psPaint.setStrokeJoin(Paint.Join.ROUND);
-		psPaint.setStrokeCap(Paint.Cap.ROUND);
-		psPaint.setStrokeWidth(1.3f);
-		psPaint.setMaskFilter(new BlurMaskFilter(1.5f, BlurMaskFilter.Blur.NORMAL)); 
-		
-		Drawable[] layers = new Drawable[]{ sign2, sign };
+		Drawable[] layers = new Drawable[]{ outline, sign };
 		LayerDrawable ld = new LayerDrawable(layers);
 		ld.setBounds(0, 0, buttonWidth, buttonHeight);
 		
@@ -96,6 +83,34 @@ public class PlayerButtonDrawableFactory {
 		ld.setLayerInset(1, signDx, signDy+1, signDx+1, signDy+1);
 	
 		return ld;
+	}
+	
+	private Drawable createButtonOutlineDrawable(Shape shape,
+			int signWidth, int signHeight) {
+		ShapeDrawable outline = new ShapeDrawable(shape);
+		outline.setIntrinsicHeight(signHeight);
+		outline.setIntrinsicWidth(signWidth);
+		Paint psPaint = outline.getPaint();
+		psPaint.setStyle(Style.STROKE);
+		psPaint.setColor(BUTTON_SIGN_STROKE_COLOR);
+		psPaint.setAntiAlias(true);
+		psPaint.setStrokeJoin(Paint.Join.ROUND);
+		psPaint.setStrokeCap(Paint.Cap.ROUND);
+		psPaint.setStrokeWidth(1.3f);
+		psPaint.setMaskFilter(new BlurMaskFilter(1.5f, BlurMaskFilter.Blur.NORMAL));
+		
+		return outline;
+	}
+	
+	private Drawable createButtonFillDrawable(Shape shape,
+			int signWidth, int signHeight) {
+		ShapeDrawable sign = new ShapeDrawable(shape);
+		sign.setIntrinsicHeight(signHeight);
+		sign.setIntrinsicWidth(signWidth);
+		sign.setShaderFactory(
+				new ButtonSignShaderFactory(signWidth, signHeight));
+		
+		return sign;
 	}
 	
 	private class ButtonSignShaderFactory extends ShapeDrawable.ShaderFactory {
@@ -115,7 +130,7 @@ public class PlayerButtonDrawableFactory {
 		@Override
 		public Shader resize(int width, int height) {
 			return new RadialGradient(_cx, _cy, _r, 
-					new int[]{0xC0AEFF8C, BUTTON_SIGN_MAIN_COLOR}, 
+					new int[]{BUTTON_SIGN_HIGHLIGHT_COLOR, BUTTON_SIGN_MAIN_COLOR}, 
 					new float[]{0, 1},
 					Shader.TileMode.REPEAT);
 		}
