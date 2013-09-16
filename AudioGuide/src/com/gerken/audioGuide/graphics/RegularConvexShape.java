@@ -47,6 +47,7 @@ public class RegularConvexShape extends Shape {
 			path.lineTo(xi, yi);
 		}
 		
+		path.close();		
 		return path;
 	}
 

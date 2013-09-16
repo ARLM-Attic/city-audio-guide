@@ -8,18 +8,21 @@ import android.graphics.Paint.Style;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.OvalShape;
 import android.graphics.drawable.shapes.RectShape;
 import android.graphics.drawable.shapes.Shape;
 
-public class PlayerButtonDrawableFactory {
-	private final int BUTTON_SIGN_MAIN_COLOR = 0xC04CFF00;
+public class PlayerButtonDrawableFactory {	
+	private final int BUTTON_SIGN_MAIN_COLOR = 0xE000FF33;
+	private final int BUTTON_SIGN_STROKE_COLOR = 0xCCCC00CC;
 	private final float PLAY_SIGN_SIZE_RATIO = 0.8f;
 	private final float STOP_SIGN_SIZE_RATIO = 0.5f;
 	
 	public Drawable createPlayButtonDefaultDrawable(int width, int height) {
 		int signSize = (int)(PLAY_SIGN_SIZE_RATIO * (float)Math.min(width, height));
 		Drawable playSign = createButtonDrawable(width, height,
-				new RegularConvexShape(3, 0), signSize, signSize);
+				new RegularConvexShape(3, 0), 
+				signSize, signSize);
 		
 		return playSign;
 	}
@@ -76,14 +79,14 @@ public class PlayerButtonDrawableFactory {
 		sign2.setIntrinsicWidth(signWidth);
 		Paint psPaint = sign2.getPaint();
 		psPaint.setStyle(Style.STROKE);
-		psPaint.setColor(BUTTON_SIGN_MAIN_COLOR);
+		psPaint.setColor(BUTTON_SIGN_STROKE_COLOR);
 		psPaint.setAntiAlias(true);
 		psPaint.setStrokeJoin(Paint.Join.ROUND);
 		psPaint.setStrokeCap(Paint.Cap.ROUND);
-		psPaint.setStrokeWidth(1.5f);
+		psPaint.setStrokeWidth(1.3f);
 		psPaint.setMaskFilter(new BlurMaskFilter(1.5f, BlurMaskFilter.Blur.NORMAL)); 
 		
-		Drawable[] layers = new Drawable[]{ sign, sign2 };
+		Drawable[] layers = new Drawable[]{ sign2, sign };
 		LayerDrawable ld = new LayerDrawable(layers);
 		ld.setBounds(0, 0, buttonWidth, buttonHeight);
 		
