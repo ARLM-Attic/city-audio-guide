@@ -14,9 +14,19 @@ public class SchedulerService implements Scheduler {
 	public void schedule(TimerTask task, long delay) {
 		if(!_isTimerStarted) {
 			_timer = new Timer();
-			_timer.schedule(task, delay);
+			_timer.schedule(decorateWithResetter(task),	delay);
 			_isTimerStarted = true;
 		}
+	}
+	
+	private TimerTask decorateWithResetter(final TimerTask task) {
+		return new TimerTask() {				
+			@Override
+			public void run() {
+				task.run();
+				_isTimerStarted = false;
+			}
+		};
 	}
 
 	@Override
