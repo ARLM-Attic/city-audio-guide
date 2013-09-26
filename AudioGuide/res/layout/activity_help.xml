@@ -1,37 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootLayout"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/prague_silhouette"
     tools:context=".HelpActivity" >
+    
+    <RelativeLayout 
+	    android:id="@+id/infoLayout"
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent"
+	    android:layout_marginLeft="24dp"
+	    android:layout_marginTop="24dp"
+        android:layout_marginRight="24dp"
+        android:layout_marginBottom="24dp"
+	    android:background="@drawable/info_text_shade_drawable">
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="4dp"
-        android:layout_marginRight="4dp"
-        android:layout_marginBottom="8dp"
-        android:layout_above="@+id/buttonHelpClose"
-        android:layout_alignParentTop="true">
-
-		<TextView
-		    android:id="@+id/helpTextView"
-		    android:layout_width="match_parent"
-		    android:layout_height="wrap_content"
-		    android:textSize="16sp"
-		    android:text="@string/help_text_sight_activity" />
-
-    </ScrollView>
-
-    <Button
-        style="@style/DefaultButton"
-        android:id="@+id/buttonHelpClose"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_alignParentBottom="true"        
-        android:layout_marginBottom="4dp"
-        android:text="@string/button_text_close" />
+	    <ScrollView
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_marginTop="8dp"
+	        android:layout_marginLeft="8dp"
+	        android:layout_marginRight="8dp"
+	        android:layout_marginBottom="16dp"
+	        android:layout_above="@+id/buttonHelpClose"
+	        android:layout_alignParentTop="true">
+	
+			<TextView
+			    android:id="@+id/helpTextView"
+			    android:layout_width="match_parent"
+			    android:layout_height="wrap_content"
+			    android:textSize="16sp"
+			    android:textColor="#FFFEE73F"
+			    android:text="@string/help_text_sight_activity" />
+	
+	    </ScrollView>
+	
+	    <Button
+	        style="@style/DefaultButton"
+	        android:id="@+id/buttonHelpClose"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_centerHorizontal="true"
+	        android:layout_alignParentBottom="true"        
+	        android:layout_marginBottom="4dp"
+	        android:background="#FF01460F"
+	        android:textColor="#FF00FF33"
+	        android:text="@string/button_text_close" />
+    </RelativeLayout>
 
 </RelativeLayout>

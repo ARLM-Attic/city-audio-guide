@@ -16,11 +16,17 @@
     <string name="audio_formatted_position_default">0:00</string>
     <string name="title_activity_help">Help</string>
     <string name="help_text_sight_activity">
-        The application tracks your position using GPS. As soon as any sight gets in range
-        you get the notification and you can see how the sight looks from your standpoint.
-        Tap on the screen to open the player control panel.
-        If you have chosen a route you see the direction to the next sight on the route after finishing
-        the audio record or after pressing the Stop button. 
+        Welcome to Prague, one of the most shining gems among Central European
+		cities. Our guide will accompany you in its streets and will
+		notify you unobtrusively whenever you get close to an interesting sight. 
+		Then you can see how the sight looks from your standpoint and listen to some 
+		information about it. Tap on the screen to open the audio player control panel.
+
+		You can choose in the application settings whether you prefer to stroll
+		freely or to follow a specific route. In the latter case you can see the
+		direction to the next sight on the route after finishing the audio comment
+		for the current sight or after pressing the Stop button. We wish you an
+		enjoyable stay in Prague.
     </string>
     <string name="button_text_close">Close</string>
 
