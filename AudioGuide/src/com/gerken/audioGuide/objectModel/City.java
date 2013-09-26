@@ -11,8 +11,10 @@ public class City {
 	private int _id;
 	@Attribute(name="name")
 	private String _name;
-	@Attribute(name="mainImageName")
-	private String _mainImageName;
+	@Attribute(name="outOfRangeImageName")
+	private String _outOfRangeImageName;
+	@Attribute(name="helpBackgroundImageName")
+	private String _helpBackgroundImageName;
 	
 	@ElementList(name="sights")
 	private List<Sight> _sights;
@@ -22,12 +24,19 @@ public class City {
 	public City() {		
 	}
 	
-	public City(int id, String name, String mainImageName) {
+	public City(int id, String name, String outOfRangeImageName) {
 		_id = id;
 		_name = name;
-		_mainImageName = mainImageName;
+		_outOfRangeImageName = outOfRangeImageName;
 		_sights = new ArrayList<Sight>();
 		_routes = new ArrayList<Route>();
+	}
+	
+	public String getHelpBackgroundImageName() {
+		return _helpBackgroundImageName;
+	}
+	public void setHelpBackgroundImageName(String imageName) {
+		_helpBackgroundImageName = imageName;
 	}
 	
 	public String getName() {

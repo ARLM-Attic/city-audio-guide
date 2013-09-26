@@ -13,9 +13,9 @@ import android.graphics.drawable.shapes.RectShape;
 import android.graphics.drawable.shapes.Shape;
 
 public class PlayerButtonDrawableFactory {	
-	private final int BUTTON_SIGN_MAIN_COLOR = 0xFF00FF33;
+	private final int BUTTON_SIGN_MAIN_COLOR = 0xCF00FF33;
 	private final int BUTTON_SIGN_HIGHLIGHT_COLOR = 0xFF6AF26A;
-	private final int BUTTON_SIGN_STROKE_COLOR = 0xE6925891;
+	private final int BUTTON_SIGN_STROKE_COLOR = 0xFF925891;
 	private final float PLAY_SIGN_SIZE_RATIO = 0.8f;
 	private final float STOP_SIGN_SIZE_RATIO = 0.5f;
 	
@@ -96,7 +96,7 @@ public class PlayerButtonDrawableFactory {
 		psPaint.setAntiAlias(true);
 		psPaint.setStrokeJoin(Paint.Join.ROUND);
 		psPaint.setStrokeCap(Paint.Cap.ROUND);
-		psPaint.setStrokeWidth(1.3f);
+		psPaint.setStrokeWidth(5.5f);
 		psPaint.setMaskFilter(new BlurMaskFilter(1.5f, BlurMaskFilter.Blur.NORMAL));
 		
 		return outline;

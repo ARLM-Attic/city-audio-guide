@@ -8,6 +8,7 @@ import com.gerken.audioGuide.presenters.SightPresenter;
 import com.gerken.audioGuide.services.GuideDataManager;
 
 import android.app.Application;
+import android.content.Context;
 import android.util.Log;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -19,6 +20,8 @@ public class GuideApplication extends Application {
 	
 	private City _city = null;
 	private Logger _log;
+	
+	private PresenterContainer _presenterContainer;
 	
 	private UncaughtExceptionHandler _defaultCrashHandler;
 	
@@ -35,11 +38,17 @@ public class GuideApplication extends Application {
 		return _city;
 	}
 	
+	public PresenterContainer getPresenterContainer() {
+		return _presenterContainer;
+	}
+	
 	@Override
 	public void onCreate() {
 		super.onCreate();
 		
-		GuideDataManager mgr = new GuideDataManager(getApplicationContext());
+		Context ctx = getApplicationContext();
+		GuideDataManager mgr = new GuideDataManager(ctx);
+		_presenterContainer = new PresenterContainer(ctx, this);
 		
 		try {
 			mgr.init();
