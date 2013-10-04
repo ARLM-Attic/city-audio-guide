@@ -14,6 +14,7 @@ import com.gerken.audioGuide.interfaces.ApplicationSettingsStorage;
 import com.gerken.audioGuide.interfaces.OnEventListener;
 import com.gerken.audioGuide.interfaces.views.AudioPlayerView;
 import com.gerken.audioGuide.interfaces.views.SightView;
+import com.gerken.audioGuide.objectModel.City;
 import com.gerken.audioGuide.presenters.SightPresenter;
 
 //@RunWith(MockitoJUnitRunner.class)
@@ -35,7 +36,7 @@ public class IgnorableTest {
 		listenerCaptor = ArgumentCaptor.forClass(OnEventListener.class);
 		
 		SightPresenter sut = 
-				new SightPresenter(sightView2, mock(AudioPlayerView.class));
+				new SightPresenter(new City(), sightView2, mock(AudioPlayerView.class));
 		sut.setApplicationSettingsStorage(settingsStorage);
 		
 		verify(sightView2).addViewInitializedListener(listenerCaptor.capture());

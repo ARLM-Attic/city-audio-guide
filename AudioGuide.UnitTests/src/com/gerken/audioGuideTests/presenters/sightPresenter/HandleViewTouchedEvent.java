@@ -14,6 +14,7 @@ import com.gerken.audioGuide.interfaces.OnEventListener;
 import com.gerken.audioGuide.interfaces.OnSightLookGotInRangeListener;
 import com.gerken.audioGuide.interfaces.views.AudioPlayerView;
 import com.gerken.audioGuide.interfaces.views.SightView;
+import com.gerken.audioGuide.objectModel.City;
 import com.gerken.audioGuide.objectModel.NextRoutePoint;
 import com.gerken.audioGuide.objectModel.Sight;
 import com.gerken.audioGuide.objectModel.SightLook;
@@ -145,7 +146,7 @@ public class HandleViewTouchedEvent {
 		doNothing().when(sightLookFinder)
 			.addSightLookGotInRangeListener(sightLookGotInRangeListenerCaptor.capture());
 		
-		SightPresenter sut = new SightPresenter(sightView, playerView);
+		SightPresenter sut = new SightPresenter(new City(), sightView, playerView);
 		sut.setNewSightLookGotInRangeRaiser(sightLookFinder);
 		sut.setBitmapLoader(mock(DownscalingBitmapLoader.class));
 		sut.setApplicationSettingsStorage(settingsStorage);

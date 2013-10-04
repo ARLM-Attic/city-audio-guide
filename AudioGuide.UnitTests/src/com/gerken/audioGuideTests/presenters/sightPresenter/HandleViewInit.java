@@ -9,6 +9,7 @@ import com.gerken.audioGuide.interfaces.ApplicationSettingsStorage;
 import com.gerken.audioGuide.interfaces.OnEventListener;
 import com.gerken.audioGuide.interfaces.views.AudioPlayerView;
 import com.gerken.audioGuide.interfaces.views.SightView;
+import com.gerken.audioGuide.objectModel.City;
 import com.gerken.audioGuide.presenters.SightPresenter;
 
 public class HandleViewInit {
@@ -60,7 +61,7 @@ public class HandleViewInit {
 		doNothing().when(sightView).addViewInitializedListener(sightViewInitializedListenerCaptor.capture());
 		
 		SightPresenter sut = 
-				new SightPresenter(sightView, mock(AudioPlayerView.class));
+				new SightPresenter(new City(), sightView, mock(AudioPlayerView.class));
 		sut.setApplicationSettingsStorage(settingsStorage);
 		
 		return sightViewInitializedListenerCaptor.getValue();

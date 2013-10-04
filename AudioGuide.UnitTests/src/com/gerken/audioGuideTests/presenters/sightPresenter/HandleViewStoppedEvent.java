@@ -13,6 +13,7 @@ import com.gerken.audioGuide.interfaces.AudioPlayer;
 import com.gerken.audioGuide.interfaces.OnEventListener;
 import com.gerken.audioGuide.interfaces.views.AudioPlayerView;
 import com.gerken.audioGuide.interfaces.views.SightView;
+import com.gerken.audioGuide.objectModel.City;
 import com.gerken.audioGuide.presenters.SightPresenter;
 
 public class HandleViewStoppedEvent {
@@ -57,7 +58,7 @@ public class HandleViewStoppedEvent {
 				ArgumentCaptor.forClass(OnEventListener.class);
 		doNothing().when(sightView).addViewStoppedListener(sightViewStoppedListenerCaptor.capture());		
 		
-		SightPresenter sut = new SightPresenter(sightView, mock(AudioPlayerView.class));
+		SightPresenter sut = new SightPresenter(new City(), sightView, mock(AudioPlayerView.class));
 		sut.setAudioPlayer(player);
 		
 		result.sut = sut;

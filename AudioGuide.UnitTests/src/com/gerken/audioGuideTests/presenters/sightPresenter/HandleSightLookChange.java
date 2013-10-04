@@ -280,7 +280,7 @@ public class HandleSightLookChange {
 		doNothing().when(sightLookFinder)
 			.addSightLookGotInRangeListener(sightLookGotInRangeListenerCaptor.capture());
 		
-		SightPresenter sut = new SightPresenter(sightView, playerView);
+		SightPresenter sut = new SightPresenter(new City(), sightView, playerView);
 		sut.setAudioPlayer(player);
 		sut.setAudioNotifier(notifier);
 		sut.setNewSightLookGotInRangeRaiser(sightLookFinder);

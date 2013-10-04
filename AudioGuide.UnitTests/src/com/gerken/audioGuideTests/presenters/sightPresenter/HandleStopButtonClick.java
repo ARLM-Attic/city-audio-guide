@@ -125,7 +125,7 @@ public class HandleStopButtonClick {
 		doNothing().when(sightLookFinder)
 			.addSightLookGotInRangeListener(sightLookGotInRangeListenerCaptor.capture());
 		
-		SightPresenter sut = new SightPresenter(sightView, playerView);
+		SightPresenter sut = new SightPresenter(new City(), sightView, playerView);
 		sut.setAudioPlayer(player);
 		sut.setNewSightLookGotInRangeRaiser(sightLookFinder);
 		sut.setBitmapLoader(mock(DownscalingBitmapLoader.class));
