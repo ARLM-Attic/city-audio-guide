@@ -6,14 +6,9 @@ import com.gerken.audioGuide.R;
 import com.gerken.audioGuide.controls.AudioPlayerControl;
 import com.gerken.audioGuide.controls.ControlUpdater;
 import com.gerken.audioGuide.graphics.*;
-import com.gerken.audioGuide.interfaces.AudioPlayer;
 import com.gerken.audioGuide.interfaces.BitmapContainer;
-import com.gerken.audioGuide.interfaces.MediaAssetManager;
 import com.gerken.audioGuide.interfaces.OnEventListener;
 import com.gerken.audioGuide.interfaces.views.SightView;
-import com.gerken.audioGuide.objectModel.City;
-import com.gerken.audioGuide.presenters.AudioPlayerPresenter;
-import com.gerken.audioGuide.presenters.SightPresenter;
 import com.gerken.audioGuide.services.*;
 
 import android.graphics.Bitmap;
@@ -36,11 +31,7 @@ public class MainActivity extends Activity implements SightView {
 	
 	private RouteArrowsView _nextSightPointerArrow;
 	
-	private SightPresenter _presenter;
-	private AudioPlayerPresenter _audioPlayerPresenter;
 	private AndroidLocationManagerFacade _locationManager;
-	private SightLookFinderByLocation _sightLookFinderByLocation;
-	
 	
 	private Bitmap _backgroundBitmap;
 	
@@ -90,34 +81,12 @@ public class MainActivity extends Activity implements SightView {
     
     private void setupDependencies() {
     	Context ctx = getApplicationContext();
-    	MediaAssetManager assetManager = new PlainMediaAssetManager(ctx);
-        AudioPlayer player = new AndroidMediaPlayerFacade();
         _locationManager = new AndroidLocationManagerFacade(ctx); 
-        _locationManager.setLogger(new DefaultLoggingAdapter("AndroidLocationManagerFacade"));
+        _locationManager.setLogger(new Log4JAdapter(AndroidLocationManagerFacade.class));
         
-        City city = ((GuideApplication)getApplication()).getCity();
-        _sightLookFinderByLocation = new SightLookFinderByLocation(
-        		city, _locationManager);
-        
-        _presenter = new SightPresenter(city, this, _audioPlayerControl);
-        _presenter.setAudioPlayer(player);
-        _presenter.setAudioNotifier(new AndroidMediaPlayerNotifier(ctx));
-        _presenter.setBitmapLoader(new AndroidDownscalingBitmapLoader(assetManager));
-        _presenter.setApplicationSettingsStorage(new SharedPreferenceManager(ctx));
-        _presenter.setNewSightLookGotInRangeRaiser(_sightLookFinderByLocation);
-        _presenter.setPlayerPanelHidingScheduler(new SchedulerService());
-        _presenter.setMediaAssetManager(assetManager);
-        //_presenter.setLogger(new DefaultLoggingAdapter("SightPresenter"));
-        _presenter.setLogger(new Log4JAdapter(SightPresenter.class));
-        
-        _audioPlayerPresenter = new AudioPlayerPresenter(
-        		_audioPlayerControl, player);
-        //_audioPlayerPresenter.setLogger(new DefaultLoggingAdapter("AudioPlayerPresenter"));
-        _audioPlayerPresenter.setMediaAssetManager(assetManager);
-        _audioPlayerPresenter.setLogger(new Log4JAdapter(AudioPlayerPresenter.class));
-        _audioPlayerPresenter.setAudioUpdateScheduler(new SchedulerService());
-        _audioPlayerPresenter.setAudioRewindScheduler(new SchedulerService());
-        _audioPlayerPresenter.setNewSightLookGotInRangeRaiser(_sightLookFinderByLocation);
+        GuideApplication app = (GuideApplication)getApplication();
+        app.getPresenterContainer().initSightPresenter(this, _audioPlayerControl, _locationManager);
+        app.getPresenterContainer().initAudioPlayerPresenter(_audioPlayerControl, _locationManager);  
     }
     
     private float calculatePlayerPanelHeight() {
