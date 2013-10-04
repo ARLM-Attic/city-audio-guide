@@ -15,6 +15,7 @@ import com.gerken.audioGuide.util.IntentExtraManager;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.preference.ListPreference;
@@ -111,24 +112,29 @@ public class MainPreferenceActivity extends Activity implements MainPreferenceVi
 	}
 
 	private View createRouteChoice(CharSequence entry, CharSequence entryValue) {
-		LinearLayout layout = new LinearLayout(this);
-		layout.setOrientation(LinearLayout.HORIZONTAL);
+		RelativeLayout layout = new RelativeLayout(this);
+		//layout.setOrientation(LinearLayout.HORIZONTAL);
 		
 		RadioButton choice = new RadioButton(this);
 		choice.setText(entry);
 		choice.setTag(entryValue);
 		choice.setTextColor(0xFFFEE73F);
-		layout.addView(choice, 
-				new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
-		);
+		RelativeLayout.LayoutParams choiceLp = new RelativeLayout.LayoutParams(
+				RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+		choiceLp.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+		layout.addView(choice, choiceLp);
 		
 		Button showMapButton = new Button(this);
 		showMapButton.setText("Map");
 		showMapButton.setTag(entryValue);
+		showMapButton.setTextColor(0xFF00FF33);
+		showMapButton.setTypeface(Typeface.DEFAULT_BOLD);
+		showMapButton.setBackgroundColor(0x00000000);
 		showMapButton.setOnClickListener(_mapButtonOnClickListener);
-		layout.addView(showMapButton, 
-				new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
-		);
+		RelativeLayout.LayoutParams showMapButtonLp = new RelativeLayout.LayoutParams(
+				RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+		showMapButtonLp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+		layout.addView(showMapButton, showMapButtonLp);
 		
 		return layout;
 	}
