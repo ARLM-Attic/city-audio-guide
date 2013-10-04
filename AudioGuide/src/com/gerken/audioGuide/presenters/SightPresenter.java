@@ -29,6 +29,7 @@ public class SightPresenter {
 	private boolean _isPlayerPanelVisible = false;
 	private boolean _isNextRoutePointInfoShown = false;
 	private boolean _hasPlayerBeenPausedOnViewStop = false;
+	private boolean _isViewBackgroundInitialized = false;
 	
 	private int _currentSightLookImageHeight;
 	private int _currentSightLookImageVerticalPadding;	
@@ -245,16 +246,10 @@ public class SightPresenter {
 	}
 	
 	private void handleSightViewLayoutComplete() {
-		BitmapDownscalingResult backgroundImage = null;
-		try {
-			backgroundImage = _bitmapLoader.load(
-				_city.getOutOfRangeImageName(),	_sightView.getWidth(), _sightView.getHeight());
+		if(!_isViewBackgroundInitialized){
+			notifyViewAboutNoSightViewInRange();
+			_isViewBackgroundInitialized = true;
 		}
-		catch(Exception ex) {
-			logError("Unable to set the background image", ex);
-		}
-		if(backgroundImage != null)		
-			_sightView.setBackgroundImage(backgroundImage);
 	}
 	
 	private void handleSightViewTouch() {
