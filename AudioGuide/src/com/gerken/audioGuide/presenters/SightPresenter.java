@@ -51,6 +51,13 @@ public class SightPresenter {
 		}
 	};
 	
+	private OnEventListener _sightViewLayoutCompleteListener = new OnEventListener() {		
+		@Override
+		public void onEvent() {
+			handleSightViewLayoutComplete();	
+		}
+	};
+	
 	private OnEventListener _playPressedListener = new OnEventListener() {		
 		@Override
 		public void onEvent() {
@@ -135,9 +142,11 @@ public class SightPresenter {
 		}
 	};
 	
-	public SightPresenter(SightView sightView, AudioPlayerView audioPlayerView) {
+	public SightPresenter(City city, SightView sightView, AudioPlayerView audioPlayerView) {
+		_city = city;
 		_sightView = sightView;
 		_sightView.addViewInitializedListener(_sightViewInitializedListener);
+		_sightView.addViewLayoutCompleteListener(_sightViewLayoutCompleteListener);
 		_sightView.addViewTouchedListener(_sightViewTouchedListener);
 		_sightView.addViewStoppedListener(_sightViewStoppedListener);
 		_sightView.addViewDestroyedListener(_sightViewDestroyedListener);
@@ -202,7 +211,7 @@ public class SightPresenter {
 			}
 		}
 		else if(_currentSightLook != null) {
-			_sightView.acceptNoSightInRange();	
+			notifyViewAboutNoSightViewInRange();	
 			if(_audioPlayer != null && _audioPlayer.isPlaying())
 				_audioPlayer.stop();
 			_currentSight = null;
@@ -233,6 +242,19 @@ public class SightPresenter {
 		int originalHeight = _currentSightLookImageHeight + 2*_currentSightLookImageVerticalPadding;
 		int originalHorizon = Math.round(0.01f*originalHorizonPerc*originalHeight);
 		return (float)(originalHorizon - _currentSightLookImageVerticalPadding)/(float)_currentSightLookImageHeight;
+	}
+	
+	private void handleSightViewLayoutComplete() {
+		BitmapDownscalingResult backgroundImage = null;
+		try {
+			backgroundImage = _bitmapLoader.load(
+				_city.getOutOfRangeImageName(),	_sightView.getWidth(), _sightView.getHeight());
+		}
+		catch(Exception ex) {
+			logError("Unable to set the background image", ex);
+		}
+		if(backgroundImage != null)		
+			_sightView.setBackgroundImage(backgroundImage);
 	}
 	
 	private void handleSightViewTouch() {
@@ -289,6 +311,21 @@ public class SightPresenter {
 		if(sightLookImage != null)		
 			_sightView.setBackgroundImage(sightLookImage);
 		
+		_sightView.hideNextSightDirection();
+	}
+	
+	private void notifyViewAboutNoSightViewInRange() {
+		try{
+			BitmapDownscalingResult bmp = _bitmapLoader.load(_city.getOutOfRangeImageName(), 
+				_sightView.getWidth(), _sightView.getHeight());
+			if(bmp != null)		
+				_sightView.setBackgroundImage(bmp);		
+		}
+		catch(Exception ex) {
+			logError("Unable to retrieve the no sight in range image", ex);
+		}
+		
+		_sightView.resetInfoPanelCaptionText();
 		_sightView.hideNextSightDirection();
 	}
 	

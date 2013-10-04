@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import com.gerken.audioGuide.interfaces.BitmapContainer;
 import com.gerken.audioGuide.interfaces.OnEventListener;
-import com.gerken.audioGuide.interfaces.views.HelpView;
+import com.gerken.audioGuide.interfaces.views.AuxiliaryView;
 
 import android.os.Bundle;
 import android.app.Activity;
@@ -13,7 +13,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewTreeObserver;
 
-public class HelpActivity extends Activity implements HelpView {
+public class HelpActivity extends Activity implements AuxiliaryView {
 	
 	private View _rootView;
 	

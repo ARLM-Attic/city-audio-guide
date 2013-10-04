@@ -6,22 +6,37 @@ import com.gerken.audioGuide.interfaces.*;
 import com.gerken.audioGuide.interfaces.views.MainPreferenceView;
 import com.gerken.audioGuide.objectModel.*;
 
-public class MainPreferencePresenter {
+public class MainPreferencePresenter extends AuxiliaryPresenter {
 	
 	private City _city;
 	private MainPreferenceView _view;
 	private ApplicationSettingsStorage _prefStorage;
-	private Logger _logger;
+	
+	private OnEventListener _viewLayoutCompleteListener = new OnEventListener() {		
+		@Override
+		public void onEvent() {
+			handleViewLayoutComplete();
+		}
+	};
+	private OnEventListener _okButtonPressedListener = new OnEventListener() {		
+		@Override
+		public void onEvent() {
+			handleOk();
+		}
+	};
 	
 	public MainPreferencePresenter(City city, MainPreferenceView prefView, 
-			ApplicationSettingsStorage prefStorage, Logger logger) {
+			ApplicationSettingsStorage prefStorage) {
+		super(prefView, city);
 		_city = city;
 		_view = prefView;
 		_prefStorage = prefStorage;
-		_logger = logger;
+		
+		_view.addViewInitializedListener(_viewLayoutCompleteListener);
+		_view.addOkButtonPressedListener(_okButtonPressedListener);
 	}
 	
-	public void init() {
+	public void handleViewLayoutComplete() {
 		ArrayList<CharSequence> entries = new ArrayList<CharSequence>();
 		ArrayList<CharSequence> entryValues = new ArrayList<CharSequence>();
 		
@@ -37,9 +52,10 @@ public class MainPreferencePresenter {
 			_view.setSelectedRoute(String.valueOf(_prefStorage.getCurrentRouteId()));
 	}
 	
-	public void handleOk(Object selectedRouteTag) {
-		if(selectedRouteTag != null && selectedRouteTag instanceof String) {
-			int routeId = Integer.valueOf((String)selectedRouteTag);
+	public void handleOk() {
+		String routeIdString = _view.getSelectedRoute();
+		if(routeIdString != null) {
+			int routeId = Integer.valueOf(routeIdString);
 			_prefStorage.setCurrentRouteId(routeId);
 		}
 		else

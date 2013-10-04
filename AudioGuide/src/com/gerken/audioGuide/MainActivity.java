@@ -11,6 +11,7 @@ import com.gerken.audioGuide.interfaces.BitmapContainer;
 import com.gerken.audioGuide.interfaces.MediaAssetManager;
 import com.gerken.audioGuide.interfaces.OnEventListener;
 import com.gerken.audioGuide.interfaces.views.SightView;
+import com.gerken.audioGuide.objectModel.City;
 import com.gerken.audioGuide.presenters.AudioPlayerPresenter;
 import com.gerken.audioGuide.presenters.SightPresenter;
 import com.gerken.audioGuide.services.*;
@@ -48,6 +49,7 @@ public class MainActivity extends Activity implements SightView {
 	private float _playerPanelHeight = 0.0f;
 	
 	private ArrayList<OnEventListener> _viewInitializedListeners = new ArrayList<OnEventListener>();
+	private ArrayList<OnEventListener> _viewLayoutCompleteListeners = new ArrayList<OnEventListener>();
 	private ArrayList<OnEventListener> _viewTouchedListeners = new ArrayList<OnEventListener>();
 	private ArrayList<OnEventListener> _viewStoppedListeners = new ArrayList<OnEventListener>();
 	private ArrayList<OnEventListener> _viewDestroyedListeners = new ArrayList<OnEventListener>();
@@ -73,6 +75,15 @@ public class MainActivity extends Activity implements SightView {
         playPlayerPanelHidingAnimation(1);
         setPlayerButtonsClickable(false);
         
+        _rootView.getViewTreeObserver().addOnGlobalLayoutListener(
+		    new ViewTreeObserver.OnGlobalLayoutListener() {
+		    	public void onGlobalLayout() {
+		    		for(OnEventListener l : _viewLayoutCompleteListeners)
+		            	l.onEvent();
+		    	}
+		    }
+	    );
+        
         for(OnEventListener l : _viewInitializedListeners)
         	l.onEvent();
     }
@@ -84,10 +95,11 @@ public class MainActivity extends Activity implements SightView {
         _locationManager = new AndroidLocationManagerFacade(ctx); 
         _locationManager.setLogger(new DefaultLoggingAdapter("AndroidLocationManagerFacade"));
         
+        City city = ((GuideApplication)getApplication()).getCity();
         _sightLookFinderByLocation = new SightLookFinderByLocation(
-        		((GuideApplication)getApplication()).getCity(), _locationManager);
+        		city, _locationManager);
         
-        _presenter = new SightPresenter(this, _audioPlayerControl);
+        _presenter = new SightPresenter(city, this, _audioPlayerControl);
         _presenter.setAudioPlayer(player);
         _presenter.setAudioNotifier(new AndroidMediaPlayerNotifier(ctx));
         _presenter.setBitmapLoader(new AndroidDownscalingBitmapLoader(assetManager));
@@ -199,10 +211,8 @@ public class MainActivity extends Activity implements SightView {
 	}
 	
 	@Override
-	public void acceptNoSightInRange() {
+	public void resetInfoPanelCaptionText() {
 		setInfoPanelCaptionText(getString(R.string.sight_info_none));
-		_rootView.setBackgroundResource(R.drawable.prague_silhouette);
-		_nextSightPointerArrow.setVisibility(View.INVISIBLE);
 	}
 
 	@Override
@@ -272,6 +282,11 @@ public class MainActivity extends Activity implements SightView {
 	@Override
 	public void addViewInitializedListener(OnEventListener listener) {
 		_viewInitializedListeners.add(listener);
+	}
+	
+	@Override
+	public void addViewLayoutCompleteListener(OnEventListener listener) {
+		_viewLayoutCompleteListeners.add(listener);
 	}
 
 	@Override

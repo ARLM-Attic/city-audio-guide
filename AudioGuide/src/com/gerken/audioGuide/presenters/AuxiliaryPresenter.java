@@ -4,27 +4,27 @@ import com.gerken.audioGuide.graphics.BitmapDownscalingResult;
 import com.gerken.audioGuide.interfaces.DownscalingBitmapLoader;
 import com.gerken.audioGuide.interfaces.Logger;
 import com.gerken.audioGuide.interfaces.OnEventListener;
-import com.gerken.audioGuide.interfaces.views.HelpView;
+import com.gerken.audioGuide.interfaces.views.AuxiliaryView;
 import com.gerken.audioGuide.objectModel.City;
 
-public class HelpPresenter {
-	private HelpView _helpView;
+public class AuxiliaryPresenter {
+	private AuxiliaryView _auxView;
 	private City _city;
 	
 	private DownscalingBitmapLoader _bitmapLoader;
 	private Logger _logger;
 
-	private OnEventListener _helpViewInitializedListener = new OnEventListener() {		
+	private OnEventListener _viewLayoutCompleteListener = new OnEventListener() {		
 		@Override
 		public void onEvent() {
-			handleHelpViewInitialized();
+			handleViewLayoutComplete();
 		}
 	};
 	
-	public HelpPresenter(HelpView helpView, City city){
-		_helpView = helpView;
+	public AuxiliaryPresenter(AuxiliaryView view, City city){
+		_auxView = view;
 		_city = city;
-		_helpView.addViewLayoutCompleteListener(_helpViewInitializedListener);
+		_auxView.addViewLayoutCompleteListener(_viewLayoutCompleteListener);
 	}
 	
 	public void setBitmapLoader(DownscalingBitmapLoader bitmapLoader) {
@@ -35,17 +35,17 @@ public class HelpPresenter {
 		_logger = logger;
 	}
 	
-	private void handleHelpViewInitialized(){
+	private void handleViewLayoutComplete(){
 		BitmapDownscalingResult backgroundImage = null;
 		try {
 			backgroundImage = _bitmapLoader.load(
-				_city.getHelpBackgroundImageName(),	_helpView.getWidth(), _helpView.getHeight());
+				_city.getHelpBackgroundImageName(),	_auxView.getWidth(), _auxView.getHeight());
 		}
 		catch(Exception ex) {
 			logError("Unable to set the background image", ex);
 		}
 		if(backgroundImage != null)		
-			_helpView.setBackgroundImage(backgroundImage);
+			_auxView.setBackgroundImage(backgroundImage);
 	}
 	
 	private void logError(String message, Throwable ex) {

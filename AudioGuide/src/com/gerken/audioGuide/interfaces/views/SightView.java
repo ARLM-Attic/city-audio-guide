@@ -7,7 +7,7 @@ public interface SightView {
 	int getWidth();
 	int getHeight();
 	
-	void acceptNoSightInRange();
+	void resetInfoPanelCaptionText();
 	void setInfoPanelCaptionText(String text);
 	void setBackgroundImage(BitmapContainer bitmap);
 	
@@ -25,6 +25,7 @@ public interface SightView {
 	void displayError(int messageResourceId);
 	
 	void addViewInitializedListener(OnEventListener listener);
+	void addViewLayoutCompleteListener(OnEventListener listener);
 	void addViewTouchedListener(OnEventListener listener);
 	void addViewStoppedListener(OnEventListener listener);
 	void addViewDestroyedListener(OnEventListener listener);

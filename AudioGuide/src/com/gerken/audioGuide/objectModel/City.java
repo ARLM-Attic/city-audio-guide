@@ -39,6 +39,10 @@ public class City {
 		_helpBackgroundImageName = imageName;
 	}
 	
+	public String getOutOfRangeImageName() {
+		return _outOfRangeImageName;
+	}
+	
 	public String getName() {
 		return _name;
 	}
