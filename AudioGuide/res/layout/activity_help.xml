@@ -5,25 +5,25 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/prague_silhouette"
+    android:background="#00000000"
     tools:context=".HelpActivity" >
     
     <RelativeLayout 
 	    android:id="@+id/infoLayout"
 	    android:layout_width="match_parent"
 	    android:layout_height="match_parent"
-	    android:layout_marginLeft="24dp"
-	    android:layout_marginTop="24dp"
-        android:layout_marginRight="24dp"
-        android:layout_marginBottom="24dp"
+	    android:layout_marginLeft="18dp"
+	    android:layout_marginTop="18dp"
+        android:layout_marginRight="18dp"
+        android:layout_marginBottom="18dp"
 	    android:background="@drawable/info_text_shade_drawable">
 
 	    <ScrollView
 	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
-	        android:layout_marginTop="8dp"
-	        android:layout_marginLeft="8dp"
-	        android:layout_marginRight="8dp"
+	        android:layout_marginTop="12dp"
+	        android:layout_marginLeft="12dp"
+	        android:layout_marginRight="12dp"
 	        android:layout_marginBottom="16dp"
 	        android:layout_above="@+id/buttonHelpClose"
 	        android:layout_alignParentTop="true">
@@ -45,9 +45,11 @@
 	        android:layout_height="wrap_content"
 	        android:layout_centerHorizontal="true"
 	        android:layout_alignParentBottom="true"        
-	        android:layout_marginBottom="4dp"
-	        android:background="#FF01460F"
+	        android:layout_marginBottom="12dp"
+	        android:padding="8dp"
+	        android:background="@drawable/regular_button_drawable"
 	        android:textColor="#FF00FF33"
+	        android:textStyle="bold"
 	        android:text="@string/button_text_close" />
     </RelativeLayout>
 
