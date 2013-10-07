@@ -1,16 +1,11 @@
 package com.gerken.audioGuide;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import com.gerken.audioGuide.controls.FlexiRadioGroup;
 import com.gerken.audioGuide.interfaces.BitmapContainer;
 import com.gerken.audioGuide.interfaces.OnEventListener;
 import com.gerken.audioGuide.interfaces.views.MainPreferenceView;
-import com.gerken.audioGuide.objectModel.City;
-import com.gerken.audioGuide.objectModel.Route;
-import com.gerken.audioGuide.presenters.MainPreferencePresenter;
-import com.gerken.audioGuide.services.*;
 import com.gerken.audioGuide.util.IntentExtraManager;
 
 import android.app.Activity;
@@ -18,12 +13,10 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
-import android.preference.ListPreference;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.View.OnClickListener;
 import android.widget.*;
-import android.widget.LinearLayout.LayoutParams;
 
 
 public class MainPreferenceActivity extends Activity implements MainPreferenceView {

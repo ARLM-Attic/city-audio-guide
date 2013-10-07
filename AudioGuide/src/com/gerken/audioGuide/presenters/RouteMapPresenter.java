@@ -1,13 +1,6 @@
 package com.gerken.audioGuide.presenters;
 
-import java.io.IOException;
 import java.io.InputStream;
-
-import android.content.res.AssetManager;
-import android.graphics.drawable.Drawable;
-import android.util.Log;
-import android.view.View;
-import android.widget.TextView;
 
 import com.gerken.audioGuide.R;
 import com.gerken.audioGuide.interfaces.MediaAssetManager;
