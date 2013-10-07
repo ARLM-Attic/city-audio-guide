@@ -41,14 +41,9 @@
 	    <Button
 	        style="@style/DefaultButton"
 	        android:id="@+id/buttonHelpClose"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
 	        android:layout_centerHorizontal="true"
 	        android:layout_alignParentBottom="true"        
 	        android:layout_marginBottom="12dp"
-	        android:padding="8dp"
-	        android:background="@drawable/regular_button_drawable"
-	        android:textColor="#FF00FF33"
 	        android:textStyle="bold"
 	        android:text="@string/button_text_close" />
     </RelativeLayout>
