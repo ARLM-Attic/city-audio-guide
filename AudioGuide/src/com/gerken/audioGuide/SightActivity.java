@@ -23,7 +23,7 @@ import android.view.View.OnClickListener;
 import android.view.animation.TranslateAnimation;
 import android.widget.*;
 
-public class MainActivity extends Activity implements SightView {
+public class SightActivity extends Activity implements SightView {
 	
 	private View _rootView;
 	private View _playerInfoPanel;
@@ -49,7 +49,7 @@ public class MainActivity extends Activity implements SightView {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_sight);
         
         _handler = new Handler();    
         
