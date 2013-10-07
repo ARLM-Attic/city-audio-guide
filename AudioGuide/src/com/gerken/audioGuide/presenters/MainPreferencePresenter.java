@@ -12,10 +12,10 @@ public class MainPreferencePresenter extends AuxiliaryPresenter {
 	private MainPreferenceView _view;
 	private ApplicationSettingsStorage _prefStorage;
 	
-	private OnEventListener _viewLayoutCompleteListener = new OnEventListener() {		
+	private OnEventListener _viewInitializedListener = new OnEventListener() {		
 		@Override
 		public void onEvent() {
-			handleViewLayoutComplete();
+			handleViewInitialized();
 		}
 	};
 	private OnEventListener _okButtonPressedListener = new OnEventListener() {		
@@ -32,11 +32,11 @@ public class MainPreferencePresenter extends AuxiliaryPresenter {
 		_view = prefView;
 		_prefStorage = prefStorage;
 		
-		_view.addViewInitializedListener(_viewLayoutCompleteListener);
+		_view.addViewInitializedListener(_viewInitializedListener);
 		_view.addOkButtonPressedListener(_okButtonPressedListener);
 	}
 	
-	public void handleViewLayoutComplete() {
+	public void handleViewInitialized() {
 		ArrayList<CharSequence> entries = new ArrayList<CharSequence>();
 		ArrayList<CharSequence> entryValues = new ArrayList<CharSequence>();
 		

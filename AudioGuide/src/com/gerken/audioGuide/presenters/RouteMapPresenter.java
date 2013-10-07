@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.gerken.audioGuide.R;
 import com.gerken.audioGuide.interfaces.MediaAssetManager;
 import com.gerken.audioGuide.interfaces.Logger;
+import com.gerken.audioGuide.interfaces.OnEventListener;
 import com.gerken.audioGuide.interfaces.views.RouteMapView;
 import com.gerken.audioGuide.util.IntentExtraManager;
 
@@ -21,14 +22,23 @@ public class RouteMapPresenter {
 	private MediaAssetManager _assetStreamProvider;
 	private Logger _logger;
 	
+	private OnEventListener _viewInitializedListener = new OnEventListener() {		
+		@Override
+		public void onEvent() {
+			handleViewInitialized();
+		}
+	};
+	
 	public RouteMapPresenter(RouteMapView view, 
 			MediaAssetManager assetStreamProvider, Logger logger) {
 		_view = view;
 		_assetStreamProvider = assetStreamProvider;
 		_logger = logger;
+		
+		_view.addViewInitializedListener(_viewInitializedListener);
 	}
 	
-	public void init() {
+	public void handleViewInitialized() {
 		int routeId = new IntentExtraManager(_view.getIntent()).getRouteId();
 		String assetName = String.format("rt_%d.png", routeId);		
 		

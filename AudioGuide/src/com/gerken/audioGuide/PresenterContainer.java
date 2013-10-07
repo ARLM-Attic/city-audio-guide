@@ -23,6 +23,7 @@ public class PresenterContainer {
 	private AudioPlayerPresenter _audioPlayerPresenter;
 	private AuxiliaryPresenter _helpPresenter;
 	private MainPreferencePresenter _mainPreferencePresenter;
+	private RouteMapPresenter _routeMapPresenter;
 	
 	private MediaAssetManager _assetManager;
 	private ApplicationSettingsStorage _settingsStorage;
@@ -72,9 +73,14 @@ public class PresenterContainer {
 	
 	public void initMainPreferencePresenter(MainPreferenceView mainPreferenceView) {
 		_mainPreferencePresenter = new MainPreferencePresenter(getCity(),
-				mainPreferenceView, _settingsStorage);
+			mainPreferenceView, _settingsStorage);
 		_mainPreferencePresenter.setBitmapLoader(_bitmapLoader);
 		_mainPreferencePresenter.setLogger(createLogger(MainPreferencePresenter.class));
+	}
+	
+	public void initRouteMapPresenter(RouteMapView routeMapView) {
+		_routeMapPresenter = new RouteMapPresenter(routeMapView,
+			_assetManager, createLogger(RouteMapPresenter.class));
 	}
 	
 	private Logger createLogger(Class cls) {
