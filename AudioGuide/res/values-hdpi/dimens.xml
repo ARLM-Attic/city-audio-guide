@@ -1,0 +1,5 @@
+<resources>
+
+    <item name="info_text_shade_gradient_radius" type="dimen" format="float">400</item>
+
+</resources>

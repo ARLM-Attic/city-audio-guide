@@ -8,9 +8,8 @@
         android:centerX="0.5"
         android:centerY="0.5"
         android:startColor="#FF2F002F"
-        android:endColor="#AA2F002F"        
+        android:endColor="#AA2F002F"      
         android:type="radial"
-        android:gradientRadius="200"
-        
+        android:gradientRadius="@dimen/info_text_shade_gradient_radius"        
 	 /> 
 </shape>
