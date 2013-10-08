@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.View.OnClickListener;
@@ -20,9 +21,10 @@ import android.widget.*;
 
 
 public class MainPreferenceActivity extends Activity implements MainPreferenceView {
-	private View _rootView;
-	
+	private View _rootView;	
 	private FlexiRadioGroup _routeChoiceGroup;
+	
+	private float _choiceTextSize = 0.0f;
 	
 	private ArrayList<OnEventListener> _viewInitializedListeners = new ArrayList<OnEventListener>();
 	private ArrayList<OnEventListener> _viewLayoutCompleteListeners = new ArrayList<OnEventListener>();
@@ -35,6 +37,7 @@ public class MainPreferenceActivity extends Activity implements MainPreferenceVi
 		
 		_rootView = findViewById(R.id.rootLayout);
 		_routeChoiceGroup = (FlexiRadioGroup)findViewById(R.id.routeChoiceGroup);
+		_choiceTextSize = ((RadioButton)findViewById(R.id.routeNone)).getTextSize();
 		
 		((GuideApplication)getApplication()).getPresenterContainer().initMainPreferencePresenter(this);
 		
@@ -106,15 +109,16 @@ public class MainPreferenceActivity extends Activity implements MainPreferenceVi
 
 	private View createRouteChoice(CharSequence entry, CharSequence entryValue) {
 		RelativeLayout layout = new RelativeLayout(this);
-		//layout.setOrientation(LinearLayout.HORIZONTAL);
 		
 		RadioButton choice = new RadioButton(this);
 		choice.setText(entry);
 		choice.setTag(entryValue);
 		choice.setTextColor(0xFFFEE73F);
+		choice.setTextSize(TypedValue.COMPLEX_UNIT_PX, _choiceTextSize);
 		RelativeLayout.LayoutParams choiceLp = new RelativeLayout.LayoutParams(
 				RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
 		choiceLp.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+		choiceLp.addRule(RelativeLayout.CENTER_VERTICAL);
 		layout.addView(choice, choiceLp);
 		
 		Button showMapButton = new Button(this);
@@ -122,11 +126,13 @@ public class MainPreferenceActivity extends Activity implements MainPreferenceVi
 		showMapButton.setTag(entryValue);
 		showMapButton.setTextColor(0xFF00FF33);
 		showMapButton.setTypeface(Typeface.DEFAULT_BOLD);
+		showMapButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, _choiceTextSize);
 		showMapButton.setBackgroundColor(0x00000000);
 		showMapButton.setOnClickListener(_mapButtonOnClickListener);
 		RelativeLayout.LayoutParams showMapButtonLp = new RelativeLayout.LayoutParams(
 				RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
 		showMapButtonLp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+		showMapButtonLp.addRule(RelativeLayout.CENTER_VERTICAL);
 		layout.addView(showMapButton, showMapButtonLp);
 		
 		return layout;
