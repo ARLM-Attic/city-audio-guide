@@ -10,6 +10,8 @@ import android.os.Bundle;
 import android.app.Activity;
 import android.graphics.drawable.Drawable;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -35,6 +37,15 @@ public class RouteMapActivity extends Activity implements RouteMapView {
 		mapImage.setImageDrawable(Drawable.createFromStream(mapStream, ""));
 		mapStream.close();
 		findViewById(R.id.routeMapErrorMessage).setVisibility(View.INVISIBLE);
+		
+		View mapl = findViewById(R.id.mapContainer);
+		mapl.setMinimumWidth(mapImage.getWidth());
+		mapl.setMinimumHeight(mapImage.getHeight());
+
+		
+		View mapPointerContainer = findViewById(R.id.mapPointerContainer);
+		mapPointerContainer.setMinimumWidth(mapImage.getWidth());
+		mapPointerContainer.setMinimumHeight(mapImage.getHeight());
 	}	
 
 	@Override

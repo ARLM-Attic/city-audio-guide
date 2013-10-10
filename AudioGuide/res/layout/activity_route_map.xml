@@ -13,11 +13,31 @@
 	    <HorizontalScrollView 
 	            android:layout_width="wrap_content"
 	            android:layout_height="wrap_content">
-		    <ImageView
-		        android:id="@+id/mapImage"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"		        
-		        android:scaleType="centerCrop" />
+            <FrameLayout
+                android:id="@+id/mapContainer"
+                android:layout_width="wrap_content"
+		        android:layout_height="wrap_content">
+                <ImageView
+			        android:id="@+id/mapImage"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"		        
+			        android:scaleType="centerCrop" />
+
+   		      	<AbsoluteLayout 
+   		      	    android:id="@+id/mapPointerContainer"
+		            android:layout_width="match_parent"
+    				android:layout_height="match_parent">
+		            <ImageView
+				        android:id="@+id/mapPointerImage"
+				        android:layout_width="10dp"
+				        android:layout_height="10dp"
+				        android:layout_x="100px"
+						android:layout_y="200px"
+				        android:src="@drawable/map_pointer_drawable" />
+	            </AbsoluteLayout>
+
+            </FrameLayout>
+		    
 	
 		</HorizontalScrollView>
 	</ScrollView>

@@ -9,12 +9,16 @@ public class Route {
 	private int _id;
 	@Attribute(name="name")
 	private String _name;
-	
+	@Element(name="mapBounds", required=false)
+	private MapBounds _mapBounds;	
 	
 	public int getId() {
 		return _id;
 	}
 	public String getName() {
 		return _name;
+	}
+	public MapBounds getMapBounds() {
+		return _mapBounds;
 	}
 }
