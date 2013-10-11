@@ -26,4 +26,9 @@ public class DefaultLoggingAdapter implements Logger {
 		Log.d(_tag, message);		
 	}
 
+	@Override
+	public void logWarning(String message) {
+		Log.w(_tag, message);		
+	}
+
 }

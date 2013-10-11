@@ -7,6 +7,7 @@ import com.gerken.audioGuide.interfaces.views.*;
 import com.gerken.audioGuide.objectModel.City;
 import com.gerken.audioGuide.presenters.*;
 import com.gerken.audioGuide.services.AndroidDownscalingBitmapLoader;
+import com.gerken.audioGuide.services.AndroidLocationManagerFacade;
 import com.gerken.audioGuide.services.AndroidMediaPlayerFacade;
 import com.gerken.audioGuide.services.AndroidMediaPlayerNotifier;
 import com.gerken.audioGuide.services.Log4JAdapter;
@@ -29,6 +30,7 @@ public class PresenterContainer {
 	private ApplicationSettingsStorage _settingsStorage;
 	private DownscalingBitmapLoader _bitmapLoader;
 	private AudioPlayer _player;
+	private LocationTracker _locationTracker;
 	
 	public PresenterContainer(Context ctx, GuideApplication app){
 		_context = ctx;
@@ -38,6 +40,10 @@ public class PresenterContainer {
 		_settingsStorage = new SharedPreferenceManager(ctx);
 		_bitmapLoader = new AndroidDownscalingBitmapLoader(_assetManager);
 		_player = new AndroidMediaPlayerFacade();
+		
+		AndroidLocationManagerFacade locMgr = new AndroidLocationManagerFacade(ctx);
+		locMgr.setLogger(createLogger(AndroidLocationManagerFacade.class));
+		_locationTracker = locMgr;		
 	}
 	
 	
@@ -79,8 +85,10 @@ public class PresenterContainer {
 	}
 	
 	public void initRouteMapPresenter(RouteMapView routeMapView) {
-		_routeMapPresenter = new RouteMapPresenter(routeMapView,
-			_assetManager, createLogger(RouteMapPresenter.class));
+		_routeMapPresenter = new RouteMapPresenter(getCity(), routeMapView,
+			_assetManager);
+		_routeMapPresenter.setLocationTracker(_locationTracker);
+		_routeMapPresenter.setLogger(createLogger(RouteMapPresenter.class));
 	}
 	
 	private Logger createLogger(Class cls) {
@@ -90,6 +98,4 @@ public class PresenterContainer {
 	private City getCity() {
 		return _application.getCity();
 	}
-	
-
 }

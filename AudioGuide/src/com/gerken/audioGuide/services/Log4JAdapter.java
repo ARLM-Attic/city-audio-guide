@@ -28,4 +28,9 @@ public class Log4JAdapter implements com.gerken.audioGuide.interfaces.Logger{
 		_log.debug(message);		
 	}
 
+	@Override
+	public void logWarning(String message) {
+		_log.warn(message);		
+	}
+
 }
