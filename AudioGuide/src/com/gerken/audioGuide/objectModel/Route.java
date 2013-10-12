@@ -21,4 +21,7 @@ public class Route {
 	public MapBounds getMapBounds() {
 		return _mapBounds;
 	}
+	public void setMapBounds(MapBounds mapBounds){
+		_mapBounds = mapBounds;
+	}
 }
