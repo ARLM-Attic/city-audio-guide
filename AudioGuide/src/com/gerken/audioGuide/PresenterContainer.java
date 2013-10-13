@@ -47,27 +47,28 @@ public class PresenterContainer {
 	}
 	
 	
-	public void initSightPresenter(SightView sightView, AudioPlayerView playerView, LocationTracker locTracker){
+	public void initSightPresenter(SightView sightView, AudioPlayerView playerView){
 		_sightPresenter = new SightPresenter(getCity(), sightView, playerView);
 		_sightPresenter.setAudioPlayer(_player);
 		_sightPresenter.setAudioNotifier(new AndroidMediaPlayerNotifier(_context));
 		_sightPresenter.setBitmapLoader(_bitmapLoader);
 		_sightPresenter.setApplicationSettingsStorage(_settingsStorage);
 		_sightPresenter.setNewSightLookGotInRangeRaiser(
-				new SightLookFinderByLocation(getCity(), locTracker));
+				new SightLookFinderByLocation(getCity(), _locationTracker));
 		_sightPresenter.setPlayerPanelHidingScheduler(new SchedulerService());
 		_sightPresenter.setMediaAssetManager(_assetManager);
         //_presenter.setLogger(new DefaultLoggingAdapter("SightPresenter"));
+		_sightPresenter.setLocationTracker(_locationTracker);
 		_sightPresenter.setLogger(createLogger(SightPresenter.class));
 	}
 	
-	public void initAudioPlayerPresenter(AudioPlayerView playerView, LocationTracker locTracker){
+	public void initAudioPlayerPresenter(AudioPlayerView playerView){
 		_audioPlayerPresenter = new AudioPlayerPresenter(playerView, _player);
 		_audioPlayerPresenter.setMediaAssetManager(_assetManager);        
         _audioPlayerPresenter.setAudioUpdateScheduler(new SchedulerService());
         _audioPlayerPresenter.setAudioRewindScheduler(new SchedulerService());
         _audioPlayerPresenter.setNewSightLookGotInRangeRaiser(
-        		new SightLookFinderByLocation(getCity(), locTracker));
+        		new SightLookFinderByLocation(getCity(), _locationTracker));
         _audioPlayerPresenter.setLogger(new Log4JAdapter(AudioPlayerPresenter.class));
 	}
 	

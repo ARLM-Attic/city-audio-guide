@@ -25,6 +25,7 @@ public interface SightView {
 	void displayError(int messageResourceId);
 	
 	void addViewInitializedListener(OnEventListener listener);
+	void addViewStartedListener(OnEventListener listener);
 	void addViewLayoutCompleteListener(OnEventListener listener);
 	void addViewTouchedListener(OnEventListener listener);
 	void addViewStoppedListener(OnEventListener listener);

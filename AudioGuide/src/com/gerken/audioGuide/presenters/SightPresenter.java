@@ -21,6 +21,7 @@ public class SightPresenter {
 	private NewSightLookGotInRangeRaiser _newSightLookGotInRangeRaiser;
 	private Scheduler _playerPanelHidingScheduler;
 	private MediaAssetManager _mediaAssetManager;
+	private LocationTracker _locationTracker;
 	private Logger _logger;
 	
 	private Sight _currentSight = null;
@@ -49,6 +50,13 @@ public class SightPresenter {
 				_sightView.showHelp();
 				_prefStorage.setShowHelpAtStartup(false);			
 			}
+		}
+	};
+	
+	private OnEventListener _sightViewStartedListener = new OnEventListener() {		
+		@Override
+		public void onEvent() {
+			handleSightViewStart();	
 		}
 	};
 	
@@ -147,6 +155,7 @@ public class SightPresenter {
 		_city = city;
 		_sightView = sightView;
 		_sightView.addViewInitializedListener(_sightViewInitializedListener);
+		_sightView.addViewStartedListener(_sightViewStartedListener);
 		_sightView.addViewLayoutCompleteListener(_sightViewLayoutCompleteListener);
 		_sightView.addViewTouchedListener(_sightViewTouchedListener);
 		_sightView.addViewStoppedListener(_sightViewStoppedListener);
@@ -190,6 +199,11 @@ public class SightPresenter {
 	
 	public void setMediaAssetManager(MediaAssetManager mediaAssetManager) {
 		_mediaAssetManager = mediaAssetManager;
+	}
+	
+	public void setLocationTracker(LocationTracker tracker) {
+		_locationTracker = tracker;
+		//_locationTracker.addLocationChangedListener(_locationChangedListener);
 	}
 		
 	public void setLogger(Logger logger) {
@@ -252,6 +266,10 @@ public class SightPresenter {
 		}
 	}
 	
+	private void handleSightViewStart() {
+		_locationTracker.startTracking();
+	}
+	
 	private void handleSightViewTouch() {
 		if(isSightInRange() && !_isPlayerPanelVisible) {
 			_sightView.showPlayerPanel();
@@ -267,6 +285,7 @@ public class SightPresenter {
 	}
 	
 	private void handleSightViewStop() {
+		_locationTracker.stopTracking();
 		if(_audioPlayer.isPlaying()) {
 			_audioPlayer.pause();
 			_hasPlayerBeenPausedOnViewStop = true;
