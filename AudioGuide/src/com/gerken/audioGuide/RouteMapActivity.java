@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import com.gerken.audioGuide.interfaces.OnEventListener;
 import com.gerken.audioGuide.interfaces.views.RouteMapView;
+import com.gerken.audioGuide.util.IntentExtraManager;
 
 import android.os.Bundle;
 import android.app.Activity;
@@ -18,6 +19,7 @@ import android.widget.TextView;
 
 public class RouteMapActivity extends Activity implements RouteMapView {
 	private ImageView _mapImage;
+	private IntentExtraManager _intentExtraManager;
 	
 	private ArrayList<OnEventListener> _viewInitializedListeners = new ArrayList<OnEventListener>();
 	private ArrayList<OnEventListener> _viewStartedListeners = new ArrayList<OnEventListener>();
@@ -29,6 +31,7 @@ public class RouteMapActivity extends Activity implements RouteMapView {
 		setContentView(R.layout.activity_route_map);
 		
 		_mapImage = (ImageView)findViewById(R.id.mapImage);
+		_intentExtraManager = new IntentExtraManager(getIntent());
 		
 		((GuideApplication)getApplication()).getPresenterContainer().initRouteMapPresenter(this);
 		
@@ -109,6 +112,11 @@ public class RouteMapActivity extends Activity implements RouteMapView {
 		pointerLp.y = y;
 		//pointerLp.setMargins(100, 200, pointerLp.rightMargin, pointerLp.bottomMargin);
 		mapPointer.setLayoutParams(pointerLp);		
+	}
+
+	@Override
+	public int getRouteId() {
+		return _intentExtraManager.getRouteId();
 	}
 
 }

@@ -7,7 +7,7 @@ import com.gerken.audioGuide.interfaces.OnEventListener;
 import android.content.Intent;
 
 public interface RouteMapView {
-	Intent getIntent();
+	int getRouteId();
 	
 	int getMapWidth();
 	int getMapHeight();

@@ -12,7 +12,6 @@ import com.gerken.audioGuide.interfaces.views.RouteMapView;
 import com.gerken.audioGuide.objectModel.City;
 import com.gerken.audioGuide.objectModel.MapBounds;
 import com.gerken.audioGuide.objectModel.Route;
-import com.gerken.audioGuide.util.IntentExtraManager;
 
 public class RouteMapPresenter {
 	private City _city; 
@@ -70,7 +69,7 @@ public class RouteMapPresenter {
 	}
 	
 	private void handleViewInitialized() {
-		int routeId = new IntentExtraManager(_view.getIntent()).getRouteId();
+		int routeId = _view.getRouteId();
 		_currentRoute = getCurrentRoute(routeId);
 		String assetName = String.format("rt_%d.png", routeId);		
 		
