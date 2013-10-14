@@ -18,26 +18,29 @@ public class HandleLocationChanged {
 	
 	@Test
 	public void Given_NewLocationIsOnMap__Then_MapPointerUpdated() {
-		final double MAP_NORTH = 22.0;
-		final double MAP_WEST = 14.0;
-		final double MAP_SOUTH = 28.0;
+		final double MAP_NORTH = 26.0;
+		final double MAP_WEST = 12.0;
+		final double MAP_SOUTH = 22.0;
 		final double MAP_EAST = 16.0;
 		
-		final double NEW_LATITUDE = 15.0;
-		final double NEW_LONGITUDE = 26.0;
+		final double NEW_LATITUDE = 25.0;
+		final double NEW_LONGITUDE = 13.0;
 		
 		final int MAP_WIDTH = 400;
 		final int MAP_HEIGHT = 200;
 		
-		final int EXP_MAP_POINTER_X = 200;
-		final int EXP_MAP_POINTER_Y = 100;
+		final int EXP_MAP_POINTER_X = 100;
+		final int EXP_MAP_POINTER_Y = 50;
+		
+		final int ROUTE_ID = 42;
 		
 		MapBounds bounds = new MapBounds(MAP_NORTH, MAP_WEST, MAP_SOUTH, MAP_EAST);
-		City city = createSingleRouteCity(bounds);
+		City city = createSingleRouteCity(ROUTE_ID, bounds);
 		
 		RouteMapView view = mock(RouteMapView.class);
 		when(view.getMapHeight()).thenReturn(MAP_HEIGHT);
 		when(view.getMapWidth()).thenReturn(MAP_WIDTH);
+		when(view.getRouteId()).thenReturn(ROUTE_ID);
 		LocationTracker tracker = mock(LocationTracker.class);
 		
 		SutSetupResult sutSetupResult = setupSut(city, view, tracker);
@@ -58,6 +61,7 @@ public class HandleLocationChanged {
 		
 		
 		RouteMapPresenter sut = new RouteMapPresenter(city, view, mock(MediaAssetManager.class));
+		sut.setLocationTracker(tracker);
 		
 		result.sut = sut;
 		result.locationChangedListener = locationChangedListenerCaptor.getValue();
@@ -70,9 +74,9 @@ public class HandleLocationChanged {
 		public OnLocationChangedListener locationChangedListener;
 	}
 	
-	private City createSingleRouteCity(MapBounds routeMapBounds) {
+	private City createSingleRouteCity(int routeId, MapBounds routeMapBounds) {
 		City city = new City();
-		Route route = new Route();
+		Route route = new Route(routeId, "whatever");
 		route.setMapBounds(routeMapBounds);
 		city.getRoutes().add(route);
 		
