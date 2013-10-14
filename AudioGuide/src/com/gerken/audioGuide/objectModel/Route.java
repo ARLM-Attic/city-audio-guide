@@ -10,7 +10,15 @@ public class Route {
 	@Attribute(name="name")
 	private String _name;
 	@Element(name="mapBounds", required=false)
-	private MapBounds _mapBounds;	
+	private MapBounds _mapBounds;
+	
+	public Route() {		
+	}
+	
+	public Route(int id, String name) {
+		_id=id;
+		_name=name;
+	}
 	
 	public int getId() {
 		return _id;

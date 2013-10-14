@@ -21,7 +21,9 @@ public class City {
 	@ElementList(name="routes")
 	private List<Route> _routes;
 	
-	public City() {		
+	public City() {	
+		_sights = new ArrayList<Sight>();
+		_routes = new ArrayList<Route>();
 	}
 	
 	public City(int id, String name, String outOfRangeImageName) {
