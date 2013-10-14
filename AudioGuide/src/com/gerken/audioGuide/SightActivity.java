@@ -30,9 +30,6 @@ public class SightActivity extends Activity implements SightView {
 	private AudioPlayerControl _audioPlayerControl;
 	
 	private RouteArrowsView _nextSightPointerArrow;
-	
-	private AndroidLocationManagerFacade _locationManager;
-	
 	private Bitmap _backgroundBitmap;
 	
 	private Handler _handler;
@@ -41,6 +38,7 @@ public class SightActivity extends Activity implements SightView {
 	
 	private ArrayList<OnEventListener> _viewInitializedListeners = new ArrayList<OnEventListener>();
 	private ArrayList<OnEventListener> _viewLayoutCompleteListeners = new ArrayList<OnEventListener>();
+	private ArrayList<OnEventListener> _viewStartedListeners = new ArrayList<OnEventListener>();
 	private ArrayList<OnEventListener> _viewTouchedListeners = new ArrayList<OnEventListener>();
 	private ArrayList<OnEventListener> _viewStoppedListeners = new ArrayList<OnEventListener>();
 	private ArrayList<OnEventListener> _viewDestroyedListeners = new ArrayList<OnEventListener>();
@@ -60,7 +58,9 @@ public class SightActivity extends Activity implements SightView {
         _playerInfoPanel = findControl(R.id.playerInfoPanel);
         _audioPlayerControl = findControl(R.id.playerPanel);
         
-        setupDependencies();
+        GuideApplication app = (GuideApplication)getApplication();
+        app.getPresenterContainer().initSightPresenter(this, _audioPlayerControl);
+        app.getPresenterContainer().initAudioPlayerPresenter(_audioPlayerControl); 
         
         _playerPanelHeight = calculatePlayerPanelHeight();
         playPlayerPanelHidingAnimation(1);
@@ -78,17 +78,7 @@ public class SightActivity extends Activity implements SightView {
         for(OnEventListener l : _viewInitializedListeners)
         	l.onEvent();
     }
-    
-    private void setupDependencies() {
-    	Context ctx = getApplicationContext();
-        _locationManager = new AndroidLocationManagerFacade(ctx); 
-        _locationManager.setLogger(new Log4JAdapter(AndroidLocationManagerFacade.class));
-        
-        GuideApplication app = (GuideApplication)getApplication();
-        app.getPresenterContainer().initSightPresenter(this, _audioPlayerControl, _locationManager);
-        app.getPresenterContainer().initAudioPlayerPresenter(_audioPlayerControl, _locationManager);  
-    }
-    
+
     private float calculatePlayerPanelHeight() {
         //Display display = getWindowManager().getDefaultDisplay(); 
         //int height = display.getHeight();
@@ -103,13 +93,13 @@ public class SightActivity extends Activity implements SightView {
     @Override
     protected void onStart() {
     	super.onStart();
-    	_locationManager.startTracking();
+    	for(OnEventListener l : _viewStartedListeners)
+        	l.onEvent();
     }
     
     @Override
     protected void onStop() {
     	super.onStop();
-    	_locationManager.stopTracking();
     	for(OnEventListener l : _viewStoppedListeners)
         	l.onEvent();
     }
@@ -259,6 +249,11 @@ public class SightActivity extends Activity implements SightView {
 	}
 
 	@Override
+	public void addViewStartedListener(OnEventListener listener) {
+		_viewStartedListeners.add(listener);		
+	}
+
+	@Override
 	public void addViewTouchedListener(OnEventListener listener) {
 		_viewTouchedListeners.add(listener);		
 	}
@@ -309,5 +304,4 @@ public class SightActivity extends Activity implements SightView {
 			}, 
 			500L
 		);
-
 }
