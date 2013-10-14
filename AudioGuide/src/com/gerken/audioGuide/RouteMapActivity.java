@@ -65,8 +65,6 @@ public class RouteMapActivity extends Activity implements RouteMapView {
 		View mapPointerContainer = findViewById(R.id.mapPointerContainer);
 		mapPointerContainer.setMinimumWidth(_mapImage.getWidth());
 		mapPointerContainer.setMinimumHeight(_mapImage.getHeight());
-		
-		setLocationPointerPosition(100, 200);
 	}	
 
 	@Override
@@ -103,13 +101,19 @@ public class RouteMapActivity extends Activity implements RouteMapView {
 	}
 
 	@Override
-	public void setLocationPointerPosition(int x, int y) {
+	public void showLocationPointerAt(int x, int y) {
 		View mapPointer = findViewById(R.id.mapPointerImage);
 		AbsoluteLayout.LayoutParams pointerLp = (AbsoluteLayout.LayoutParams)mapPointer.getLayoutParams();
 		pointerLp.x = x;
 		pointerLp.y = y;
 		//pointerLp.setMargins(100, 200, pointerLp.rightMargin, pointerLp.bottomMargin);
-		mapPointer.setLayoutParams(pointerLp);		
+		mapPointer.setLayoutParams(pointerLp);
+		mapPointer.setVisibility(View.VISIBLE);
+	}
+
+	@Override
+	public void hideLocationPointer() {
+		findViewById(R.id.mapPointerImage).setVisibility(View.INVISIBLE);		
 	}
 
 	@Override

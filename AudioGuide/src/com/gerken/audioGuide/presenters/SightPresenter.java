@@ -267,7 +267,8 @@ public class SightPresenter {
 	}
 	
 	private void handleSightViewStart() {
-		_locationTracker.startTracking();
+		if(_locationTracker != null)
+			_locationTracker.startTracking();
 	}
 	
 	private void handleSightViewTouch() {
@@ -285,7 +286,9 @@ public class SightPresenter {
 	}
 	
 	private void handleSightViewStop() {
-		_locationTracker.stopTracking();
+		if(_locationTracker != null)
+			_locationTracker.stopTracking();
+		
 		if(_audioPlayer.isPlaying()) {
 			_audioPlayer.pause();
 			_hasPlayerBeenPausedOnViewStop = true;

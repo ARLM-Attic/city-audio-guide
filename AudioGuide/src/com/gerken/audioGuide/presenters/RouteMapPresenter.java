@@ -109,7 +109,10 @@ public class RouteMapPresenter {
 			(bounds.getNorth() - latitude) / (bounds.getNorth() - bounds.getSouth())
 		);
 		
-		_view.setLocationPointerPosition(dx, dy);
+		if(dx >= 0 && dx < _view.getMapWidth() && dy >=0 && dy < _view.getMapHeight())
+			_view.showLocationPointerAt(dx, dy);
+		else
+			_view.hideLocationPointer();
 	}
 	
 	private Route getCurrentRoute() {

@@ -9,7 +9,9 @@ public interface RouteMapView {
 	
 	int getMapWidth();
 	int getMapHeight();
-	void setLocationPointerPosition(int x, int y);
+	
+	void showLocationPointerAt(int x, int y);
+	void hideLocationPointer();
 	
 	void displayMap(InputStream mapStream) throws Exception;
 	void displayError(int messageResourceId);
