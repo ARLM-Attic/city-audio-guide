@@ -69,8 +69,7 @@ public class RouteMapPresenter {
 	}
 	
 	private void handleViewInitialized() {
-		int routeId = _view.getRouteId();
-		_currentRoute = getCurrentRoute(routeId);
+		int routeId = getCurrentRoute().getId();
 		String assetName = String.format("rt_%d.png", routeId);		
 		
 		InputStream str;
@@ -94,23 +93,30 @@ public class RouteMapPresenter {
 	}
 
 	private void handleLocationChanged(double latitude, double longitude) {
-		MapBounds bounds = _currentRoute.getMapBounds();
+		Route currentRoute = getCurrentRoute();
+		MapBounds bounds = currentRoute.getMapBounds();
 		if(bounds == null)
 			return;
 		if(bounds.getEast() <= bounds.getWest())
-			logWarning("East <= West bound for the route " + _currentRoute.getName());
+			logWarning("East <= West bound for the route " + currentRoute.getName());
 		if(bounds.getNorth() <= bounds.getSouth())
-			logWarning("North <= South bound for the route " + _currentRoute.getName());
+			logWarning("North <= South bound for the route " + currentRoute.getName());
 		
-		int dx = (int)((longitude - bounds.getWest()) / (bounds.getEast() - bounds.getWest())
-				* (double)_view.getMapWidth());
-		int dy = (int)((latitude - bounds.getSouth()) / (bounds.getNorth() - bounds.getSouth())
-				* (double)_view.getMapHeight());
+		int dx = (int)( (double)_view.getMapWidth() * 
+			(longitude - bounds.getWest()) / (bounds.getEast() - bounds.getWest()) 
+		);
+		int dy = (int)( (double)_view.getMapHeight() *
+			(bounds.getNorth() - latitude) / (bounds.getNorth() - bounds.getSouth())
+		);
 		
 		_view.setLocationPointerPosition(dx, dy);
 	}
 	
-	private Route getCurrentRoute(int routeId) {
+	private Route getCurrentRoute() {
+		if(_currentRoute != null)
+			return _currentRoute;
+		
+		int routeId = _view.getRouteId();
 		for(Route r : _city.getRoutes()) {
 			if(r.getId() == routeId)
 				return r;
