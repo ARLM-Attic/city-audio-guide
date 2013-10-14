@@ -4,8 +4,6 @@ import java.io.InputStream;
 
 import com.gerken.audioGuide.interfaces.OnEventListener;
 
-import android.content.Intent;
-
 public interface RouteMapView {
 	int getRouteId();
 	
