@@ -11,9 +11,7 @@ import android.os.Bundle;
 import android.app.Activity;
 import android.graphics.drawable.Drawable;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AbsoluteLayout;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
