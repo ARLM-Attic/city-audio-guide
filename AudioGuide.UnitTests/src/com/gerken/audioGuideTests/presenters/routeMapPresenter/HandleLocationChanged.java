@@ -26,10 +26,10 @@ public class HandleLocationChanged {
 		final double NEW_LATITUDE = 15.0;
 		final double NEW_LONGITUDE = 26.0;
 		
-		final int MAP_WIDTH = 300;
+		final int MAP_WIDTH = 400;
 		final int MAP_HEIGHT = 200;
 		
-		final int EXP_MAP_POINTER_X = 150;
+		final int EXP_MAP_POINTER_X = 200;
 		final int EXP_MAP_POINTER_Y = 100;
 		
 		MapBounds bounds = new MapBounds(MAP_NORTH, MAP_WEST, MAP_SOUTH, MAP_EAST);
