@@ -160,12 +160,12 @@ public class SightActivity extends Activity implements SightView {
 	*/
 
 	@Override
-	public int getWidth() {
+	public Integer getWidth() {
 		return _rootView.getWidth();
 	}
 
 	@Override
-	public int getHeight() {
+	public Integer getHeight() {
 		return _rootView.getHeight();
 	}
 	

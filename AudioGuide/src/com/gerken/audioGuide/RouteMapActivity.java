@@ -1,55 +1,37 @@
 package com.gerken.audioGuide;
 
 import java.io.InputStream;
-import java.util.ArrayList;
 
-import com.gerken.audioGuide.interfaces.OnEventListener;
 import com.gerken.audioGuide.interfaces.views.RouteMapView;
 import com.gerken.audioGuide.util.IntentExtraManager;
 
 import android.os.Bundle;
-import android.app.Activity;
 import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.widget.AbsoluteLayout;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
-public class RouteMapActivity extends Activity implements RouteMapView {
+public class RouteMapActivity extends BasicGuideActivity implements RouteMapView {
+	private View _rootView;	
 	private ImageView _mapImage;
-	private IntentExtraManager _intentExtraManager;
-	
-	private ArrayList<OnEventListener> _viewInitializedListeners = new ArrayList<OnEventListener>();
-	private ArrayList<OnEventListener> _viewStartedListeners = new ArrayList<OnEventListener>();
-	private ArrayList<OnEventListener> _viewStoppedListeners = new ArrayList<OnEventListener>();
+	private IntentExtraManager _intentExtraManager;	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_route_map);
 		
+		_rootView = findViewById(R.id.rootLayout);
 		_mapImage = (ImageView)findViewById(R.id.mapImage);
 		_intentExtraManager = new IntentExtraManager(getIntent());
 		
 		((GuideApplication)getApplication()).getPresenterContainer().initRouteMapPresenter(this);
 		
-		for(OnEventListener l : _viewInitializedListeners)
-        	l.onEvent();
+		onInitialized();
 	}
-	
-	@Override
-    protected void onStart() {
-    	super.onStart();
-    	for(OnEventListener l : _viewStartedListeners)
-        	l.onEvent();
-    }
-	
-	@Override
-    protected void onStop() {
-    	super.onStop();
-    	for(OnEventListener l : _viewStoppedListeners)
-        	l.onEvent();
-    }
 
 	@Override
 	public void displayMap(InputStream mapStream) throws Exception {	
@@ -73,22 +55,7 @@ public class RouteMapActivity extends Activity implements RouteMapView {
 		
 		((TextView)findViewById(R.id.routeMapErrorMessage)).setText(
 				getString(messageResourceId));		
-	}
-	
-	@Override
-	public void addViewInitializedListener(OnEventListener listener) {
-		_viewInitializedListeners.add(listener);
-	}
-
-	@Override
-	public void addViewStartedListener(OnEventListener listener) {
-		_viewStartedListeners.add(listener);
-	}
-
-	@Override
-	public void addViewStoppedListener(OnEventListener listener) {
-		_viewStoppedListeners.add(listener);
-	}
+	}	
 	
 	@Override
 	public int getMapWidth() {
@@ -119,6 +86,20 @@ public class RouteMapActivity extends Activity implements RouteMapView {
 	@Override
 	public int getRouteId() {
 		return _intentExtraManager.getRouteId();
+	}
+
+	@Override
+	public void scrollTo(int x, int y) {
+		HorizontalScrollView hscroller = (HorizontalScrollView)findViewById(R.id.routeMapHorizontalScroller);
+		hscroller.scrollTo(x, y);
+		
+		ScrollView vscroller = (ScrollView)findViewById(R.id.routeMapMainView);
+		vscroller.scrollTo(x, y);
+	}
+
+	@Override
+	protected View getRootView() {
+		return _rootView;
 	}
 
 }

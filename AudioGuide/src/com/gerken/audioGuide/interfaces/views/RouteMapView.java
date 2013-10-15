@@ -4,7 +4,7 @@ import java.io.InputStream;
 
 import com.gerken.audioGuide.interfaces.OnEventListener;
 
-public interface RouteMapView {
+public interface RouteMapView extends Measurable<Integer> {
 	int getRouteId();
 	
 	int getMapWidth();
@@ -12,6 +12,7 @@ public interface RouteMapView {
 	
 	void showLocationPointerAt(int x, int y);
 	void hideLocationPointer();
+	void scrollTo(int x, int y);
 	
 	void displayMap(InputStream mapStream) throws Exception;
 	void displayError(int messageResourceId);

@@ -109,10 +109,17 @@ public class RouteMapPresenter {
 			(bounds.getNorth() - latitude) / (bounds.getNorth() - bounds.getSouth())
 		);
 		
-		if(dx >= 0 && dx < _view.getMapWidth() && dy >=0 && dy < _view.getMapHeight())
+		if(dx >= 0 && dx < _view.getMapWidth() && dy >=0 && dy < _view.getMapHeight()){
 			_view.showLocationPointerAt(dx, dy);
+			scrollTo(dx, dy);
+		}
 		else
 			_view.hideLocationPointer();
+	}
+	
+	private void scrollTo(int dx, int dy) {
+		int sx = dx - _view.getWidth()/2;
+		_view.scrollTo(sx, dy);
 	}
 	
 	private Route getCurrentRoute() {

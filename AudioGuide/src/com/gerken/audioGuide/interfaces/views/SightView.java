@@ -3,9 +3,7 @@ package com.gerken.audioGuide.interfaces.views;
 import com.gerken.audioGuide.interfaces.BitmapContainer;
 import com.gerken.audioGuide.interfaces.OnEventListener;
 
-public interface SightView {
-	int getWidth();
-	int getHeight();
+public interface SightView extends Measurable<Integer> {
 	
 	void resetInfoPanelCaptionText();
 	void setInfoPanelCaptionText(String text);
