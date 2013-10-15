@@ -57,7 +57,6 @@ public class PresenterContainer {
 				new SightLookFinderByLocation(getCity(), _locationTracker));
 		_sightPresenter.setPlayerPanelHidingScheduler(new SchedulerService());
 		_sightPresenter.setMediaAssetManager(_assetManager);
-        //_presenter.setLogger(new DefaultLoggingAdapter("SightPresenter"));
 		_sightPresenter.setLocationTracker(_locationTracker);
 		_sightPresenter.setLogger(createLogger(SightPresenter.class));
 	}
@@ -93,6 +92,7 @@ public class PresenterContainer {
 	}
 	
 	private Logger createLogger(Class cls) {
+        //return new DefaultLoggingAdapter(cls.getName());
 		return new Log4JAdapter(cls);
 	}
 	
