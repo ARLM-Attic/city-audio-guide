@@ -21,6 +21,7 @@ public class RouteMapPresenter {
 	private Logger _logger;
 	
 	private Route _currentRoute;
+	private boolean _isSctollingToCurrentLocationDone = false;
 	
 	private OnEventListener _viewInitializedListener = new OnEventListener() {		
 		@Override
@@ -85,7 +86,8 @@ public class RouteMapPresenter {
 	}
 
 	protected void handleViewStarted() {
-		_locationTracker.startTracking();		
+		_locationTracker.startTracking();
+		_isSctollingToCurrentLocationDone = false;
 	}
 
 	protected void handleViewStopped() {
@@ -111,15 +113,19 @@ public class RouteMapPresenter {
 		
 		if(dx >= 0 && dx < _view.getMapWidth() && dy >=0 && dy < _view.getMapHeight()){
 			_view.showLocationPointerAt(dx, dy);
-			scrollTo(dx, dy);
+			if(!_isSctollingToCurrentLocationDone) {
+				scrollTo(dx, dy);
+				_isSctollingToCurrentLocationDone = true;
+			}
 		}
 		else
 			_view.hideLocationPointer();
 	}
 	
 	private void scrollTo(int dx, int dy) {
-		int sx = dx - _view.getWidth()/2;
-		_view.scrollTo(sx, dy);
+		int sx = Math.max(0, dx - _view.getWidth()/2);
+		int sy = Math.max(0, dy - _view.getHeight()/2);
+		_view.scrollTo(sx, sy);
 	}
 	
 	private Route getCurrentRoute() {
