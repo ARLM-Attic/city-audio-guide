@@ -7,8 +7,10 @@ import com.gerken.audioGuide.interfaces.views.Measurable;
 
 import android.app.Activity;
 import android.view.View;
+import android.view.ViewTreeObserver;
 
 public abstract class BasicGuideActivity extends Activity implements Measurable<Integer> {
+	private ArrayList<OnEventListener> _viewLayoutCompleteListeners = new ArrayList<OnEventListener>();
 	private ArrayList<OnEventListener> _viewInitializedListeners = new ArrayList<OnEventListener>();
 	private ArrayList<OnEventListener> _viewStartedListeners = new ArrayList<OnEventListener>();
 	private ArrayList<OnEventListener> _viewStoppedListeners = new ArrayList<OnEventListener>();
@@ -16,6 +18,15 @@ public abstract class BasicGuideActivity extends Activity implements Measurable<
 	protected abstract View getRootView();	
 
 	protected void onInitialized() {
+		getRootView().getViewTreeObserver().addOnGlobalLayoutListener(
+			    new ViewTreeObserver.OnGlobalLayoutListener() {
+			    	public void onGlobalLayout() {
+			    		for(OnEventListener l : _viewLayoutCompleteListeners)
+			            	l.onEvent();
+			    	}
+			    }
+		    );
+		
 		for(OnEventListener l : _viewInitializedListeners)
         	l.onEvent();
 	}
@@ -34,6 +45,11 @@ public abstract class BasicGuideActivity extends Activity implements Measurable<
         	l.onEvent();
     }
 	
+	protected <T> T findControl(int controlId) {
+    	T control = (T)findViewById(controlId);
+    	return control;
+    }
+	
 	@Override
 	public Integer getWidth() {
 		return getRootView().getWidth();
@@ -46,6 +62,10 @@ public abstract class BasicGuideActivity extends Activity implements Measurable<
 	
 	public void addViewInitializedListener(OnEventListener listener) {
 		_viewInitializedListeners.add(listener);
+	}
+	
+	public void addViewLayoutCompleteListener(OnEventListener listener) {
+		_viewLayoutCompleteListeners.add(listener);
 	}
 
 	public void addViewStartedListener(OnEventListener listener) {

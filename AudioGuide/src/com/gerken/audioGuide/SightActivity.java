@@ -9,21 +9,18 @@ import com.gerken.audioGuide.graphics.*;
 import com.gerken.audioGuide.interfaces.BitmapContainer;
 import com.gerken.audioGuide.interfaces.OnEventListener;
 import com.gerken.audioGuide.interfaces.views.SightView;
-import com.gerken.audioGuide.services.*;
 
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.view.*;
 import android.view.View.OnClickListener;
 import android.view.animation.TranslateAnimation;
 import android.widget.*;
 
-public class SightActivity extends Activity implements SightView {
+public class SightActivity extends BasicGuideActivity implements SightView {
 	
 	private View _rootView;
 	private View _playerInfoPanel;
@@ -36,11 +33,7 @@ public class SightActivity extends Activity implements SightView {
 	
 	private float _playerPanelHeight = 0.0f;
 	
-	private ArrayList<OnEventListener> _viewInitializedListeners = new ArrayList<OnEventListener>();
-	private ArrayList<OnEventListener> _viewLayoutCompleteListeners = new ArrayList<OnEventListener>();
-	private ArrayList<OnEventListener> _viewStartedListeners = new ArrayList<OnEventListener>();
 	private ArrayList<OnEventListener> _viewTouchedListeners = new ArrayList<OnEventListener>();
-	private ArrayList<OnEventListener> _viewStoppedListeners = new ArrayList<OnEventListener>();
 	private ArrayList<OnEventListener> _viewDestroyedListeners = new ArrayList<OnEventListener>();
 	private ArrayList<OnEventListener> _viewRestartedListeners = new ArrayList<OnEventListener>();
 
@@ -64,19 +57,9 @@ public class SightActivity extends Activity implements SightView {
         
         _playerPanelHeight = calculatePlayerPanelHeight();
         playPlayerPanelHidingAnimation(1);
-        setPlayerButtonsClickable(false);
+        setPlayerButtonsClickable(false);       
         
-        _rootView.getViewTreeObserver().addOnGlobalLayoutListener(
-		    new ViewTreeObserver.OnGlobalLayoutListener() {
-		    	public void onGlobalLayout() {
-		    		for(OnEventListener l : _viewLayoutCompleteListeners)
-		            	l.onEvent();
-		    	}
-		    }
-	    );
-        
-        for(OnEventListener l : _viewInitializedListeners)
-        	l.onEvent();
+        onInitialized();
     }
 
     private float calculatePlayerPanelHeight() {
@@ -90,19 +73,6 @@ public class SightActivity extends Activity implements SightView {
         return playerInfoPanelLp.height-sightCaptionFrameLp.height;
     }
     
-    @Override
-    protected void onStart() {
-    	super.onStart();
-    	for(OnEventListener l : _viewStartedListeners)
-        	l.onEvent();
-    }
-    
-    @Override
-    protected void onStop() {
-    	super.onStop();
-    	for(OnEventListener l : _viewStoppedListeners)
-        	l.onEvent();
-    }
 
     @Override
     protected void onDestroy() {
@@ -140,10 +110,6 @@ public class SightActivity extends Activity implements SightView {
     	return super.onOptionsItemSelected(item);
     }
     
-    private <T> T findControl(int controlId) {
-    	T control = (T)findViewById(controlId);
-    	return control;
-    }
 
 	/*
 	public void acceptNewSightGotInRange(String sightName, InputStream imageStream) throws Exception {
@@ -158,16 +124,6 @@ public class SightActivity extends Activity implements SightView {
 		_nextSightPointerArrow.setVisibility(View.INVISIBLE);
 	}
 	*/
-
-	@Override
-	public Integer getWidth() {
-		return _rootView.getWidth();
-	}
-
-	@Override
-	public Integer getHeight() {
-		return _rootView.getHeight();
-	}
 	
 	@Override
 	public void resetInfoPanelCaptionText() {
@@ -239,28 +195,8 @@ public class SightActivity extends Activity implements SightView {
 	}
 
 	@Override
-	public void addViewInitializedListener(OnEventListener listener) {
-		_viewInitializedListeners.add(listener);
-	}
-	
-	@Override
-	public void addViewLayoutCompleteListener(OnEventListener listener) {
-		_viewLayoutCompleteListeners.add(listener);
-	}
-
-	@Override
-	public void addViewStartedListener(OnEventListener listener) {
-		_viewStartedListeners.add(listener);		
-	}
-
-	@Override
 	public void addViewTouchedListener(OnEventListener listener) {
 		_viewTouchedListeners.add(listener);		
-	}
-	
-	@Override
-	public void addViewStoppedListener(OnEventListener listener) {
-		_viewStoppedListeners.add(listener);		
 	}
 	
 	@Override
@@ -271,6 +207,11 @@ public class SightActivity extends Activity implements SightView {
 	@Override
 	public void addViewRestartedListener(OnEventListener listener) {
 		_viewRestartedListeners.add(listener);		
+	}
+	
+	@Override
+	protected View getRootView() {
+		return _rootView;
 	}
 
 	private void playPlayerPanelHidingAnimation(long duration) {

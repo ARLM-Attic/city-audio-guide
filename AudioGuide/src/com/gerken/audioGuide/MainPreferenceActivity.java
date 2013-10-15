@@ -8,26 +8,21 @@ import com.gerken.audioGuide.interfaces.OnEventListener;
 import com.gerken.audioGuide.interfaces.views.MainPreferenceView;
 import com.gerken.audioGuide.util.IntentExtraManager;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.View;
-import android.view.ViewTreeObserver;
 import android.view.View.OnClickListener;
 import android.widget.*;
 
-
-public class MainPreferenceActivity extends Activity implements MainPreferenceView {
+public class MainPreferenceActivity extends BasicGuideActivity implements MainPreferenceView {
 	private View _rootView;	
 	private FlexiRadioGroup _routeChoiceGroup;
 	
 	private float _choiceTextSize = 0.0f;
 	
-	private ArrayList<OnEventListener> _viewInitializedListeners = new ArrayList<OnEventListener>();
-	private ArrayList<OnEventListener> _viewLayoutCompleteListeners = new ArrayList<OnEventListener>();
 	private ArrayList<OnEventListener> _okButtonPressedListeners = new ArrayList<OnEventListener>();
 	
 	@Override
@@ -43,18 +38,7 @@ public class MainPreferenceActivity extends Activity implements MainPreferenceVi
 		
 		findViewById(R.id.buttonOk).setOnClickListener(_okButtonOnClickListener);
 		findViewById(R.id.buttonCancel).setOnClickListener(_cancelButtonOnClickListener);	
-		
-		_rootView.getViewTreeObserver().addOnGlobalLayoutListener(
-			    new ViewTreeObserver.OnGlobalLayoutListener() {
-			    	public void onGlobalLayout() {
-			    		for(OnEventListener l : _viewLayoutCompleteListeners)
-			            	l.onEvent();
-			    	}
-			    }
-	    );
-		
-		for(OnEventListener l : _viewInitializedListeners)
-        	l.onEvent();
+		onInitialized();
 	}
 
 	@Override
@@ -83,28 +67,13 @@ public class MainPreferenceActivity extends Activity implements MainPreferenceVi
 	}
 
 	@Override
-	public Integer getWidth() {
-		return _rootView.getWidth();
-	}
-
-	@Override
-	public Integer getHeight() {
-		return _rootView.getHeight();
+	public void addOkButtonPressedListener(OnEventListener listener) {
+		_okButtonPressedListeners.add(listener);		
 	}
 	
 	@Override
-	public void addViewInitializedListener(OnEventListener listener) {
-		_viewInitializedListeners.add(listener);		
-	}
-
-	@Override
-	public void addViewLayoutCompleteListener(OnEventListener listener) {
-		_viewLayoutCompleteListeners.add(listener);		
-	}
-
-	@Override
-	public void addOkButtonPressedListener(OnEventListener listener) {
-		_okButtonPressedListeners.add(listener);		
+	protected View getRootView() {
+		return _rootView;
 	}
 
 	private View createRouteChoice(CharSequence entry, CharSequence entryValue) {
