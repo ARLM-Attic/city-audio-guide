@@ -1,6 +1,7 @@
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -11,6 +12,7 @@
     	android:layout_height="match_parent">
 
 	    <HorizontalScrollView 
+	        android:id="@+id/routeMapHorizontalScroller"
 	            android:layout_width="wrap_content"
 	            android:layout_height="wrap_content">
             <FrameLayout
@@ -31,8 +33,7 @@
 				        android:id="@+id/mapPointerImage"
 				        android:layout_width="10dp"
 				        android:layout_height="10dp"
-				        android:layout_x="100px"
-						android:layout_y="200px"
+				        android:visibility="invisible"
 				        android:src="@drawable/map_pointer_drawable" />
 	            </AbsoluteLayout>
 
