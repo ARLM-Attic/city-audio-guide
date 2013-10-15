@@ -21,14 +21,14 @@
 	    android:id="@+id/playerInfoPanel"
 	    android:orientation="vertical"
 	    android:layout_width="match_parent"
-	    android:layout_height="132dp"
+	    android:layout_height="160dp"
 	    android:layout_gravity="bottom"	   
 	     >
 	    <LinearLayout
 	        android:id="@+id/sightCaptionFrame"
 		    android:orientation="vertical"
 		    android:layout_width="match_parent"
-		    android:layout_height="24dp"
+		    android:layout_height="32dp"
 		    android:layout_gravity="bottom"
 		    android:background="@drawable/sight_caption_background" >
 	        <TextView
@@ -38,14 +38,14 @@
 		        android:layout_gravity="center"
 		        android:textColor="#FFFFE633"
 		        android:textStyle="bold"
-		        android:textSize="16sp"
+		        android:textSize="20sp"
 		        android:text="@string/sight_info_none"  />
         </LinearLayout>
         
 	    <com.gerken.audioGuide.controls.AudioPlayerControl
 	        android:id="@+id/playerPanel"
 		    android:layout_width="match_parent"
-		    android:layout_height="108dp"
+		    android:layout_height="128dp"
 		    android:layout_gravity="center"
 		     />
 
