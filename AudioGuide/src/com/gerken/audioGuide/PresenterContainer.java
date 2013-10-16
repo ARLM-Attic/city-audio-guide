@@ -30,7 +30,7 @@ public class PresenterContainer {
 	private ApplicationSettingsStorage _settingsStorage;
 	private DownscalingBitmapLoader _bitmapLoader;
 	private AudioPlayer _player;
-	private LocationTracker _locationTracker;
+	private LocationTracker _defaultLocationTracker;
 	
 	public PresenterContainer(Context ctx, GuideApplication app){
 		_context = ctx;
@@ -40,10 +40,8 @@ public class PresenterContainer {
 		_settingsStorage = new SharedPreferenceManager(ctx);
 		_bitmapLoader = new AndroidDownscalingBitmapLoader(_assetManager);
 		_player = new AndroidMediaPlayerFacade();
-		
-		AndroidLocationManagerFacade locMgr = new AndroidLocationManagerFacade(ctx);
-		locMgr.setLogger(createLogger(AndroidLocationManagerFacade.class));
-		_locationTracker = locMgr;		
+
+		_defaultLocationTracker = createLocationTracker();
 	}
 	
 	
@@ -54,10 +52,10 @@ public class PresenterContainer {
 		_sightPresenter.setBitmapLoader(_bitmapLoader);
 		_sightPresenter.setApplicationSettingsStorage(_settingsStorage);
 		_sightPresenter.setNewSightLookGotInRangeRaiser(
-				new SightLookFinderByLocation(getCity(), _locationTracker));
+				new SightLookFinderByLocation(getCity(), _defaultLocationTracker));
 		_sightPresenter.setPlayerPanelHidingScheduler(new SchedulerService());
 		_sightPresenter.setMediaAssetManager(_assetManager);
-		_sightPresenter.setLocationTracker(_locationTracker);
+		_sightPresenter.setLocationTracker(_defaultLocationTracker);
 		_sightPresenter.setLogger(createLogger(SightPresenter.class));
 	}
 	
@@ -67,7 +65,7 @@ public class PresenterContainer {
         _audioPlayerPresenter.setAudioUpdateScheduler(new SchedulerService());
         _audioPlayerPresenter.setAudioRewindScheduler(new SchedulerService());
         _audioPlayerPresenter.setNewSightLookGotInRangeRaiser(
-        		new SightLookFinderByLocation(getCity(), _locationTracker));
+        		new SightLookFinderByLocation(getCity(), _defaultLocationTracker));
         _audioPlayerPresenter.setLogger(new Log4JAdapter(AudioPlayerPresenter.class));
 	}
 	
@@ -87,13 +85,19 @@ public class PresenterContainer {
 	public void initRouteMapPresenter(RouteMapView routeMapView) {
 		_routeMapPresenter = new RouteMapPresenter(getCity(), routeMapView,
 			_assetManager);
-		_routeMapPresenter.setLocationTracker(_locationTracker);
+		_routeMapPresenter.setLocationTracker(createLocationTracker());
 		_routeMapPresenter.setLogger(createLogger(RouteMapPresenter.class));
 	}
 	
 	private Logger createLogger(Class cls) {
         //return new DefaultLoggingAdapter(cls.getName());
 		return new Log4JAdapter(cls);
+	}
+	
+	private LocationTracker createLocationTracker() {
+		AndroidLocationManagerFacade locMgr = new AndroidLocationManagerFacade(_context);
+		locMgr.setLogger(createLogger(AndroidLocationManagerFacade.class));
+		return locMgr;
 	}
 	
 	private City getCity() {
