@@ -70,16 +70,13 @@ public class RouteMapPresenter {
 	}
 	
 	private void handleViewInitialized() {
-		int routeId = getCurrentRoute().getId();
-		String assetName = String.format("rt_%d.png", routeId);		
-		
 		InputStream str;
 		try {
-			str = _assetStreamProvider.getImageAssetStream(assetName);
+			str = _assetStreamProvider.getImageAssetStream(getCurrentRoute().getImageName());
 			_view.displayMap(str);
 		} 
 		catch (Exception e) {
-			String emsg = String.format("Cannot display map for the route %d", routeId);
+			String emsg = String.format("Cannot display map for the route %d", getCurrentRoute().getId());
 			logError(emsg, e);
 			_view.displayError(R.string.route_map_cannot_read);
 		}	

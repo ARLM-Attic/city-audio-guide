@@ -9,6 +9,8 @@ public class Route {
 	private int _id;
 	@Attribute(name="name")
 	private String _name;
+	@Attribute(name="imageName")
+	private String _imageName;
 	@Element(name="mapBounds", required=false)
 	private MapBounds _mapBounds;
 	
@@ -19,12 +21,20 @@ public class Route {
 		_id=id;
 		_name=name;
 	}
+	public Route(int id, String name, String imageName) {
+		_id=id;
+		_name=name;
+		_imageName=imageName;
+	}
 	
 	public int getId() {
 		return _id;
 	}
 	public String getName() {
 		return _name;
+	}
+	public String getImageName() {
+		return _imageName;
 	}
 	public MapBounds getMapBounds() {
 		return _mapBounds;
