@@ -9,14 +9,14 @@ public interface SightView extends Measurable<Integer> {
 	void setInfoPanelCaptionText(String text);
 	void setBackgroundImage(BitmapContainer bitmap);
 	
-	void acceptNewRouteSelected(String sightName, String routeName);
-
 	void displayNextSightDirection(float heading, float horizon);
 	void hideNextSightDirection();
 	
 	void hidePlayerPanel();
 	void showPlayerPanel();
 	
+	void enableRouteMapMenuItem(int routeId);
+	void disableRouteMapMenuItem();
 	void showHelp();
 	
 	void displayError(String message);

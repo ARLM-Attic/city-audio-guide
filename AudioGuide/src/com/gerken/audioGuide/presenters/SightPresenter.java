@@ -48,8 +48,9 @@ public class SightPresenter {
 		public void onEvent() {
 			if(_prefStorage.showHelpAtStartup()) {
 				_sightView.showHelp();
-				_prefStorage.setShowHelpAtStartup(false);			
+				_prefStorage.setShowHelpAtStartup(false);
 			}
+			handleRouteSelection();
 		}
 	};
 	
@@ -127,19 +128,7 @@ public class SightPresenter {
 	private OnEventListener _routeChangeListener = new OnEventListener() {		
 		@Override
 		public void onEvent() {
-			if(_currentSight != null) {
-				if(_prefStorage.isRouteChosen()) {
-					String routeName = null;
-					for(Route r: _city.getRoutes()) {
-						if(r.getId()==_prefStorage.getCurrentRouteId()) {
-							routeName = r.getName();
-							break;
-						}
-					}
-					_sightView.acceptNewRouteSelected(_currentSight.getName(), routeName);
-				}
-			}
-			
+			handleRouteSelection();			
 		}
 	};
 	
@@ -310,6 +299,13 @@ public class SightPresenter {
 				logError("Unable to play audio track for the current sight ", ex);
 			}			
 		}
+	}
+	
+	private void handleRouteSelection() {
+		if(_prefStorage.isRouteChosen())
+			_sightView.enableRouteMapMenuItem(_prefStorage.getCurrentRouteId());
+		else
+			_sightView.disableRouteMapMenuItem();
 	}
 
 	private boolean isSightInRange() {

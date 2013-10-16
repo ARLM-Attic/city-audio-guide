@@ -9,6 +9,7 @@ import com.gerken.audioGuide.graphics.*;
 import com.gerken.audioGuide.interfaces.BitmapContainer;
 import com.gerken.audioGuide.interfaces.OnEventListener;
 import com.gerken.audioGuide.interfaces.views.SightView;
+import com.gerken.audioGuide.util.IntentExtraManager;
 
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -21,6 +22,8 @@ import android.view.animation.TranslateAnimation;
 import android.widget.*;
 
 public class SightActivity extends BasicGuideActivity implements SightView {
+	private final int ROUTE_ID_UNDEFINED = Integer.MIN_VALUE;
+	private int _currentRouteId = ROUTE_ID_UNDEFINED;
 	
 	private View _rootView;
 	private View _playerInfoPanel;
@@ -106,35 +109,27 @@ public class SightActivity extends BasicGuideActivity implements SightView {
     	case R.id.action_help:
     		showHelp();
     		break;
+    	case R.id.action_route_map:
+			Intent mapIntent = new Intent(this, RouteMapActivity.class);
+			new IntentExtraManager(mapIntent).setRouteId(_currentRouteId);
+    		startActivity(mapIntent);
+    		break;
     	}
     	return super.onOptionsItemSelected(item);
     }
     
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+    	MenuItem mi = menu.findItem(R.id.action_route_map);
+    	mi.setEnabled(_currentRouteId != ROUTE_ID_UNDEFINED); 
+    	return super.onPrepareOptionsMenu(menu);
+    }    
 
-	/*
-	public void acceptNewSightGotInRange(String sightName, InputStream imageStream) throws Exception {
-		setInfoPanelCaptionText(sightName);
-        setNewBackgroundImage(imageStream);     
-        _nextSightPointerArrow.setVisibility(View.INVISIBLE);
-	}
-	
-	@Override
-	public void acceptNewSightLookGotInRange(InputStream imageStream) throws Exception {
-		setNewBackgroundImage(imageStream);
-		_nextSightPointerArrow.setVisibility(View.INVISIBLE);
-	}
-	*/
-	
 	@Override
 	public void resetInfoPanelCaptionText() {
 		setInfoPanelCaptionText(getString(R.string.sight_info_none));
 	}
 
-	@Override
-	public void acceptNewRouteSelected(String sightName, String routeName) {
-		setInfoPanelCaptionText(String.format("%s: %s", sightName, routeName));		
-	}
-	
 	@Override
 	public void setBackgroundImage(BitmapContainer bitmapContainer) {
 		if(_backgroundBitmap != null)
@@ -176,6 +171,16 @@ public class SightActivity extends BasicGuideActivity implements SightView {
         ta.setFillAfter(true);
 	    _playerInfoPanel.startAnimation(ta);	
 	    setPlayerButtonsClickable(true);
+	}	
+
+	@Override
+	public void enableRouteMapMenuItem(int routeId) {
+		_currentRouteId = routeId;		
+	}
+
+	@Override
+	public void disableRouteMapMenuItem() {
+		_currentRouteId = ROUTE_ID_UNDEFINED;		
 	}
 	
 	@Override

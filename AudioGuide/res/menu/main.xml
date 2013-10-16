@@ -6,8 +6,13 @@
         android:title="@string/action_settings"/>
     
     <item
-        android:id="@+id/action_help"
+        android:id="@+id/action_route_map"
         android:orderInCategory="101"
+        android:title="@string/action_route_map"/>
+    
+    <item
+        android:id="@+id/action_help"
+        android:orderInCategory="102"
         android:title="@string/action_help"/>
 
 </menu>
