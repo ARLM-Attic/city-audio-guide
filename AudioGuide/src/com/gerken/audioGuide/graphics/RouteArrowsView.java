@@ -17,9 +17,13 @@ public class RouteArrowsView extends View {
 	private final float DEF_ARROW_WIDTH = 40;
 	private final float DEF_ARROW_HEIGHT = 60;
 	
+	private final int COLOR_FILL   = 0x9000FF33;
+	private final int COLOR_STROKE = 0x9066FF84;
+	
 	private final float A_125 = (float)(Math.PI * 125.0 / 180.0);
 	
-	private Paint _arrowPaint;
+	private Paint _arrowFillPaint;
+	private Paint _arrowStrokePaint;
 	
 	private float _tipX = 0.4f;
 	private float _tipY = 0.4f;
@@ -39,7 +43,8 @@ public class RouteArrowsView extends View {
 	public RouteArrowsView(Context context) {		
 		super(context);
 		
-		_arrowPaint = createArrowPaint();
+		_arrowFillPaint = createArrowFillPaint();
+		_arrowStrokePaint = createArrowStrokePaint();
 		_camera = new Camera();
 	}
 	
@@ -56,7 +61,8 @@ public class RouteArrowsView extends View {
     } 
     
     private void init(Context context, AttributeSet attrs) {
-    	_arrowPaint = createArrowPaint();
+    	_arrowFillPaint = createArrowFillPaint();
+    	_arrowStrokePaint = createArrowStrokePaint();
         _camera = new Camera();
         
     	TypedArray arr = context.obtainStyledAttributes(attrs, R.styleable.RouteArrowsView);
@@ -90,7 +96,8 @@ public class RouteArrowsView extends View {
 		canvas.save();
 		canvas.translate(_arrowLeft, _arrowTop);
 		applyPerspective(canvas);		
-		canvas.drawPath(arrow, _arrowPaint);
+		canvas.drawPath(arrow, _arrowFillPaint);
+		canvas.drawPath(arrow, _arrowStrokePaint);
 		canvas.restore();
 	}
 	
@@ -113,14 +120,27 @@ public class RouteArrowsView extends View {
 		return path;				
 	}
 	
-	private Paint createArrowPaint(){
+	private Paint createArrowFillPaint(){
 		Paint arrowPaint = new Paint();
-		arrowPaint.setColor(0x904AFF00);
+		arrowPaint.setColor(COLOR_FILL);
 		arrowPaint.setStyle(Paint.Style.FILL);
 		arrowPaint.setAntiAlias(true);
+		
 		return arrowPaint;
 	}
 	
+	private Paint createArrowStrokePaint(){
+		Paint arrowPaint = new Paint();
+		arrowPaint.setStyle(Paint.Style.STROKE);
+		arrowPaint.setAntiAlias(true);
+		arrowPaint.setColor(COLOR_STROKE);
+		arrowPaint.setStrokeJoin(Paint.Join.ROUND);
+		arrowPaint.setStrokeCap(Paint.Cap.ROUND);
+		arrowPaint.setStrokeWidth(2.5f);
+		arrowPaint.setMaskFilter(new BlurMaskFilter(1.5f, BlurMaskFilter.Blur.NORMAL));
+		
+		return arrowPaint;
+	}	
 
 	public void applyPerspective(Canvas canvas) {
 		Matrix m = new Matrix();
@@ -136,6 +156,7 @@ public class RouteArrowsView extends View {
 		else if(_heading <= -A_125)
 			dZ -= 180; 
 		_camera.rotateZ(dZ);
+		_camera.translate((float)(_arrowWidth*Math.sin(-_heading)), 0, 0);
 		_camera.getMatrix(m);
 
 		float cx = 0.5f*_arrowWidth;

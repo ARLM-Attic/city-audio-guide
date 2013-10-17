@@ -14,7 +14,7 @@ import android.graphics.drawable.shapes.Shape;
 
 public class PlayerButtonDrawableFactory {	
 	private final int BUTTON_SIGN_MAIN_COLOR = 0xCF00FF33;
-	private final int BUTTON_SIGN_HIGHLIGHT_COLOR = 0xFF6AF26A;
+	private final int BUTTON_SIGN_HIGHLIGHT_COLOR = 0xFF91FF91;
 	private final int BUTTON_SIGN_STROKE_COLOR = 0xFF925891;
 	private final float PLAY_SIGN_SIZE_RATIO = 0.8f;
 	private final float STOP_SIGN_SIZE_RATIO = 0.5f;
@@ -131,7 +131,7 @@ public class PlayerButtonDrawableFactory {
 		public Shader resize(int width, int height) {
 			return new RadialGradient(_cx, _cy, _r, 
 					new int[]{BUTTON_SIGN_HIGHLIGHT_COLOR, BUTTON_SIGN_MAIN_COLOR}, 
-					new float[]{0, 1},
+					new float[]{0.05f, 0.8f},
 					Shader.TileMode.REPEAT);
 		}
 	}
