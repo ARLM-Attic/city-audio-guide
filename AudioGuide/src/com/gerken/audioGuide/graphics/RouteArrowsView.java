@@ -17,10 +17,12 @@ public class RouteArrowsView extends View {
 	private final float DEF_ARROW_WIDTH = 40;
 	private final float DEF_ARROW_HEIGHT = 60;
 	
-	private final int COLOR_FILL   = 0x9000FF33;
-	private final int COLOR_STROKE = 0x9066FF84;
+	private final int COLOR_FILL   = 0xA000991E;
+	private final int COLOR_STROKE = 0xC0CCFFD6;
 	
 	private final float A_125 = (float)(Math.PI * 125.0 / 180.0);
+	private final float HEADING_RIGHT = (float)(Math.PI / 2.0);
+	private final float HEADING_LEFT = -HEADING_RIGHT;
 	
 	private Paint _arrowFillPaint;
 	private Paint _arrowStrokePaint;
@@ -136,7 +138,7 @@ public class RouteArrowsView extends View {
 		arrowPaint.setColor(COLOR_STROKE);
 		arrowPaint.setStrokeJoin(Paint.Join.ROUND);
 		arrowPaint.setStrokeCap(Paint.Cap.ROUND);
-		arrowPaint.setStrokeWidth(2.5f);
+		arrowPaint.setStrokeWidth(3.5f);
 		arrowPaint.setMaskFilter(new BlurMaskFilter(1.5f, BlurMaskFilter.Blur.NORMAL));
 		
 		return arrowPaint;
@@ -146,17 +148,20 @@ public class RouteArrowsView extends View {
 		Matrix m = new Matrix();
 		
 		_camera.save();
-		//_camera.rotateY(-(int)(180.0*_heading/Math.PI));
 		_camera.rotateY(0);
 		_camera.rotateX(_xRotationAngle);		
-		//_camera.rotateZ(0);
 		float dZ = -(int)(180.0*_heading/Math.PI);
-		if(_heading >= A_125)
+		if(_heading >= HEADING_RIGHT)
 			dZ += 180; 
-		else if(_heading <= -A_125)
+		else if(_heading <= HEADING_LEFT)
 			dZ -= 180; 
 		_camera.rotateZ(dZ);
-		_camera.translate((float)(_arrowWidth*Math.sin(-_heading)), 0, 0);
+		
+		float tx = (float)(_arrowWidth*Math.sin(-_heading));
+		if(_heading < HEADING_LEFT || _heading > HEADING_RIGHT)
+			tx = -tx;
+		_camera.translate(tx, 0, 0);
+		
 		_camera.getMatrix(m);
 
 		float cx = 0.5f*_arrowWidth;
@@ -167,15 +172,15 @@ public class RouteArrowsView extends View {
 		canvas.concat(m);
 		_camera.restore();    
 		
-		if(_heading >= A_125 || _heading <= -A_125) {
+		if(_heading >= HEADING_RIGHT || _heading <= HEADING_LEFT) {
 			m = new Matrix();
 			
 			_camera.save();
 			_camera.rotateZ(180);
 			_camera.getMatrix(m);
 
-			cx = 0.5f*_arrowWidth;
-			cy = 0.5f*_arrowHeight; 
+			cx = 0.4f*_arrowWidth;
+			cy = 0.4f*_arrowHeight; 
 
 			m.preTranslate(-cx, -cy);
 			m.postTranslate(cx, cy); 
