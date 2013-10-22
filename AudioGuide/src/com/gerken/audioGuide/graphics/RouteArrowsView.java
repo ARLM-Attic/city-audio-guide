@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.*;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 
 public class RouteArrowsView extends View {
@@ -20,10 +19,6 @@ public class RouteArrowsView extends View {
 	private final int COLOR_FILL   = 0xA000991E;
 	private final int COLOR_STROKE = 0xC0CCFFD6;
 	
-	private final float A_125 = (float)(Math.PI * 125.0 / 180.0);
-	private final float HEADING_RIGHT = (float)(Math.PI / 2.0);
-	private final float HEADING_LEFT = -HEADING_RIGHT;
-	
 	private Paint _arrowFillPaint;
 	private Paint _arrowStrokePaint;
 	
@@ -32,6 +27,7 @@ public class RouteArrowsView extends View {
 	
 	private float _arrowWidth = DEF_ARROW_WIDTH;
 	private float _arrowHeight = DEF_ARROW_HEIGHT;
+	private float _arrowHeightAdjusted = DEF_ARROW_HEIGHT;
 	
 	private float _heading = 0.0f;
 	
@@ -80,21 +76,57 @@ public class RouteArrowsView extends View {
     	_heading = heading;
     	
     	float tx = _tipX * getWidth();
-		float ty = _tipY * getHeight();
 		_arrowLeft = tx - 0.5f*_arrowWidth;
-		_arrowTop = getHeight() - getPaddingBottom() - _arrowHeight;
+		_arrowTop = _tipY * getHeight();
+		float arrowProjectionMaxHeight = getHeight() - getPaddingBottom() - _arrowTop;
+
+		double ax = Math.acos(1.6*horizon);
+		_xRotationAngle = (float)(180.0*ax/Math.PI);
 		
-		double perspectiveRatio = 1.0 + (_arrowTop - ty)/_arrowHeight;
-		_xRotationAngle = (perspectiveRatio >= 1.0) ? 0 :
-			(float)(180.0*Math.acos(perspectiveRatio)/Math.PI);	
+		float arrowHeightMax = 
+				calculateHeightFromProjection(_arrowWidth, arrowProjectionMaxHeight, ax, heading);
+		if(_arrowHeight > arrowHeightMax)
+			_arrowHeightAdjusted = arrowHeightMax;
+		else {
+			_arrowHeightAdjusted = _arrowHeight;
+			float arrowProjectionHeight = 
+					calculateProjectionHeight(_arrowWidth, _arrowHeight, ax, heading);
+			float arrowTopCorrection = (arrowProjectionMaxHeight - arrowProjectionHeight) / 2.0f;
+			_arrowTop += (float)arrowTopCorrection;
+		}
     }
     
+    private float calculateProjectionHeight(float width, float height, double ax, double az) {
+    	az = mendAngle(az);
+    	return (float)( (height*Math.cos(az)+width*Math.sin(az))*Math.cos(ax) );    	
+    }
+    
+    private float calculateHeightFromProjection(float width, float height, double ax, double az) {
+    	az = mendAngle(az);
+    	return (float)( (height/Math.cos(ax)-width*Math.sin(az))/Math.cos(az) );
+    }
+    
+    private double mendAngle(double angle) {
+    	final double HALF_PI = Math.PI / 2.0;
+    	final double MINUS_HALF_PI = -HALF_PI;
+    	if(angle < 0) {
+    		if(angle < MINUS_HALF_PI)
+    			return (Math.PI + angle);
+    		else
+    			return -angle;
+    	}
+    	else {
+    		if(angle > HALF_PI)
+    			return Math.PI - angle;
+    	}
+    	return angle;
+    }
 	
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
 		
-		Path arrow = createArrow(_arrowWidth, _arrowHeight);
+		Path arrow = createArrow(_arrowWidth, _arrowHeightAdjusted);
 		canvas.save();
 		canvas.translate(_arrowLeft, _arrowTop);
 		applyPerspective(canvas);		
@@ -118,6 +150,11 @@ public class RouteArrowsView extends View {
 		path.rLineTo(0, -straightTailHeight);
 		path.lineTo(0, tipBottomY);		
 		path.close();
+		
+		Matrix rm = new Matrix();
+		float dZ = (float)(180.0*_heading/Math.PI);
+		rm.setRotate(dZ, 0.5f*w, 0.5f*h);
+		path.transform(rm);
 		
 		return path;				
 	}
@@ -150,43 +187,18 @@ public class RouteArrowsView extends View {
 		_camera.save();
 		_camera.rotateY(0);
 		_camera.rotateX(_xRotationAngle);		
-		float dZ = -(int)(180.0*_heading/Math.PI);
-		if(_heading >= HEADING_RIGHT)
-			dZ += 180; 
-		else if(_heading <= HEADING_LEFT)
-			dZ -= 180; 
-		_camera.rotateZ(dZ);
+		_camera.rotateZ(0);
 		
 		float tx = (float)(_arrowWidth*Math.sin(-_heading));
-		if(_heading < HEADING_LEFT || _heading > HEADING_RIGHT)
-			tx = -tx;
 		_camera.translate(tx, 0, 0);
 		
 		_camera.getMatrix(m);
 
 		float cx = 0.5f*_arrowWidth;
-		float cy = _arrowHeight;
-		m.preTranslate(-cx, -cy);
-		m.postTranslate(cx, cy); 
+		m.preTranslate(-cx, 0);
+		m.postTranslate(cx, 0);
 		
 		canvas.concat(m);
 		_camera.restore();    
-		
-		if(_heading >= HEADING_RIGHT || _heading <= HEADING_LEFT) {
-			m = new Matrix();
-			
-			_camera.save();
-			_camera.rotateZ(180);
-			_camera.getMatrix(m);
-
-			cx = 0.4f*_arrowWidth;
-			cy = 0.4f*_arrowHeight; 
-
-			m.preTranslate(-cx, -cy);
-			m.postTranslate(cx, cy); 
-			
-			canvas.concat(m);
-			_camera.restore(); 
-		}
 	}
 }
