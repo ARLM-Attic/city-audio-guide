@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="invisible"
-        android:paddingBottom="30dp"
+        android:paddingBottom="34dp"
         aguide:arrowWidth="60dp"
         aguide:arrowHeight="80dp" />
     
