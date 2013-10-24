@@ -34,7 +34,7 @@
 				        android:layout_width="10dp"
 				        android:layout_height="10dp"
 				        android:visibility="invisible"
-				        android:src="@drawable/map_pointer_drawable" />
+				        android:src="@drawable/map_pointer" />
 	            </AbsoluteLayout>
 
             </FrameLayout>
