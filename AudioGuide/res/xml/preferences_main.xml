@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
-    <PreferenceCategory android:title="@string/pref_category_route" android:key="route">
-        <ListPreference android:key="routeList" android:negativeButtonText="neg" android:positiveButtonText="pos"/>
-    </PreferenceCategory>
-    
-
-</PreferenceScreen>
