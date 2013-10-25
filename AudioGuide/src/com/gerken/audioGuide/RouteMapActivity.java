@@ -6,7 +6,12 @@ import com.gerken.audioGuide.interfaces.views.RouteMapView;
 import com.gerken.audioGuide.util.IntentExtraManager;
 
 import android.os.Bundle;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -38,19 +43,24 @@ public class RouteMapActivity extends BasicGuideActivity implements RouteMapView
 	}
 
 	@Override
-	public void displayMap(InputStream mapStream) throws Exception {	
-
-		_mapImage.setImageDrawable(Drawable.createFromStream(mapStream, ""));
+	public void displayMap(InputStream mapStream) throws Exception {
+		Bitmap bmp = BitmapFactory.decodeStream(mapStream);		
 		mapStream.close();
+		int mapWidth = bmp.getWidth();
+		int mapHeight = bmp.getHeight();
+		
+		_mapImage.setImageDrawable(
+				new BitmapDrawable(getApplicationContext().getResources(), bmp));
+
 		findViewById(R.id.routeMapErrorMessage).setVisibility(View.INVISIBLE);
 		
 		View mapContainer = findViewById(R.id.mapContainer);
-		mapContainer.setMinimumWidth(_mapImage.getWidth());
-		mapContainer.setMinimumHeight(_mapImage.getHeight());
+		mapContainer.setMinimumWidth(mapWidth);
+		mapContainer.setMinimumHeight(mapHeight);
 		
 		View mapPointerContainer = findViewById(R.id.mapPointerContainer);
-		mapPointerContainer.setMinimumWidth(_mapImage.getWidth());
-		mapPointerContainer.setMinimumHeight(_mapImage.getHeight());
+		mapPointerContainer.setMinimumWidth(mapWidth);
+		mapPointerContainer.setMinimumHeight(mapHeight);
 	}	
 
 	@Override

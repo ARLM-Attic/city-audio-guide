@@ -31,8 +31,9 @@
     				android:layout_height="match_parent">
 		            <ImageView
 				        android:id="@+id/mapPointerImage"
-				        android:layout_width="10dp"
-				        android:layout_height="10dp"
+				        android:layout_width="20px"
+				        android:layout_height="20px"
+				        android:scaleType="fitXY"
 				        android:visibility="invisible"
 				        android:src="@drawable/map_pointer" />
 	            </AbsoluteLayout>
