@@ -147,9 +147,9 @@ public class AudioPlayerPresenter {
 				_audioPlayer.play();
 			}
 			catch(Exception ex) {
-				//String sightName = (_currentSight != null) ?
-				//	_currentSight.getName() : "[unknown]";
-				logError("Unable to play audio track for the current sight ", ex);// + sightName, ex);
+				String sightName = (_currentSight != null) ?
+					_currentSight.getName() : "[unknown]";
+				logError("Unable to play audio track for the sight " + sightName, ex);
 			}
 			_audioPlayerView.displayPlayerPlaying();
 			startAudioUpdateTimer();

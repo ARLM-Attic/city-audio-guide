@@ -34,6 +34,7 @@ public class FileInfo {
 	}
 	
 	public void close() throws IOException {
-		_fileInputStream.close();
+		if(_fileInputStream != null)
+			_fileInputStream.close();
 	}
 }
