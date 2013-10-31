@@ -1,15 +1,15 @@
 package com.gerken.audioGuideTests.presenters.audioPlayerPresenter;
 
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import java.util.Random;
 
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
+import com.gerken.audioGuide.containers.FileInfo;
 import com.gerken.audioGuide.interfaces.AudioPlayer;
+import com.gerken.audioGuide.interfaces.MediaAssetManager;
 import com.gerken.audioGuide.interfaces.NewSightLookGotInRangeRaiser;
 import com.gerken.audioGuide.interfaces.OnSightLookGotInRangeListener;
 import com.gerken.audioGuide.interfaces.views.AudioPlayerView;
@@ -25,9 +25,10 @@ public class HandleSightLookIsInRange {
 		
 		AudioPlayerView playerView = mock(AudioPlayerView.class);
 		AudioPlayer player = mock(AudioPlayer.class);
+		MediaAssetManager mediaAssetManager = mock(MediaAssetManager.class);
 		NewSightLookGotInRangeRaiser raiser = mock(NewSightLookGotInRangeRaiser.class);
 		
-		SutSetupResult sutSetupResult = setupSut(playerView, player, raiser);
+		SutSetupResult sutSetupResult = setupSut(playerView, player, mediaAssetManager, raiser);
 		
 		// --- Act
 		sutSetupResult.sightLookGotInRangeListener.onSightLookGotInRange(
@@ -37,17 +38,74 @@ public class HandleSightLookIsInRange {
 		verify(playerView).displayPlayerStopped();
 	}
 	
-	private City createSingleSightLookModel() {
-		final String WHATEVER_STRING = "whatever";
-		return createSingleSightLookModel(_random.nextDouble(), _random.nextDouble(), WHATEVER_STRING);
+	@Test
+	public void Given_NewSightGotInRange__Then_PlayerPreparedToPlaySightAudioTrack() throws Exception {
+		final String AUDIO_NAME = "audio1.ogg";
+		City city = createSingleSightLookModel(_random.nextDouble(), _random.nextDouble(),
+				"", AUDIO_NAME);
+		FileInfo dummyFileInfo = new FileInfo(null, 0);
+		
+		AudioPlayerView playerView = mock(AudioPlayerView.class);
+		AudioPlayer player = mock(AudioPlayer.class);
+		NewSightLookGotInRangeRaiser raiser = mock(NewSightLookGotInRangeRaiser.class);
+		MediaAssetManager mediaAssetManager = mock(MediaAssetManager.class);
+		when(mediaAssetManager.prepareAudioAsset(AUDIO_NAME)).thenReturn(dummyFileInfo);
+		
+		SutSetupResult sutSetupResult = setupSut(playerView, player, mediaAssetManager, raiser);
+		
+		// --- Act
+		sutSetupResult.sightLookGotInRangeListener.onSightLookGotInRange(
+				city.getSights().get(0).getSightLooks().get(0));
+		
+		// --- Assert
+		verify(mediaAssetManager).prepareAudioAsset(AUDIO_NAME);
+		verify(player).prepareAudioAsset(dummyFileInfo);
 	}
 	
-	private City createSingleSightLookModel(double latitude, double longitude, String sightName) {
+	@Test
+	public void Given_SameSightOtherLookGotInRange__Then_PlayerPreparedOnlyOnce() throws Exception {
+		final String WHATEVER_STRING = "whatever";
+		final String AUDIO_NAME = "audio1.ogg";
+		City city = createSingleSightLookModel(_random.nextDouble(), _random.nextDouble(),
+				WHATEVER_STRING, AUDIO_NAME);
+		SightLook otherSightLook = new SightLook(
+				_random.nextDouble(), _random.nextDouble(), WHATEVER_STRING);
+		Sight sight = city.getSights().get(0);
+		sight.getSightLooks().add(otherSightLook);
+		otherSightLook.setSight(sight);
+		FileInfo dummyFileInfo = new FileInfo(null, 0);
+		
+		AudioPlayerView playerView = mock(AudioPlayerView.class);
+		AudioPlayer player = mock(AudioPlayer.class);
+		NewSightLookGotInRangeRaiser raiser = mock(NewSightLookGotInRangeRaiser.class);
+		MediaAssetManager mediaAssetManager = mock(MediaAssetManager.class);
+		when(mediaAssetManager.prepareAudioAsset(AUDIO_NAME)).thenReturn(dummyFileInfo);
+		
+		SutSetupResult sutSetupResult = setupSut(playerView, player, mediaAssetManager, raiser);
+		
+		// --- Act
+		sutSetupResult.sightLookGotInRangeListener.onSightLookGotInRange(
+				city.getSights().get(0).getSightLooks().get(0));
+		sutSetupResult.sightLookGotInRangeListener.onSightLookGotInRange(otherSightLook);
+		
+		// --- Assert
+		verify(mediaAssetManager, times(1)).prepareAudioAsset(AUDIO_NAME);
+		verify(player, times(1)).prepareAudioAsset(dummyFileInfo);
+	}
+	
+	private City createSingleSightLookModel() {
+		final String WHATEVER_STRING = "whatever";
+		return createSingleSightLookModel(_random.nextDouble(), _random.nextDouble(), 
+				WHATEVER_STRING, WHATEVER_STRING);
+	}
+	
+	private City createSingleSightLookModel(double latitude, double longitude, 
+			String sightName, String audioName) {
 		final String WHATEVER_STRING = "whatever";	
 		
 		SightLook expectedSightLook = new SightLook(
 				latitude, longitude, WHATEVER_STRING);
-		Sight expectedSight = new Sight(_random.nextInt(), sightName, WHATEVER_STRING);
+		Sight expectedSight = new Sight(_random.nextInt(), sightName, audioName);
 		expectedSight.addLook(expectedSightLook);
 		City city = new City(_random.nextInt(), WHATEVER_STRING, WHATEVER_STRING);
 		city.getSights().add(expectedSight);
@@ -57,7 +115,7 @@ public class HandleSightLookIsInRange {
 	
 	
 	private SutSetupResult setupSut(AudioPlayerView playerView, 
-			AudioPlayer audioPlayer, 
+			AudioPlayer audioPlayer, MediaAssetManager mediaAssetManager,
 			NewSightLookGotInRangeRaiser newSightLookGotInRangeRaiser) {
 		SutSetupResult result = new SutSetupResult();
 
@@ -68,6 +126,7 @@ public class HandleSightLookIsInRange {
 		
 		AudioPlayerPresenter sut = new AudioPlayerPresenter(playerView, audioPlayer);
 		sut.setNewSightLookGotInRangeRaiser(newSightLookGotInRangeRaiser);
+		sut.setMediaAssetManager(mediaAssetManager);
 		
 		result.sut = sut;
 		result.sightLookGotInRangeListener = sightLookGotInRangeCaptor.getValue();
