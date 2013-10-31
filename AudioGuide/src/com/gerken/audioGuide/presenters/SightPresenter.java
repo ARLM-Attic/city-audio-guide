@@ -235,10 +235,12 @@ public class SightPresenter {
 	private void showNextRoutePointDirection() {
 		if(_prefStorage.isRouteChosen()) {
 			NextRoutePoint nrp = getNextRoutePoint();
-			float heading = (float)(Math.PI*nrp.getHeading()/180.0);
-			_sightView.displayNextSightDirection(heading, getAdjustedHorizon(nrp.getHorizon()));
-			_sightView.setInfoPanelCaptionText(nrp.getName());
-			_isNextRoutePointInfoShown = true;
+			if(nrp != null) {
+				float heading = (float)(Math.PI*nrp.getHeading()/180.0);
+				_sightView.displayNextSightDirection(heading, getAdjustedHorizon(nrp.getHorizon()));
+				_sightView.setInfoPanelCaptionText(nrp.getName());
+				_isNextRoutePointInfoShown = true;
+			}
 		}
 	}
 	
@@ -361,7 +363,10 @@ public class SightPresenter {
 		if(_currentSightLook == null)
 			return null;
 		
-		int routeId = _prefStorage.getCurrentRouteId();
+		if(_currentSightLook.getNextRoutePoints() == null)
+			return null;
+		
+		int routeId = _prefStorage.getCurrentRouteId();		
 		for(NextRoutePoint nrp: _currentSightLook.getNextRoutePoints()) {
 			if(nrp.getRouteId() == routeId)
 				return nrp;
