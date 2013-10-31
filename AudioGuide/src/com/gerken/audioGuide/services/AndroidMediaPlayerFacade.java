@@ -41,6 +41,7 @@ public class AndroidMediaPlayerFacade implements AudioPlayer {
 				assetFileInfo.getStartOffset(), assetFileInfo.getLength());		
 		_mediaPlayer.prepare();
 		_needsPreparation = false;
+		_isPlaying = false;
 	}
 
 	@Override

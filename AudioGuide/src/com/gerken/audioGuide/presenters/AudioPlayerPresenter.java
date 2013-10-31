@@ -118,6 +118,7 @@ public class AudioPlayerPresenter {
 				prepareNewAudio(newSight.getAudioName());
 				_currentSight = newSight;
 			}
+			_audioPlayerView.displayPlayerStopped();
 		}
 	}
 	
