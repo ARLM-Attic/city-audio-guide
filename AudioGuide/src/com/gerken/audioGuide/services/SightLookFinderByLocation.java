@@ -11,8 +11,8 @@ import com.gerken.audioGuide.objectModel.Sight;
 import com.gerken.audioGuide.objectModel.SightLook;
 
 public class SightLookFinderByLocation implements NewSightLookGotInRangeRaiser {
-	private final float SIGHT_ACTIVATION_RADIUS = 20.0f;
-	private final double EARTH_RADIUS = 6371.0;
+	private final float SIGHT_ACTIVATION_RADIUS_M = 20.0f;
+	private final double EARTH_RADIUS_M = 6371000.0;
 	
 	private City _city;
 	private LocationTracker _locationTracker;
@@ -51,7 +51,7 @@ public class SightLookFinderByLocation implements NewSightLookGotInRangeRaiser {
 		for(Sight s : _city.getSights()) {
 			for(SightLook sl : s.getSightLooks()) {
 				double distance = calcDistance(latitude, longitude, sl.getLatitude(), sl.getLongitude());
-				if(distance < SIGHT_ACTIVATION_RADIUS && distance < closestSightLookDistance) {
+				if(distance < SIGHT_ACTIVATION_RADIUS_M && distance < closestSightLookDistance) {
 					closestSightLook = sl;
 					closestSightLookDistance = distance;
 				}
@@ -69,7 +69,7 @@ public class SightLookFinderByLocation implements NewSightLookGotInRangeRaiser {
         double a = (Math.sin(dlat / 2) * Math.sin(dlat / 2)) + 
         		Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * (Math.sin(dlon / 2) * Math.sin(dlon / 2));
         double angle = 2.0 * Math.atan2(Math.sqrt(a), Math.sqrt(1.0 - a));
-        return angle * EARTH_RADIUS;
+        return Math.abs(angle * EARTH_RADIUS_M);
 	}
 	
 	private double deg2rad(double deg) {
