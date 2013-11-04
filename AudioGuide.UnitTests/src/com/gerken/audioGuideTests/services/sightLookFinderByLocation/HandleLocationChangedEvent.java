@@ -15,25 +15,51 @@ import com.gerken.audioGuide.services.SightLookFinderByLocation;
 
 public class HandleLocationChangedEvent {
 	private Random _random = new Random(System.currentTimeMillis());
+	private final float DEFAULT_ACTIVATION_RADIUS = 20;
 
 	@Test
-	public void Given_SightLookinRangeFound__Then_SightLookSentToListeners() {
-		final double EXPECTED_LOCATION_LATITUDE = 12.345;
-		final double EXPECTED_LOCATION_LONGITUDE = 24.567;	
+	public void Given_SightLookIsWithinActivationRadius__Then_SightLookSentToListeners() {
+		final double SIGHT_LOOK_LATITUDE = 50.08577;
+		final double SIGHT_LOOK_LONGITUDE = 14.42304;	
+		final double LOCATION_LATITUDE = 50.08572;
+		final double LOCATION_LONGITUDE = 14.42305;	
 		
-		final double WHATEVER_DOUBLE = 111.222;
 		City city = createSingleSightCity();
 		SightLook expectedSightLook = addSightLook(city, 
-				EXPECTED_LOCATION_LATITUDE, EXPECTED_LOCATION_LONGITUDE);
-		SightLook unexpectedSightLook = addSightLook(city, 
-				WHATEVER_DOUBLE, WHATEVER_DOUBLE);
+				SIGHT_LOOK_LATITUDE, SIGHT_LOOK_LONGITUDE);
 		
 		OnSightLookGotInRangeListener sightLookInRangeListener = mock(OnSightLookGotInRangeListener.class);
 		SutSetupResult setupResult = setupSut(city, sightLookInRangeListener);
+		setupResult.sut.setSightActivationRadius(DEFAULT_ACTIVATION_RADIUS);
 		
 		// --- Act
-		setupResult.locationChangedListener.onLocationChanged(
-				EXPECTED_LOCATION_LATITUDE, EXPECTED_LOCATION_LONGITUDE);
+		setupResult.locationChangedListener.onLocationChanged(LOCATION_LATITUDE, LOCATION_LONGITUDE);
+		
+		// --- Assert
+		verify(sightLookInRangeListener).onSightLookGotInRange(expectedSightLook);
+	}
+	
+	@Test
+	public void Given_MultipleSightLooksInRangeFound__Then_TheClosestSightLookSentToListeners() {
+		final double EXPECTED_SIGHT_LOOK_LATITUDE = 50.08577;
+		final double EXPECTED_SIGHT_LOOK_LONGITUDE = 14.42304;	
+		final double UNEXPECTED_SIGHT_LOOK_LATITUDE = 50.08584;
+		final double UNEXPECTED_SIGHT_LOOK_LONGITUDE = 14.42298;	
+		final double LOCATION_LATITUDE = 50.08572;
+		final double LOCATION_LONGITUDE = 14.42305;	
+		
+		City city = createSingleSightCity();
+		SightLook expectedSightLook = addSightLook(city, 
+				EXPECTED_SIGHT_LOOK_LATITUDE, EXPECTED_SIGHT_LOOK_LONGITUDE);
+		SightLook unexpectedSightLook = addSightLook(city, 
+				UNEXPECTED_SIGHT_LOOK_LATITUDE, UNEXPECTED_SIGHT_LOOK_LONGITUDE);
+		
+		OnSightLookGotInRangeListener sightLookInRangeListener = mock(OnSightLookGotInRangeListener.class);
+		SutSetupResult setupResult = setupSut(city, sightLookInRangeListener);
+		setupResult.sut.setSightActivationRadius(DEFAULT_ACTIVATION_RADIUS);
+		
+		// --- Act
+		setupResult.locationChangedListener.onLocationChanged(LOCATION_LATITUDE, LOCATION_LONGITUDE);
 		
 		// --- Assert
 		verify(sightLookInRangeListener).onSightLookGotInRange(expectedSightLook);
@@ -41,38 +67,40 @@ public class HandleLocationChangedEvent {
 	}
 	
 	@Test
-	public void Given_SightLookinRangeNotFound__Then_NullSentToListeners() {
-		final double sightLatitude = 80.0*_random.nextDouble();
-		final double sightLongitude = 170.0*_random.nextDouble();
-		final double emptyLatitude = sightLatitude + 5.0;
-		final double emptyLongitude = sightLongitude + 5.0;
+	public void Given_NoSightLookWithinActivationRadius__Then_NullSightLookSentToListeners() {
+		final double SIGHT_LOOK_LATITUDE = 50.08577;
+		final double SIGHT_LOOK_LONGITUDE = 14.42304;	
+		final double LOCATION_LATITUDE = 50.08618;
+		final double LOCATION_LONGITUDE = 14.42263;	
 		
 		City city = createSingleSightCity();
-		addSightLook(city,	sightLatitude, sightLongitude);
-		OnSightLookGotInRangeListener sightLookInRangeListener = mock(OnSightLookGotInRangeListener.class);
+		SightLook sightLookOutsideRange = addSightLook(city, 
+				SIGHT_LOOK_LATITUDE, SIGHT_LOOK_LONGITUDE);
 		
+		OnSightLookGotInRangeListener sightLookInRangeListener = mock(OnSightLookGotInRangeListener.class);
 		SutSetupResult setupResult = setupSut(city, sightLookInRangeListener);
+		setupResult.sut.setSightActivationRadius(DEFAULT_ACTIVATION_RADIUS);
 		
 		// --- Act
-		setupResult.locationChangedListener.onLocationChanged(emptyLatitude, emptyLongitude);
+		setupResult.locationChangedListener.onLocationChanged(LOCATION_LATITUDE, LOCATION_LONGITUDE);
 		
 		// --- Assert
 		verify(sightLookInRangeListener).onSightLookGotInRange(null);
+		verify(sightLookInRangeListener, never()).onSightLookGotInRange(sightLookOutsideRange);
 	}
 	
 	private City createSingleSightCity() {
-		final String EXPECTED_SIGHT_NAME = "Colosseum";
-		final String WHATEVER_STRING = "whatever";	
+		final String WHATEVER_STRING = createRandomString();
 		
-		Sight expectedSight = new Sight(1, EXPECTED_SIGHT_NAME, WHATEVER_STRING);
-		City city = new City(1, "Default", WHATEVER_STRING);
+		Sight expectedSight = new Sight(_random.nextInt(), WHATEVER_STRING, WHATEVER_STRING);
+		City city = new City(_random.nextInt(), WHATEVER_STRING, WHATEVER_STRING);
 		city.getSights().add(expectedSight);
 		
 		return city;
 	}
 	
 	private SightLook addSightLook(City city, double latitude, double longitude) {
-		final String WHATEVER_STRING = "whatever";	
+		final String WHATEVER_STRING = createRandomString();	
 		
 		Sight expectedSight = city.getSights().get(0);
 		SightLook sightLook = new SightLook(
@@ -80,6 +108,10 @@ public class HandleLocationChangedEvent {
 		expectedSight.addLook(sightLook);
 		
 		return sightLook;
+	}
+	
+	private String createRandomString() {
+		return String.valueOf(_random.nextLong());
 	}
 	
 	private SutSetupResult setupSut(City city, OnSightLookGotInRangeListener sightLookInRangeListener) {
