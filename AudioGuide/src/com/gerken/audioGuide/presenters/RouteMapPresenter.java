@@ -22,7 +22,7 @@ public class RouteMapPresenter {
 	
 	private Route _currentRoute;
 	private boolean _isScrollingToCurrentLocationDone = false;
-	private boolean _shouldScrollAfterRestoringInstance = false;
+	private boolean _shouldHandleRestoringInstance = false;
 	
 	private OnEventListener _viewInitializedListener = new OnEventListener() {		
 		@Override
@@ -51,7 +51,7 @@ public class RouteMapPresenter {
 	private OnEventListener _viewInstanceStateRestoredListener = new OnEventListener() {		
 		@Override
 		public void onEvent() {
-			_shouldScrollAfterRestoringInstance = true;
+			_shouldHandleRestoringInstance = true;
 		}
 	};
 	
@@ -98,9 +98,13 @@ public class RouteMapPresenter {
 	}
 	
 	private void handleViewLayoutComplete() {
-		if(_shouldScrollAfterRestoringInstance) {
+		if(_shouldHandleRestoringInstance) {
 			_view.scrollTo(_view.getRestoredScrollX(), _view.getRestoredScrollY());
-			_shouldScrollAfterRestoringInstance = false;
+			if(_view.isRestoredPointerVisible())
+				_view.showLocationPointerAt(_view.getRestoredPointerX(), _view.getRestoredPointerY());
+			else
+				_view.hideLocationPointer();
+			_shouldHandleRestoringInstance = false;
 		}
 	}
 
@@ -131,7 +135,7 @@ public class RouteMapPresenter {
 		);
 		
 		if(dx >= 0 && dx < _view.getMapWidth() && dy >=0 && dy < _view.getMapHeight()){
-			_view.showLocationPointerAt(dx, dy);
+			showLocationPointerAt(dx, dy);
 			if(!_isScrollingToCurrentLocationDone) {
 				scrollTo(dx, dy);
 				_isScrollingToCurrentLocationDone = true;
@@ -145,6 +149,12 @@ public class RouteMapPresenter {
 		int sx = Math.max(0, dx - _view.getWidth()/2);
 		int sy = Math.max(0, dy - _view.getHeight()/2);
 		_view.scrollTo(sx, sy);
+	}
+	
+	private void showLocationPointerAt(int x, int y) {
+		int px = x - (int)(_view.getPointerWidth()/2);
+		int py = y - (int)(_view.getPointerHeight()/2);
+		_view.showLocationPointerAt(px, py);
 	}
 	
 	private Route getCurrentRoute() {

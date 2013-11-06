@@ -23,6 +23,9 @@ import android.widget.TextView;
 public class RouteMapActivity extends BasicGuideActivity implements RouteMapView {
 	private static final String KEY_SCROLL_X = "ScrollX";
 	private static final String KEY_SCROLL_Y = "ScrollY";
+	private static final String KEY_POINTER_X = "PointerX";
+	private static final String KEY_POINTER_Y = "PointerY";
+	private static final String KEY_POINTER_VISIBLE = "PointerVisible";
 	
 	private View _rootView;	
 	private ImageView _mapImage;
@@ -30,9 +33,13 @@ public class RouteMapActivity extends BasicGuideActivity implements RouteMapView
 	private Animation _mapPointerAnimation;
 	private HorizontalScrollView _horizontalScrollView;
 	private ScrollView _verticalScrollView;
+	private View _mapPointer;
 	
 	private int _restoredScrollX = 0;
 	private int _restoredScrollY = 0;
+	private int _restoredPointerX = 0;
+	private int _restoredPointerY = 0;
+	private boolean _restoredPointerVisible = false;
 	
 	private ArrayList<OnEventListener> _viewInstanceStateRestoredListeners = new ArrayList<OnEventListener>();
 
@@ -45,6 +52,7 @@ public class RouteMapActivity extends BasicGuideActivity implements RouteMapView
 		_mapImage = (ImageView)findViewById(R.id.mapImage);
 		_horizontalScrollView = (HorizontalScrollView)findViewById(R.id.routeMapHorizontalScroller);
 		_verticalScrollView = (ScrollView)findViewById(R.id.routeMapMainView);
+		_mapPointer = findViewById(R.id.mapPointerImage);;
 		
 		_intentExtraManager = new IntentExtraManager(getIntent());
 		_mapPointerAnimation = createMapPointerAnimation();		
@@ -59,6 +67,12 @@ public class RouteMapActivity extends BasicGuideActivity implements RouteMapView
 	  super.onSaveInstanceState(savedInstanceState);
 	  savedInstanceState.putInt(KEY_SCROLL_X, _horizontalScrollView.getScrollX());
 	  savedInstanceState.putInt(KEY_SCROLL_Y, _verticalScrollView.getScrollY());
+	  
+	  AbsoluteLayout.LayoutParams pointerLp = (AbsoluteLayout.LayoutParams)_mapPointer.getLayoutParams();
+	  savedInstanceState.putInt(KEY_POINTER_X, pointerLp.x);
+	  savedInstanceState.putInt(KEY_POINTER_Y, pointerLp.y);
+	  savedInstanceState.putBoolean(KEY_POINTER_VISIBLE, 
+			  (_mapPointer.getVisibility() == View.VISIBLE));
 	}
 	
 	@Override
@@ -66,6 +80,9 @@ public class RouteMapActivity extends BasicGuideActivity implements RouteMapView
 	  super.onRestoreInstanceState(savedInstanceState);
 	  _restoredScrollX = savedInstanceState.getInt(KEY_SCROLL_X);
 	  _restoredScrollY = savedInstanceState.getInt(KEY_SCROLL_Y);
+	  _restoredPointerX = savedInstanceState.getInt(KEY_POINTER_X);
+	  _restoredPointerY = savedInstanceState.getInt(KEY_POINTER_Y);
+	  _restoredPointerVisible = savedInstanceState.getBoolean(KEY_POINTER_VISIBLE);
 	  
 	  for(OnEventListener l : _viewInstanceStateRestoredListeners)
       	l.onEvent();	  
@@ -104,10 +121,33 @@ public class RouteMapActivity extends BasicGuideActivity implements RouteMapView
 	public int getMapWidth() {
 		return _mapImage.getWidth();
 	}
-
 	@Override
 	public int getMapHeight() {
 		return _mapImage.getHeight();
+	}
+	
+
+	@Override
+	public int getPointerWidth() {
+		return _mapPointer.getWidth();
+	}
+	@Override
+	public int getPointerHeight() {
+		return _mapPointer.getHeight();
+	}
+
+	@Override
+	public int getRestoredPointerX() {
+		return _restoredPointerX;
+	}
+
+	@Override
+	public int getRestoredPointerY() {
+		return _restoredPointerY;
+	}
+	@Override
+	public boolean isRestoredPointerVisible() {
+		return _restoredPointerVisible;
 	}
 	
 	@Override
@@ -121,14 +161,12 @@ public class RouteMapActivity extends BasicGuideActivity implements RouteMapView
 
 	@Override
 	public void showLocationPointerAt(int x, int y) {
-		View mapPointer = findViewById(R.id.mapPointerImage);
-		AbsoluteLayout.LayoutParams pointerLp = (AbsoluteLayout.LayoutParams)mapPointer.getLayoutParams();
-		pointerLp.x = x - (int)(mapPointer.getWidth()/2);
-		pointerLp.y = y - (int)(mapPointer.getHeight()/2);
-		//pointerLp.setMargins(100, 200, pointerLp.rightMargin, pointerLp.bottomMargin);
-		mapPointer.setLayoutParams(pointerLp);
-		mapPointer.setVisibility(View.VISIBLE);
-        mapPointer.startAnimation(_mapPointerAnimation);
+		AbsoluteLayout.LayoutParams pointerLp = (AbsoluteLayout.LayoutParams)_mapPointer.getLayoutParams();
+		pointerLp.x = x;
+		pointerLp.y = y;
+		_mapPointer.setLayoutParams(pointerLp);
+		_mapPointer.setVisibility(View.VISIBLE);
+		_mapPointer.startAnimation(_mapPointerAnimation);
 	}
 
 	@Override
@@ -143,11 +181,8 @@ public class RouteMapActivity extends BasicGuideActivity implements RouteMapView
 
 	@Override
 	public void scrollTo(int x, int y) {
-		HorizontalScrollView hscroller = (HorizontalScrollView)findViewById(R.id.routeMapHorizontalScroller);
-		hscroller.scrollTo(x, y);
-		
-		ScrollView vscroller = (ScrollView)findViewById(R.id.routeMapMainView);
-		vscroller.scrollTo(x, y);
+		_horizontalScrollView.scrollTo(x, y);
+		_verticalScrollView.scrollTo(x, y);
 	}
 
 	@Override
@@ -168,4 +203,5 @@ public class RouteMapActivity extends BasicGuideActivity implements RouteMapView
         anim.setRepeatCount(Animation.INFINITE);
         return anim;
 	}
+
 }

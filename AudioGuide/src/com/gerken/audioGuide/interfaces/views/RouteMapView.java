@@ -9,9 +9,14 @@ public interface RouteMapView extends Measurable<Integer> {
 	
 	int getMapWidth();
 	int getMapHeight();
+	int getPointerWidth();
+	int getPointerHeight();
 	
 	int getRestoredScrollX();
 	int getRestoredScrollY();
+	int getRestoredPointerX();
+	int getRestoredPointerY();
+	boolean isRestoredPointerVisible();
 	
 	void showLocationPointerAt(int x, int y);
 	void hideLocationPointer();
