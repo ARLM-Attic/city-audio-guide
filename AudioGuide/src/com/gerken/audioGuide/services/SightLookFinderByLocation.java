@@ -11,7 +11,7 @@ import com.gerken.audioGuide.objectModel.Sight;
 import com.gerken.audioGuide.objectModel.SightLook;
 
 public class SightLookFinderByLocation implements NewSightLookGotInRangeRaiser {
-	private final float DEFAULT_SIGHT_ACTIVATION_RADIUS_M = 40.0f;
+	private final float DEFAULT_SIGHT_ACTIVATION_RADIUS_M = 60.0f;
 	private final double EARTH_RADIUS_M = 6371000.0;
 	
 	private City _city;

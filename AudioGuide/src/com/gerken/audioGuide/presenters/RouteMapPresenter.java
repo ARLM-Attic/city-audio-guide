@@ -21,12 +21,19 @@ public class RouteMapPresenter {
 	private Logger _logger;
 	
 	private Route _currentRoute;
-	private boolean _isSctollingToCurrentLocationDone = false;
+	private boolean _isScrollingToCurrentLocationDone = false;
+	private boolean _shouldScrollAfterRestoringInstance = false;
 	
 	private OnEventListener _viewInitializedListener = new OnEventListener() {		
 		@Override
 		public void onEvent() {
 			handleViewInitialized();
+		}
+	};
+	private OnEventListener _viewLayoutCompleteListener = new OnEventListener() {		
+		@Override
+		public void onEvent() {
+			handleViewLayoutComplete();
 		}
 	};
 	private OnEventListener _viewStartedListener = new OnEventListener() {		
@@ -39,6 +46,12 @@ public class RouteMapPresenter {
 		@Override
 		public void onEvent() {
 			handleViewStopped();
+		}
+	};
+	private OnEventListener _viewInstanceStateRestoredListener = new OnEventListener() {		
+		@Override
+		public void onEvent() {
+			_shouldScrollAfterRestoringInstance = true;
 		}
 	};
 	
@@ -56,8 +69,10 @@ public class RouteMapPresenter {
 		_assetStreamProvider = assetStreamProvider;
 		
 		_view.addViewInitializedListener(_viewInitializedListener);
+		_view.addViewLayoutCompleteListener(_viewLayoutCompleteListener);
 		_view.addViewStartedListener(_viewStartedListener);
 		_view.addViewStoppedListener(_viewStoppedListener);
+		_view.addViewInstanceStateRestoredListener(_viewInstanceStateRestoredListener);
 	}
 
 	public void setLocationTracker(LocationTracker tracker) {
@@ -81,10 +96,17 @@ public class RouteMapPresenter {
 			_view.displayError(R.string.route_map_cannot_read);
 		}	
 	}
+	
+	private void handleViewLayoutComplete() {
+		if(_shouldScrollAfterRestoringInstance) {
+			_view.scrollTo(_view.getRestoredScrollX(), _view.getRestoredScrollY());
+			_shouldScrollAfterRestoringInstance = false;
+		}
+	}
 
 	protected void handleViewStarted() {
 		_locationTracker.startTracking();
-		_isSctollingToCurrentLocationDone = false;
+		_isScrollingToCurrentLocationDone = false;
 	}
 
 	protected void handleViewStopped() {
@@ -110,9 +132,9 @@ public class RouteMapPresenter {
 		
 		if(dx >= 0 && dx < _view.getMapWidth() && dy >=0 && dy < _view.getMapHeight()){
 			_view.showLocationPointerAt(dx, dy);
-			if(!_isSctollingToCurrentLocationDone) {
+			if(!_isScrollingToCurrentLocationDone) {
 				scrollTo(dx, dy);
-				_isSctollingToCurrentLocationDone = true;
+				_isScrollingToCurrentLocationDone = true;
 			}
 		}
 		else

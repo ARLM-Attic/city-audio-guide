@@ -1,17 +1,16 @@
 package com.gerken.audioGuide;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 
+import com.gerken.audioGuide.interfaces.OnEventListener;
 import com.gerken.audioGuide.interfaces.views.RouteMapView;
 import com.gerken.audioGuide.util.IntentExtraManager;
 
 import android.os.Bundle;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -22,10 +21,20 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 public class RouteMapActivity extends BasicGuideActivity implements RouteMapView {
+	private static final String KEY_SCROLL_X = "ScrollX";
+	private static final String KEY_SCROLL_Y = "ScrollY";
+	
 	private View _rootView;	
 	private ImageView _mapImage;
 	private IntentExtraManager _intentExtraManager;	
 	private Animation _mapPointerAnimation;
+	private HorizontalScrollView _horizontalScrollView;
+	private ScrollView _verticalScrollView;
+	
+	private int _restoredScrollX = 0;
+	private int _restoredScrollY = 0;
+	
+	private ArrayList<OnEventListener> _viewInstanceStateRestoredListeners = new ArrayList<OnEventListener>();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -34,12 +43,32 @@ public class RouteMapActivity extends BasicGuideActivity implements RouteMapView
 		
 		_rootView = findViewById(R.id.rootLayout);
 		_mapImage = (ImageView)findViewById(R.id.mapImage);
+		_horizontalScrollView = (HorizontalScrollView)findViewById(R.id.routeMapHorizontalScroller);
+		_verticalScrollView = (ScrollView)findViewById(R.id.routeMapMainView);
+		
 		_intentExtraManager = new IntentExtraManager(getIntent());
-		_mapPointerAnimation = createMapPointerAnimation();
+		_mapPointerAnimation = createMapPointerAnimation();		
 		
 		((GuideApplication)getApplication()).getPresenterContainer().initRouteMapPresenter(this);
 		
 		onInitialized();
+	}
+	
+	@Override
+	public void onSaveInstanceState(Bundle savedInstanceState) {
+	  super.onSaveInstanceState(savedInstanceState);
+	  savedInstanceState.putInt(KEY_SCROLL_X, _horizontalScrollView.getScrollX());
+	  savedInstanceState.putInt(KEY_SCROLL_Y, _verticalScrollView.getScrollY());
+	}
+	
+	@Override
+	public void onRestoreInstanceState(Bundle savedInstanceState) {
+	  super.onRestoreInstanceState(savedInstanceState);
+	  _restoredScrollX = savedInstanceState.getInt(KEY_SCROLL_X);
+	  _restoredScrollY = savedInstanceState.getInt(KEY_SCROLL_Y);
+	  
+	  for(OnEventListener l : _viewInstanceStateRestoredListeners)
+      	l.onEvent();	  
 	}
 
 	@Override
@@ -80,6 +109,15 @@ public class RouteMapActivity extends BasicGuideActivity implements RouteMapView
 	public int getMapHeight() {
 		return _mapImage.getHeight();
 	}
+	
+	@Override
+	public int getRestoredScrollX() {
+		return _restoredScrollX;
+	}
+	@Override
+	public int getRestoredScrollY() {
+		return _restoredScrollY;
+	}
 
 	@Override
 	public void showLocationPointerAt(int x, int y) {
@@ -115,6 +153,11 @@ public class RouteMapActivity extends BasicGuideActivity implements RouteMapView
 	@Override
 	protected View getRootView() {
 		return _rootView;
+	}
+	
+	@Override
+	public void addViewInstanceStateRestoredListener(OnEventListener listener) {
+		_viewInstanceStateRestoredListeners.add(listener);
 	}
 
 	private Animation createMapPointerAnimation() {
