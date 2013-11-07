@@ -3,6 +3,7 @@ package com.gerken.audioGuide.services;
 import java.util.ArrayList;
 
 import com.gerken.audioGuide.interfaces.LocationTracker;
+import com.gerken.audioGuide.interfaces.Logger;
 import com.gerken.audioGuide.interfaces.NewSightLookGotInRangeRaiser;
 import com.gerken.audioGuide.interfaces.OnLocationChangedListener;
 import com.gerken.audioGuide.interfaces.OnSightLookGotInRangeListener;
@@ -16,6 +17,7 @@ public class SightLookFinderByLocation implements NewSightLookGotInRangeRaiser {
 	
 	private City _city;
 	private LocationTracker _locationTracker;
+	private Logger _logger;
 	
 	private float _sightActivationRadius = DEFAULT_SIGHT_ACTIVATION_RADIUS_M;
 	
@@ -35,6 +37,10 @@ public class SightLookFinderByLocation implements NewSightLookGotInRangeRaiser {
 		_locationTracker.addLocationChangedListener(_locationChangedListener);
 	}
 	
+	public void setLogger(Logger logger) {
+		_logger = logger;
+	}
+	
 	public void setSightActivationRadius(float radiusInMeters) {
 		_sightActivationRadius = radiusInMeters;
 	}
@@ -47,6 +53,11 @@ public class SightLookFinderByLocation implements NewSightLookGotInRangeRaiser {
 	
 	private void handleLocationChanged(double latitude, double longitude) {
 		SightLook sightLook = findClosestSightLookInRange(latitude, longitude);
+		
+		if(sightLook != null)
+			logDebug(String.format("Found sight look \"%s\" at %f,%f", 
+				sightLook.getSight().getName(), sightLook.getLatitude(), sightLook.getLongitude()));
+		
 		for(OnSightLookGotInRangeListener l : _sightLookGotInRangeListeners)
 			l.onSightLookGotInRange(sightLook);
 	}
@@ -80,5 +91,10 @@ public class SightLookFinderByLocation implements NewSightLookGotInRangeRaiser {
 	
 	private double deg2rad(double deg) {
 		return deg * (Math.PI/180.0);
+	}
+	
+	private void logDebug(String message) {
+		if(_logger != null)
+			_logger.logDebug(message);
 	}
 }
