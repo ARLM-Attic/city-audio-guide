@@ -38,8 +38,10 @@ public class AndroidLocationManagerFacade implements LocationTracker {
 		
 		@Override
 		public void onLocationChanged(Location location) {
-			logDebug(String.format("Location changed: lat=%.5f long=%.5f",  
-					location.getLatitude(), location.getLongitude()));
+			if(location == null)
+				return;
+			logDebug(String.format("Location changed: lat=%.5f long=%.5f; acc=%.1f m",  
+					location.getLatitude(), location.getLongitude(), location.getAccuracy()));
 			for(OnLocationChangedListener l : _locationChangedListeners)
 				l.onLocationChanged(location.getLatitude(), location.getLongitude());			
 		}
@@ -57,6 +59,11 @@ public class AndroidLocationManagerFacade implements LocationTracker {
 	
 	public void startTracking() {
 		logDebug("Starting location tracking");
+		Location location = _manager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+		if(location != null)
+			logDebug(String.format("Last known location of %tT: lat=%.5f long=%.5f; acc=%.1f m",  
+					new java.util.Date(location.getTime()),
+					location.getLatitude(), location.getLongitude(), location.getAccuracy()));
 		_manager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
 			UPDATE_FREQ_MIN_MS, UPDATE_DISTANCE_MIN_M,
 			_locationListener);
