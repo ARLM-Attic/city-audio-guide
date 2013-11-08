@@ -15,6 +15,7 @@ import android.os.Bundle;
 public class AndroidLocationManagerFacade implements LocationTracker {
 	private final long UPDATE_FREQ_MIN_MS = 10000;
 	private final float UPDATE_DISTANCE_MIN_M = 5.0f;
+	private final long CACHED_LOCATION_EXPIRATION_MS = 30000;
 	
 	private LocationManager _manager;	
 	private Logger _logger;
@@ -60,10 +61,16 @@ public class AndroidLocationManagerFacade implements LocationTracker {
 	public void startTracking() {
 		logDebug("Starting location tracking");
 		Location location = _manager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-		if(location != null)
+		if(location != null) {
 			logDebug(String.format("Last known location of %tT: lat=%.5f long=%.5f; acc=%.1f m",  
 					new java.util.Date(location.getTime()),
 					location.getLatitude(), location.getLongitude(), location.getAccuracy()));
+			long currentMillis = (new java.util.Date()).getTime();
+			if(currentMillis - location.getTime() < CACHED_LOCATION_EXPIRATION_MS) {
+				logDebug("Using the cached location");
+				_locationListener.onLocationChanged(location);
+			}
+		}
 		_manager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
 			UPDATE_FREQ_MIN_MS, UPDATE_DISTANCE_MIN_M,
 			_locationListener);
