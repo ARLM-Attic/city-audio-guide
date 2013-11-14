@@ -203,9 +203,9 @@ public class SightPresenter {
 		if(sightLook != null) {
 			if(!sightLook.equals(_currentSightLook)) {
 				if(!sightLook.getSight().equals(_currentSight)) {
-					notifyViewAboutNewSight(sightLook);
 					if(_audioNotifier != null)
 						_audioNotifier.signalSightInRange();
+					notifyViewAboutNewSight(sightLook);
 					_currentSight = sightLook.getSight();
 				}					
 				else
@@ -316,9 +316,6 @@ public class SightPresenter {
 	
 	private void notifyViewAboutNewSight(SightLook newSightLook) {
 		notifyViewAboutNewSightLook(newSightLook);
-		
-		Sight newSight = newSightLook.getSight();
-		_sightView.setInfoPanelCaptionText(newSight.getName());		
 	}
 	
 	private void notifyViewAboutNewSightLook(SightLook newSightLook) {
@@ -326,6 +323,7 @@ public class SightPresenter {
 		if(sightLookImage != null)		
 			_sightView.setBackgroundImage(sightLookImage);
 		
+		_sightView.setInfoPanelCaptionText(newSightLook.getSight().getName());
 		_sightView.hideNextSightDirection();
 	}
 	
