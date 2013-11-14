@@ -2,7 +2,6 @@ package com.gerken.audioGuideTests.presenters.sightPresenter;
 
 import static org.mockito.Mockito.*;
 
-import java.io.ByteArrayInputStream;
 import java.util.Random;
 
 import org.junit.Test;
@@ -47,7 +46,7 @@ public class HandleSightLookChange {
 	}
 
 	@Test
-	public void Given_NewSightGotInRange__Then_AudioNotificationPalyed() throws Exception {
+	public void Given_NewSightGotInRange__Then_AudioNotificationPlayed() throws Exception {
 		Sight sight = createSightWithSingleSightLook();
 		SightLook expectedSightLook = sight.getSightLooks().get(0);
 		
@@ -180,7 +179,36 @@ public class HandleSightLookChange {
 		
 		// --- Assert
 		verify(sightView).hideNextSightDirection();
-	}	
+	}
+	
+	@Test
+	public void Given_NewLookOfTheSameSightGotInRange__Then_CaptionSetToCurrentSightName() throws Exception {
+		final String EXPECTED_SIGHT_NAME = "Colosseum";
+		final int EXPECTED_VIEW_WIDTH = 240;
+		final int EXPECTED_VIEW_HEIGHT = 320;
+		
+		Sight sight = createSightWithSingleSightLook(
+				_random.nextDouble(), _random.nextDouble(), EXPECTED_SIGHT_NAME, createRandomString());	
+		SightLook firstSightLook = sight.getSightLooks().get(0);
+		SightLook secondSightLook = new SightLook(
+				_random.nextDouble(), _random.nextDouble(),	createRandomString());
+		secondSightLook.setSight(sight);
+		sight.getSightLooks().add(secondSightLook);
+		
+		SightView sightView = mock(SightView.class);
+		when(sightView.getWidth()).thenReturn(EXPECTED_VIEW_WIDTH);
+		when(sightView.getHeight()).thenReturn(EXPECTED_VIEW_HEIGHT);
+		DownscalingBitmapLoader bmpLoader = mock(DownscalingBitmapLoader.class);
+		
+		SutSetupResult sutSetupResult = setupSut(sightView, bmpLoader);
+		
+		// --- Act
+		sutSetupResult.sightLookGotInRangeListener.onSightLookGotInRange(firstSightLook);
+		sutSetupResult.sightLookGotInRangeListener.onSightLookGotInRange(secondSightLook);
+		
+		// --- Assert
+		verify(sightView, times(2)).setInfoPanelCaptionText(EXPECTED_SIGHT_NAME);
+	}
 	
 
 	private String createRandomString() {
@@ -199,11 +227,10 @@ public class HandleSightLookChange {
 	
 	private Sight createSightWithSingleSightLook(double latitude, double longitude, 
 			String sightName, String lookImageName) {
-		final String WHATEVER_STRING = "whatever";	
 		
 		SightLook expectedSightLook = new SightLook(
 				latitude, longitude, lookImageName);
-		Sight expectedSight = new Sight(_random.nextInt(), sightName, WHATEVER_STRING);
+		Sight expectedSight = new Sight(_random.nextInt(), sightName, createRandomString());
 		expectedSight.addLook(expectedSightLook);
 		
 		return expectedSight;
