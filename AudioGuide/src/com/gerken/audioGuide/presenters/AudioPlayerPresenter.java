@@ -166,13 +166,13 @@ public class AudioPlayerPresenter {
 	}
 	
 	private void handleRewindButtonPress() {
-		_logger.logDebug("handleRewindButtonPress");
+		logDebug("handleRewindButtonPress");
 		startAudioUpdateTimer();
 		startRewinding();
 	}
 	
 	private void handleRewindButtonRelease() {
-		_logger.logDebug("handleRewindButtonRelease");
+		logDebug("handleRewindButtonRelease");
 		try {
 			stopRewinding();			
 		}
@@ -240,6 +240,11 @@ public class AudioPlayerPresenter {
 	private void doRewindStep(int step) {
 		int newPosition = Math.max(0, _audioPlayer.getCurrentPosition()-step);
 		_audioPlayer.seekTo(newPosition);
+	}
+	
+	private void logDebug(String message) {
+		if(_logger != null)
+			_logger.logDebug(message);
 	}
 	
 	private void logError(String message, Throwable ex) {
