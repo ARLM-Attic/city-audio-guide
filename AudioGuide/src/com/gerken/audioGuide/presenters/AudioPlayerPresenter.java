@@ -18,7 +18,7 @@ import com.gerken.audioGuide.objectModel.SightLook;
 
 public class AudioPlayerPresenter {
 	private final int AUDIO_PLAYER_POLLING_INTERVAL_MS = 250;
-	private final float REWIND_STEP_RATIO = 0.02f;
+	private final float DEFAULT_REWIND_STEP_RATIO = 0.02f;
 	private final long REWIND_REPEAT_INTERVAL_MS = 500L;
 	
 	
@@ -33,6 +33,8 @@ public class AudioPlayerPresenter {
 	private boolean _resumePlayerAfterRewinding = false;
 	
 	private Sight _currentSight = null;
+	
+	private float _rewindStepRatio = DEFAULT_REWIND_STEP_RATIO;
 	
 	private OnEventListener _playPressedListener = new OnEventListener() {		
 		@Override
@@ -109,6 +111,10 @@ public class AudioPlayerPresenter {
 	
 	public void setAudioRewindScheduler(Scheduler scheduler) {
 		_rewindScheduler = scheduler;
+	}
+	
+	public void setRewindStepRatio(float value) {
+		_rewindStepRatio = value;
 	}
 	
 	private void handleSightLookIsInRange(SightLook sightLook) {
@@ -222,7 +228,7 @@ public class AudioPlayerPresenter {
 	private void startRewinding() {
 		_resumePlayerAfterRewinding = _audioPlayer.isPlaying();
 		_audioPlayer.pause();
-		int step = (int)(REWIND_STEP_RATIO * (float)_audioPlayer.getDuration());
+		int step = (int)(_rewindStepRatio * (float)_audioPlayer.getDuration());
 		
 		if(_rewindScheduler != null) {
 			_rewindScheduler.scheduleAtFixedRate(
