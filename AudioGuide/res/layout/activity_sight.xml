@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="invisible"
-        android:paddingBottom="34dp"
+        android:paddingBottom="@dimen/sight_route_arrow_padding_bottom"
         aguide:arrowWidth="60dp"
         aguide:arrowHeight="80dp" />
     
@@ -21,14 +21,14 @@
 	    android:id="@+id/playerInfoPanel"
 	    android:orientation="vertical"
 	    android:layout_width="match_parent"
-	    android:layout_height="160dp"
+	    android:layout_height="@dimen/sight_player_info_panel_height"
 	    android:layout_gravity="bottom"	   
 	     >
 	    <LinearLayout
 	        android:id="@+id/sightCaptionFrame"
 		    android:orientation="vertical"
 		    android:layout_width="match_parent"
-		    android:layout_height="32dp"
+		    android:layout_height="@dimen/sight_caption_height"
 		    android:layout_gravity="bottom"
 		    android:background="@drawable/sight_caption_background" >
 	        <TextView
@@ -38,14 +38,14 @@
 		        android:layout_gravity="center"
 		        android:textColor="#FFFFE633"
 		        android:textStyle="bold"
-		        android:textSize="20sp"
+		        android:textSize="@dimen/sight_caption_text_size"
 		        android:text="@string/sight_info_none"  />
         </LinearLayout>
         
 	    <com.gerken.audioGuide.controls.AudioPlayerControl
 	        android:id="@+id/playerPanel"
 		    android:layout_width="match_parent"
-		    android:layout_height="128dp"
+		    android:layout_height="@dimen/player_panel_height"
 		    android:layout_gravity="center"
 		     />
 

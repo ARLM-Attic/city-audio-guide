@@ -4,5 +4,24 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <item name="info_text_shade_gradient_radius" type="dimen" format="float">400</item>
-
+    
+    <dimen name="sight_player_info_panel_height">160dp</dimen>    
+    <dimen name="sight_caption_height">32dp</dimen>
+    <dimen name="sight_caption_text_size">20sp</dimen>
+    <dimen name="sight_route_arrow_padding_bottom">34dp</dimen>
+    
+    <dimen name="player_panel_height">128dp</dimen>
+    <dimen name="player_button_play_width">80dp</dimen>
+    <dimen name="player_button_play_height">80dp</dimen>
+    <dimen name="player_button_play_margin_top">16dp</dimen>
+    <dimen name="player_button_stop_width">100dp</dimen>
+    <dimen name="player_button_stop_height">60dp</dimen>
+    <dimen name="player_button_stop_margin_left">24dp</dimen>
+    <dimen name="player_button_rwnd_width">100dp</dimen>
+    <dimen name="player_button_rwnd_height">60dp</dimen>
+    <dimen name="player_button_rwnd_margin_right">24dp</dimen>
+    <dimen name="player_track_played_duration_text_size">20sp</dimen>
+    
+    <dimen name="player_progress_bar_margin_bottom">8dp</dimen>
+    <dimen name="player_progress_bar_margin_horizontal">16dp</dimen>
 </resources>

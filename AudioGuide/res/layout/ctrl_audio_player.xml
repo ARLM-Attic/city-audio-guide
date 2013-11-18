@@ -1,43 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 			    android:layout_width="match_parent"
-			    android:layout_height="128dp"
+			    android:layout_height="@dimen/player_panel_height"
 			    android:layout_gravity="center"
 			    android:background="#80EFCFEF">
     <ImageButton
         android:id="@+id/rewindButton"
-        android:layout_width="100dp"
-        android:layout_height="60dp"
+        android:layout_width="@dimen/player_button_rwnd_width"
+        android:layout_height="@dimen/player_button_rwnd_height"
         android:layout_alignTop="@+id/playButton"
         android:layout_toLeftOf="@+id/playButton"
-        android:layout_marginRight="24dp"
+        android:layout_marginRight="@dimen/player_button_rwnd_margin_right"
         android:background="#00000000" /> 
       
 	<ImageButton
         android:id="@+id/playButton"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
+        android:layout_width="@dimen/player_button_play_width"
+        android:layout_height="@dimen/player_button_play_height"
         android:layout_centerHorizontal="true"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="@dimen/player_button_play_margin_top"
         android:background="#00000000" />
        
 	<ImageButton
         android:id="@+id/stopButton"
-        android:layout_width="100dp"
-        android:layout_height="60dp"
+        android:layout_width="@dimen/player_button_stop_width"
+        android:layout_height="@dimen/player_button_stop_height"
         android:layout_alignTop="@+id/playButton"
         android:layout_toRightOf="@+id/playButton"
-        android:layout_marginLeft="24dp"
+        android:layout_marginLeft="@dimen/player_button_stop_margin_left"
         android:background="#00000000" /> 
        
 	<ProgressBar android:id="@+id/audioProgressBar"
 		android:layout_width="match_parent"
 		android:layout_height="4dp"
 		android:layout_alignParentBottom="true"
-		android:layout_marginBottom="8dp"
-		android:layout_marginLeft="16dp"
-		android:layout_marginRight="16dp"
+		android:layout_marginBottom="@dimen/player_progress_bar_margin_bottom"
+		android:layout_marginLeft="@dimen/player_progress_bar_margin_horizontal"
+		android:layout_marginRight="@dimen/player_progress_bar_margin_horizontal"
 		android:progressDrawable="@drawable/audio_progress_drawable"
 		style="@android:style/Widget.ProgressBar.Horizontal" />
        
@@ -46,7 +46,7 @@
 		android:layout_height="wrap_content"
 		android:textColor="#FF00FF33"
         android:textStyle="bold"
-        android:textSize="20sp"
+        android:textSize="@dimen/player_track_played_duration_text_size"
         android:text="0:00"
         android:layout_alignRight="@+id/audioProgressBar"
         android:layout_alignBottom="@+id/audioProgressBar"
@@ -57,7 +57,7 @@
 		android:layout_height="wrap_content"
 		android:textColor="#FF00FF33"
         android:textStyle="bold"
-        android:textSize="20sp"
+        android:textSize="@dimen/player_track_played_duration_text_size"
         android:text="0:00"
         android:layout_alignLeft="@+id/audioProgressBar"
         android:layout_alignBottom="@+id/audioProgressBar"
