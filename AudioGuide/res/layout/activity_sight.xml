@@ -13,8 +13,8 @@
         android:layout_height="match_parent"
         android:visibility="invisible"
         android:paddingBottom="@dimen/sight_route_arrow_padding_bottom"
-        aguide:arrowWidth="60dp"
-        aguide:arrowHeight="80dp" />
+        aguide:arrowWidth="@dimen/sight_route_arrow_width"
+        aguide:arrowHeight="@dimen/sight_route_arrow_height" />
     
     <!--  android:layout_gravity="bottom" -->
     <LinearLayout

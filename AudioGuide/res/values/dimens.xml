@@ -9,6 +9,8 @@
     <dimen name="sight_caption_height">32dp</dimen>
     <dimen name="sight_caption_text_size">20sp</dimen>
     <dimen name="sight_route_arrow_padding_bottom">34dp</dimen>
+    <dimen name="sight_route_arrow_width">60dp</dimen>
+    <dimen name="sight_route_arrow_height">80dp</dimen>
     
     <dimen name="player_panel_height">128dp</dimen>
     <dimen name="player_button_play_width">80dp</dimen>
