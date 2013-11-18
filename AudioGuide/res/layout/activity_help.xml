@@ -32,7 +32,7 @@
 			    android:id="@+id/helpTextView"
 			    android:layout_width="match_parent"
 			    android:layout_height="wrap_content"
-			    android:textSize="16sp"
+			    android:textSize="@dimen/help_text_size"
 			    android:textColor="#FFFEE73F"
 			    android:text="@string/help_text_sight_activity" />
 	

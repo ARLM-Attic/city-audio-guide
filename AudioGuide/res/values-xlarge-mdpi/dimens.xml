@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="sight_player_info_panel_height">280dp</dimen>
+    <dimen name="sight_caption_height">56dp</dimen>
+    <dimen name="sight_caption_text_size">36sp</dimen>
+    <dimen name="sight_route_arrow_padding_bottom">60dp</dimen>
+    <dimen name="sight_route_arrow_width">106dp</dimen>
+    <dimen name="sight_route_arrow_height">140dp</dimen>
+    
+    <dimen name="player_panel_height">224dp</dimen>
+	<dimen name="player_button_play_width">140dp</dimen>
+    <dimen name="player_button_play_height">140dp</dimen>
+    
+    <dimen name="player_button_play_margin_top">28dp</dimen>
+    <dimen name="player_button_stop_width">180dp</dimen>
+    <dimen name="player_button_stop_height">106dp</dimen>
+    <dimen name="player_button_stop_margin_left">42dp</dimen>
+    <dimen name="player_button_rwnd_width">180dp</dimen>
+    <dimen name="player_button_rwnd_height">106dp</dimen>
+    <dimen name="player_button_rwnd_margin_right">42dp</dimen>
+    <dimen name="player_track_played_duration_text_size">36sp</dimen>
+    
+    <dimen name="player_progress_bar_margin_bottom">14dp</dimen>
+    <dimen name="player_progress_bar_margin_horizontal">28dp</dimen>
+    <dimen name="player_progress_bar_height">8dp</dimen>
+    
+    <dimen name="help_text_size">28sp</dimen>
+</resources>

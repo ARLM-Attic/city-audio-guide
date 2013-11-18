@@ -21,4 +21,7 @@
     
     <dimen name="player_progress_bar_margin_bottom">12dp</dimen>
     <dimen name="player_progress_bar_margin_horizontal">22dp</dimen>
+    <dimen name="player_progress_bar_height">6dp</dimen>
+    
+    <dimen name="help_text_size">22sp</dimen>
 </resources>
