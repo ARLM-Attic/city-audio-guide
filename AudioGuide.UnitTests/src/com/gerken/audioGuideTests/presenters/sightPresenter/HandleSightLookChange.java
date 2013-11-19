@@ -89,8 +89,9 @@ public class HandleSightLookChange {
 		Sight sight = createSightWithSingleSightLook();	
 		SightLook previousSightLook = sight.getSightLooks().get(0);
 		
-		City city = new City(_random.nextInt(), createRandomString(),
-				EXPECTED_NO_SIGHT_IN_RANGE_IMAGE_NAME);
+		CityConfiguration config = new CityConfiguration(EXPECTED_NO_SIGHT_IN_RANGE_IMAGE_NAME,
+				createRandomString(), createRandomString());
+		City city = new City(_random.nextInt(), createRandomString(), config);
 		SightView sightView = mock(SightView.class);
 		when(sightView.getWidth()).thenReturn(_random.nextInt());
 		when(sightView.getHeight()).thenReturn(_random.nextInt());
@@ -105,8 +106,7 @@ public class HandleSightLookChange {
 		
 		// --- Assert
 		verify(bmpLoader).load(eq(EXPECTED_NO_SIGHT_IN_RANGE_IMAGE_NAME), anyInt(), anyInt());
-	}
-	
+	}	
 	
 	@Test
 	public void Given_SightGotOutOfRange_PlayerIsPlaying__Then_PlayerIsStopped() throws Exception {

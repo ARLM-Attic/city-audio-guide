@@ -101,16 +101,19 @@ public class HandleSightLookIsInRange {
 	
 	private City createSingleSightLookModel(double latitude, double longitude, 
 			String sightName, String audioName) {
-		final String WHATEVER_STRING = "whatever";	
 		
 		SightLook expectedSightLook = new SightLook(
-				latitude, longitude, WHATEVER_STRING);
+				latitude, longitude, createRandomString());
 		Sight expectedSight = new Sight(_random.nextInt(), sightName, audioName);
 		expectedSight.addLook(expectedSightLook);
-		City city = new City(_random.nextInt(), WHATEVER_STRING, WHATEVER_STRING);
+		City city = new City(_random.nextInt(), createRandomString());
 		city.getSights().add(expectedSight);
 		
 		return city;
+	}
+	
+	private String createRandomString() {
+		return String.valueOf(_random.nextLong());
 	}
 	
 	

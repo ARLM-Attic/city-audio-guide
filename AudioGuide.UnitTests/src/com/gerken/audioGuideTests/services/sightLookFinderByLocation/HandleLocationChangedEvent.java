@@ -90,10 +90,8 @@ public class HandleLocationChangedEvent {
 	}
 	
 	private City createSingleSightCity() {
-		final String WHATEVER_STRING = createRandomString();
-		
-		Sight expectedSight = new Sight(_random.nextInt(), WHATEVER_STRING, WHATEVER_STRING);
-		City city = new City(_random.nextInt(), WHATEVER_STRING, WHATEVER_STRING);
+		Sight expectedSight = new Sight(_random.nextInt(), createRandomString(), createRandomString());
+		City city = new City(_random.nextInt(), createRandomString());
 		city.getSights().add(expectedSight);
 		
 		return city;
