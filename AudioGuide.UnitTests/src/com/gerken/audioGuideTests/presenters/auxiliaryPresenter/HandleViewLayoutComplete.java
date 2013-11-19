@@ -41,6 +41,30 @@ public class HandleViewLayoutComplete {
 		verify(bitmapLoader).load(EXPECTED_LANDSCAPE_BACKGROUND_IMAGE_NAME, WIDTH, HEIGHT);
 	}
 	
+	@Test
+	public void Given_ViewIsPortrait__Then_LandscapeBackgroundIsLoaded() throws Exception {
+		final int WIDTH = 320;
+		final int HEIGHT = 640;
+		final String EXPECTED_PORTRAIT_BACKGROUND_IMAGE_NAME = "view_port.jpg";
+		
+		AuxiliaryView auxView = mock(AuxiliaryView.class);
+		when(auxView.getWidth()).thenReturn(WIDTH);
+		when(auxView.getHeight()).thenReturn(HEIGHT);
+		DownscalingBitmapLoader bitmapLoader = mock(DownscalingBitmapLoader.class);
+
+		CityConfiguration config = new CityConfiguration(createRandomString(), 
+				EXPECTED_PORTRAIT_BACKGROUND_IMAGE_NAME, createRandomString());
+		City city = new City(_random.nextInt(), createRandomString(), config);
+		
+		SutSetupResult sutSetupResult = setupSut(city, auxView, bitmapLoader);
+		
+		// --- Act
+		sutSetupResult.viewLayoutCompleteListener.onEvent();
+		
+		// --- Assert
+		verify(bitmapLoader).load(EXPECTED_PORTRAIT_BACKGROUND_IMAGE_NAME, WIDTH, HEIGHT);
+	}
+	
 	private String createRandomString() {
 		return String.valueOf(_random.nextLong());
 	}
