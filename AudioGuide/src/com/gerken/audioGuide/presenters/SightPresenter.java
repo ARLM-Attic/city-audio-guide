@@ -329,7 +329,8 @@ public class SightPresenter {
 	
 	private void notifyViewAboutNoSightViewInRange() {
 		try{
-			BitmapDownscalingResult bmp = _bitmapLoader.load(_city.getOutOfRangeImageName(), 
+			BitmapDownscalingResult bmp = _bitmapLoader.load(
+				_city.getConfiguration().getOutOfRangeImageName(), 
 				_sightView.getWidth(), _sightView.getHeight());
 			if(bmp != null)		
 				_sightView.setBackgroundImage(bmp);		

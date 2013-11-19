@@ -44,7 +44,9 @@ public class AuxiliaryPresenter {
 	private void handleViewLayoutComplete(){
 		BitmapDownscalingResult backgroundImage = null;
 		try {
-			String img = getBackgroundImageFileName();			
+			String img = (_auxView.getWidth() > _auxView.getHeight()) ? 
+				_city.getConfiguration().getAuxLandscapeBackgroundImageName() : 
+				_city.getConfiguration().getAuxPortraitBackgroundImageName();			
 			logDebug("Loading " + img);
 			backgroundImage = _bitmapLoader.load(
 				img, _auxView.getWidth(), _auxView.getHeight());
@@ -55,19 +57,7 @@ public class AuxiliaryPresenter {
 		if(backgroundImage != null)		
 			_auxView.setBackgroundImage(backgroundImage);
 	}
-	
-	private String getBackgroundImageFileName() {
-		String suffix = (_auxView.getWidth() > _auxView.getHeight()) ? 
-				_suffixLandscape : _suffixPortrait;		
-		
-		String[] fileNameParts = _city.getHelpBackgroundImageName().split("\\.");
-		if(fileNameParts.length == 2) {
-			return fileNameParts[0] + suffix + "." + fileNameParts[1];
-		}
-		else
-			return _city.getHelpBackgroundImageName() + suffix;
-	}
-	
+
 	private void logError(String message, Throwable ex) {
 		if(_logger != null)
 			_logger.logError(message, ex);

@@ -11,10 +11,9 @@ public class City {
 	private int _id;
 	@Attribute(name="name")
 	private String _name;
-	@Attribute(name="outOfRangeImageName")
-	private String _outOfRangeImageName;
-	@Attribute(name="helpBackgroundImageName")
-	private String _helpBackgroundImageName;
+	
+	@Element(name="cityConfiguration")
+	private CityConfiguration _config;	
 	
 	@ElementList(name="sights")
 	private List<Sight> _sights;
@@ -26,27 +25,28 @@ public class City {
 		_routes = new ArrayList<Route>();
 	}
 	
-	public City(int id, String name, String outOfRangeImageName) {
+	public City(int id, String name) {
 		_id = id;
 		_name = name;
-		_outOfRangeImageName = outOfRangeImageName;
+		_config = new CityConfiguration();
 		_sights = new ArrayList<Sight>();
 		_routes = new ArrayList<Route>();
 	}
 	
-	public String getHelpBackgroundImageName() {
-		return _helpBackgroundImageName;
-	}
-	public void setHelpBackgroundImageName(String imageName) {
-		_helpBackgroundImageName = imageName;
-	}
-	
-	public String getOutOfRangeImageName() {
-		return _outOfRangeImageName;
+	public City(int id, String name, CityConfiguration cityConfiguration) {
+		_id = id;
+		_name = name;
+		_config = cityConfiguration;
+		_sights = new ArrayList<Sight>();
+		_routes = new ArrayList<Route>();
 	}
 	
 	public String getName() {
 		return _name;
+	}
+	
+	public CityConfiguration getConfiguration() {
+		return _config;
 	}
 	
 	public List<Sight> getSights() {
@@ -54,5 +54,5 @@ public class City {
 	}
 	public List<Route> getRoutes() {
 		return _routes;
-	}
+	}	
 }
