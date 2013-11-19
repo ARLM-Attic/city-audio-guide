@@ -12,19 +12,19 @@
 	    android:id="@+id/infoLayout"
 	    android:layout_width="match_parent"
 	    android:layout_height="match_parent"
-	    android:layout_marginLeft="18dp"
-	    android:layout_marginTop="18dp"
-        android:layout_marginRight="18dp"
-        android:layout_marginBottom="18dp"
+	    android:layout_marginLeft="@dimen/help_shade_margin"
+	    android:layout_marginTop="@dimen/help_shade_margin"
+        android:layout_marginRight="@dimen/help_shade_margin"
+        android:layout_marginBottom="@dimen/help_shade_margin"
 	    android:background="@drawable/info_text_shade_drawable">
 
 	    <ScrollView
 	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
-	        android:layout_marginTop="12dp"
-	        android:layout_marginLeft="12dp"
-	        android:layout_marginRight="12dp"
-	        android:layout_marginBottom="16dp"
+	        android:layout_marginTop="@dimen/help_text_container_margin"
+	        android:layout_marginLeft="@dimen/help_text_container_margin"
+	        android:layout_marginRight="@dimen/help_text_container_margin"
+	        android:layout_marginBottom="@dimen/help_text_container_margin"
 	        android:layout_above="@+id/buttonHelpClose"
 	        android:layout_alignParentTop="true">
 	
@@ -34,6 +34,7 @@
 			    android:layout_height="wrap_content"
 			    android:textSize="@dimen/help_text_size"
 			    android:textColor="#FFFEE73F"
+			    android:singleLine="false"
 			    android:text="@string/help_text_sight_activity" />
 	
 	    </ScrollView>
@@ -42,8 +43,9 @@
 	        style="@style/DefaultButton"
 	        android:id="@+id/buttonHelpClose"
 	        android:layout_centerHorizontal="true"
-	        android:layout_alignParentBottom="true"        
-	        android:layout_marginBottom="12dp"
+	        android:layout_alignParentBottom="true"
+	        android:layout_marginTop="@dimen/help_buton_close_margin_top"        
+	        android:layout_marginBottom="@dimen/help_buton_close_margin_bottom"
 	        android:textStyle="bold"
 	        android:text="@string/button_text_close" />
     </RelativeLayout>

@@ -35,6 +35,7 @@
 		        android:id="@+id/sightCaption"
 		        android:layout_width="wrap_content"
 		        android:layout_height="wrap_content"
+		        android:paddingTop="@dimen/sight_caption_text_padding_top"
 		        android:layout_gravity="center"
 		        android:textColor="#FFFFE633"
 		        android:textStyle="bold"

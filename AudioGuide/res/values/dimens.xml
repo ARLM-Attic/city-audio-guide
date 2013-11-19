@@ -5,9 +5,14 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <item name="info_text_shade_gradient_radius" type="dimen" format="float">400</item>
     
+    <dimen name="default_button_width">100dp</dimen>
+    <dimen name="default_button_height">40dp</dimen>
+    <dimen name="default_button_text_size">16sp</dimen>
+    
     <dimen name="sight_player_info_panel_height">160dp</dimen>    
     <dimen name="sight_caption_height">32dp</dimen>
     <dimen name="sight_caption_text_size">20sp</dimen>
+    <dimen name="sight_caption_text_padding_top">1dp</dimen>
     <dimen name="sight_route_arrow_padding_bottom">34dp</dimen>
     <dimen name="sight_route_arrow_width">60dp</dimen>
     <dimen name="sight_route_arrow_height">80dp</dimen>
@@ -28,5 +33,14 @@
     <dimen name="player_progress_bar_margin_horizontal">16dp</dimen>
     <dimen name="player_progress_bar_height">4dp</dimen>
     
+    <dimen name="help_shade_margin">18dp</dimen>
     <dimen name="help_text_size">16sp</dimen>
+    <dimen name="help_text_container_margin">12dp</dimen>
+    <dimen name="help_buton_close_margin_top">4dp</dimen>
+    <dimen name="help_buton_close_margin_bottom">12dp</dimen>
+    
+    <dimen name="preferences_shade_margin">18dp</dimen>
+    <dimen name="preferences_radio_button_label_text_size">16sp</dimen>
+    <dimen name="preferences_radio_buttons_block_margin">8dp</dimen>
+    <dimen name="preferences_buttons_margin">12dp</dimen>
 </resources>
