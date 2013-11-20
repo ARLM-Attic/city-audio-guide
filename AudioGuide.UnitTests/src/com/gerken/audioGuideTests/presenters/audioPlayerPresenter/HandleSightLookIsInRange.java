@@ -22,13 +22,8 @@ public class HandleSightLookIsInRange {
 	@Test
 	public void Given_NewSightGotInRange__Then_PlayerViewShownAsStopped() {
 		City city = createSingleSightLookModel();
-		
 		AudioPlayerView playerView = mock(AudioPlayerView.class);
-		AudioPlayer player = mock(AudioPlayer.class);
-		MediaAssetManager mediaAssetManager = mock(MediaAssetManager.class);
-		NewSightLookGotInRangeRaiser raiser = mock(NewSightLookGotInRangeRaiser.class);
-		
-		SutSetupResult sutSetupResult = setupSut(playerView, player, mediaAssetManager, raiser);
+		SutSetupResult sutSetupResult = setupSut(playerView);
 		
 		// --- Act
 		sutSetupResult.sightLookGotInRangeListener.onSightLookGotInRange(
@@ -36,6 +31,21 @@ public class HandleSightLookIsInRange {
 		
 		// --- Assert
 		verify(playerView).displayPlayerStopped();
+	}
+
+	@Test
+	public void Given_NewSightGotInRange__Then_PlayerViewDisplaysZeroPosition() throws Exception {
+		City city = createSingleSightLookModel();
+		AudioPlayerView playerView = mock(AudioPlayerView.class);
+		SutSetupResult sutSetupResult = setupSut(playerView);
+		
+		// --- Act
+		sutSetupResult.sightLookGotInRangeListener.onSightLookGotInRange(
+				city.getSights().get(0).getSightLooks().get(0));
+		
+		// --- Assert
+		verify(playerView).setAudioProgressPosition(0);
+		verify(playerView).setAudioPosition("0:00");
 	}
 	
 	@Test
@@ -61,7 +71,7 @@ public class HandleSightLookIsInRange {
 		verify(mediaAssetManager).prepareAudioAsset(AUDIO_NAME);
 		verify(player).prepareAudioAsset(dummyFileInfo);
 	}
-	
+
 	@Test
 	public void Given_SameSightOtherLookGotInRange__Then_PlayerPreparedOnlyOnce() throws Exception {
 		final String WHATEVER_STRING = "whatever";
@@ -116,6 +126,10 @@ public class HandleSightLookIsInRange {
 		return String.valueOf(_random.nextLong());
 	}
 	
+	private SutSetupResult setupSut(AudioPlayerView playerView) {
+		return setupSut(playerView, mock(AudioPlayer.class),
+				mock(MediaAssetManager.class), mock(NewSightLookGotInRangeRaiser.class));
+	}
 	
 	private SutSetupResult setupSut(AudioPlayerView playerView, 
 			AudioPlayer audioPlayer, MediaAssetManager mediaAssetManager,
