@@ -74,12 +74,11 @@ public class HandleSightLookIsInRange {
 
 	@Test
 	public void Given_SameSightOtherLookGotInRange__Then_PlayerPreparedOnlyOnce() throws Exception {
-		final String WHATEVER_STRING = "whatever";
 		final String AUDIO_NAME = "audio1.ogg";
 		City city = createSingleSightLookModel(_random.nextDouble(), _random.nextDouble(),
-				WHATEVER_STRING, AUDIO_NAME);
+				createRandomString(), AUDIO_NAME);
 		SightLook otherSightLook = new SightLook(
-				_random.nextDouble(), _random.nextDouble(), WHATEVER_STRING);
+				_random.nextDouble(), _random.nextDouble(), createRandomString());
 		Sight sight = city.getSights().get(0);
 		sight.getSightLooks().add(otherSightLook);
 		otherSightLook.setSight(sight);
@@ -101,6 +100,32 @@ public class HandleSightLookIsInRange {
 		// --- Assert
 		verify(mediaAssetManager, times(1)).prepareAudioAsset(AUDIO_NAME);
 		verify(player, times(1)).prepareAudioAsset(dummyFileInfo);
+	}
+	
+	@Test
+	public void Given_SameSightOtherLookGotInRange__Then_PlayerViewIsNotRequestedToDisplayAsStopped() throws Exception {
+		City city = createSingleSightLookModel(_random.nextDouble(), _random.nextDouble(),
+				createRandomString(), createRandomString());
+		SightLook otherSightLook = new SightLook(
+				_random.nextDouble(), _random.nextDouble(), createRandomString());
+		Sight sight = city.getSights().get(0);
+		sight.getSightLooks().add(otherSightLook);
+		otherSightLook.setSight(sight);
+		
+		AudioPlayerView playerView = mock(AudioPlayerView.class);
+		AudioPlayer player = mock(AudioPlayer.class);
+		NewSightLookGotInRangeRaiser raiser = mock(NewSightLookGotInRangeRaiser.class);
+		MediaAssetManager mediaAssetManager = mock(MediaAssetManager.class);
+		
+		SutSetupResult sutSetupResult = setupSut(playerView, player, mediaAssetManager, raiser);
+		
+		// --- Act
+		sutSetupResult.sightLookGotInRangeListener.onSightLookGotInRange(
+				city.getSights().get(0).getSightLooks().get(0));
+		sutSetupResult.sightLookGotInRangeListener.onSightLookGotInRange(otherSightLook);
+		
+		// --- Assert
+		verify(playerView, times(1)).displayPlayerStopped();
 	}
 	
 	private City createSingleSightLookModel() {
