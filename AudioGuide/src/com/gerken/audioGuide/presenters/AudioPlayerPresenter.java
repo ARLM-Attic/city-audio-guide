@@ -123,9 +123,10 @@ public class AudioPlayerPresenter {
 			if(!newSight.equals(_currentSight)) {
 				prepareNewAudio(newSight.getAudioName());
 				_currentSight = newSight;
-			}
-			_audioPlayerView.displayPlayerStopped();
-			resetPlayerDisplayedPosition();
+				
+				_audioPlayerView.displayPlayerStopped();
+				resetPlayerDisplayedPosition();
+			}			
 		}
 	}
 	
