@@ -125,6 +125,7 @@ public class AudioPlayerPresenter {
 				_currentSight = newSight;
 			}
 			_audioPlayerView.displayPlayerStopped();
+			resetPlayerDisplayedPosition();
 		}
 	}
 	
