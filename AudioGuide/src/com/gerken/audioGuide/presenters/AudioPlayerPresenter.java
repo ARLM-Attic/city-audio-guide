@@ -121,6 +121,8 @@ public class AudioPlayerPresenter {
 		if(sightLook != null) {
 			Sight newSight = sightLook.getSight();
 			if(!newSight.equals(_currentSight)) {
+				if(_audioPlayer.isPlaying())
+					_audioPlayer.stop();
 				prepareNewAudio(newSight.getAudioName());
 				_currentSight = newSight;
 				
