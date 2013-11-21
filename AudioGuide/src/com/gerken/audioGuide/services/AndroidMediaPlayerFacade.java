@@ -16,14 +16,19 @@ public class AndroidMediaPlayerFacade implements AudioPlayer {
 	
 	private boolean _isPlaying = false;
 	private boolean _needsPreparation = false;
+	private boolean _notifyCompletionListeners = false;
 	
 	private ArrayList<OnEventListener> _completionListeners;
 	
 	private OnCompletionListener _audioAssetCompletionListener = new OnCompletionListener() {		
 		@Override
 		public void onCompletion(MediaPlayer mp) {
-			for(OnEventListener l: _completionListeners)
-				l.onEvent();			
+			_isPlaying = false;
+			
+			if(_notifyCompletionListeners) {
+				for(OnEventListener l: _completionListeners)
+					l.onEvent();
+			}
 		}
 	};
 	
@@ -36,9 +41,11 @@ public class AndroidMediaPlayerFacade implements AudioPlayer {
 
 	@Override
 	public void prepareAudioAsset(FileInfo assetFileInfo) throws Exception {
+		_notifyCompletionListeners = false;
+
 		_mediaPlayer.reset();
 		_mediaPlayer.setDataSource(assetFileInfo.getFileDescriptor(), 
-				assetFileInfo.getStartOffset(), assetFileInfo.getLength());		
+				assetFileInfo.getStartOffset(), assetFileInfo.getLength());
 		_mediaPlayer.prepare();
 		_needsPreparation = false;
 		_isPlaying = false;
@@ -56,6 +63,7 @@ public class AndroidMediaPlayerFacade implements AudioPlayer {
 			_needsPreparation = false;
 		}
 		_mediaPlayer.start();
+		_notifyCompletionListeners = true;
 		_isPlaying = true;
 	}
 
