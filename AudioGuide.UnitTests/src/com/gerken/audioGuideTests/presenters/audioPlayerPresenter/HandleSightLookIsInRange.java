@@ -6,6 +6,7 @@ import java.util.Random;
 
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 
 import com.gerken.audioGuide.containers.FileInfo;
 import com.gerken.audioGuide.interfaces.AudioPlayer;
@@ -46,6 +47,26 @@ public class HandleSightLookIsInRange {
 		// --- Assert
 		verify(playerView).setAudioProgressPosition(0);
 		verify(playerView).setAudioPosition("0:00");
+	}
+	
+
+	@Test
+	public void Given_NewSightGotInRange_PlayerIsPlaying__Then_PlayerIsStoppedBeforePreparingNewAudio() throws Exception {
+		final boolean PLAYER_IS_PLAYING = true;
+		City city = createSingleSightLookModel();
+		AudioPlayerView playerView = mock(AudioPlayerView.class);
+		AudioPlayer player = mock(AudioPlayer.class);
+		when(player.isPlaying()).thenReturn(PLAYER_IS_PLAYING);
+		InOrder orderedExecution = inOrder( player );
+		SutSetupResult sutSetupResult = setupSut(playerView, player);
+		
+		// --- Act
+		sutSetupResult.sightLookGotInRangeListener.onSightLookGotInRange(
+				city.getSights().get(0).getSightLooks().get(0));
+		
+		// --- Assert
+		orderedExecution.verify(player).stop();
+		orderedExecution.verify(player).prepareAudioAsset(any(FileInfo.class));	
 	}
 	
 	@Test
@@ -153,6 +174,11 @@ public class HandleSightLookIsInRange {
 	
 	private SutSetupResult setupSut(AudioPlayerView playerView) {
 		return setupSut(playerView, mock(AudioPlayer.class),
+				mock(MediaAssetManager.class), mock(NewSightLookGotInRangeRaiser.class));
+	}
+	
+	private SutSetupResult setupSut(AudioPlayerView playerView, AudioPlayer audioPlayer) {
+		return setupSut(playerView, audioPlayer,
 				mock(MediaAssetManager.class), mock(NewSightLookGotInRangeRaiser.class));
 	}
 	
