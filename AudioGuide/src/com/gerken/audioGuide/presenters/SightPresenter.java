@@ -1,12 +1,14 @@
 package com.gerken.audioGuide.presenters;
 
 import java.util.TimerTask;
+import java.util.concurrent.Executor;
 
 import com.gerken.audioGuide.graphics.BitmapDownscalingResult;
 import com.gerken.audioGuide.interfaces.*;
 import com.gerken.audioGuide.interfaces.views.AudioPlayerView;
 import com.gerken.audioGuide.interfaces.views.SightView;
 import com.gerken.audioGuide.objectModel.*;
+import com.gerken.audioGuide.util.ParametrizedRunnable;
 
 public class SightPresenter {	
 	private final long PLAYER_PANEL_HIDING_DELAY_MS = 5000L;
@@ -23,6 +25,7 @@ public class SightPresenter {
 	private MediaAssetManager _mediaAssetManager;
 	private LocationTracker _locationTracker;
 	private Logger _logger;
+	private Executor _longTaskExecutor;
 	
 	private Sight _currentSight = null;
 	private SightLook _currentSightLook = null;	
@@ -199,6 +202,10 @@ public class SightPresenter {
 		_logger = logger;
 	}
 	
+	public void setLongTaskExecutor(Executor longTaskExecutor) {
+		_longTaskExecutor = longTaskExecutor;
+	}
+	
 	private void handleSightLookIsInRange(SightLook sightLook) {
 		if(sightLook != null) {
 			if(!sightLook.equals(_currentSightLook)) {
@@ -319,12 +326,21 @@ public class SightPresenter {
 	}
 	
 	private void notifyViewAboutNewSightLook(SightLook newSightLook) {
-		BitmapDownscalingResult sightLookImage = getSightLookImage(newSightLook);
-		if(sightLookImage != null)		
-			_sightView.setBackgroundImage(sightLookImage);
-		
 		_sightView.setInfoPanelCaptionText(newSightLook.getSight().getName());
 		_sightView.hideNextSightDirection();
+		
+		Runnable bmpRunnable = 
+			new ParametrizedRunnable<SightLook>(newSightLook) {
+				public void run(SightLook newSightLook) {
+					BitmapDownscalingResult sightLookImage = getSightLookImage(newSightLook);
+					if(sightLookImage != null)		
+						_sightView.setBackgroundImage(sightLookImage);					
+				}
+			};
+		if(_longTaskExecutor != null)
+			_longTaskExecutor.execute(bmpRunnable);
+		else
+			bmpRunnable.run();
 	}
 	
 	private void notifyViewAboutNoSightViewInRange() {

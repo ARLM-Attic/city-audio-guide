@@ -1,5 +1,8 @@
 package com.gerken.audioGuide;
 
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+
 import android.content.Context;
 
 import com.gerken.audioGuide.interfaces.*;
@@ -31,7 +34,9 @@ public class PresenterContainer {
 	private ApplicationSettingsStorage _settingsStorage;
 	private DownscalingBitmapLoader _bitmapLoader;
 	private AudioPlayer _player;
+	private AudioPlayer _demoPlayer;
 	private LocationTracker _defaultLocationTracker;
+	private Executor _longTaskExecutor;
 	
 	public PresenterContainer(Context ctx, GuideApplication app){
 		_context = ctx;
@@ -43,12 +48,20 @@ public class PresenterContainer {
 		_player = new AndroidMediaPlayerFacade();
 
 		_defaultLocationTracker = createLocationTracker();
+		_longTaskExecutor = Executors.newCachedThreadPool();
+	}
+	
+	private synchronized AudioPlayer getDemoAudioPlayer() {
+		if(_demoPlayer == null)
+			_demoPlayer = new AndroidMediaPlayerFacade();
+		return _demoPlayer;
 	}
 	
 	
 	public void initSightPresenter(SightView sightView, AudioPlayerView playerView, boolean isDemo){
+		AudioPlayer player = isDemo ? getDemoAudioPlayer() : _player;
 		_sightPresenter = new SightPresenter(getCity(), sightView, playerView);
-		_sightPresenter.setAudioPlayer(_player);
+		_sightPresenter.setAudioPlayer(player);
 		_sightPresenter.setAudioNotifier(new AndroidMediaPlayerNotifier(_context));
 		_sightPresenter.setBitmapLoader(_bitmapLoader);
 		_sightPresenter.setApplicationSettingsStorage(_settingsStorage);
@@ -56,6 +69,7 @@ public class PresenterContainer {
 		_sightPresenter.setMediaAssetManager(_assetManager);
 		_sightPresenter.setLocationTracker(_defaultLocationTracker);
 		_sightPresenter.setLogger(createLogger(SightPresenter.class));
+		_sightPresenter.setLongTaskExecutor(_longTaskExecutor);
 		
 		if(isDemo) {
 			DemoSightLookGotInRangeRaiser raiser = 
@@ -71,11 +85,13 @@ public class PresenterContainer {
 	}
 	
 	public void initAudioPlayerPresenter(AudioPlayerView playerView, boolean isDemo){
-		_audioPlayerPresenter = new AudioPlayerPresenter(playerView, _player);
+		AudioPlayer player = isDemo ? getDemoAudioPlayer() : _player;
+		_audioPlayerPresenter = new AudioPlayerPresenter(playerView, player);
 		_audioPlayerPresenter.setMediaAssetManager(_assetManager);        
         _audioPlayerPresenter.setAudioUpdateScheduler(new SchedulerService());
         _audioPlayerPresenter.setAudioRewindScheduler(new SchedulerService());
         _audioPlayerPresenter.setLogger(new Log4JAdapter(AudioPlayerPresenter.class));
+        _audioPlayerPresenter.setLongTaskExecutor(_longTaskExecutor);
         
         if(isDemo) {
 			DemoSightLookGotInRangeRaiser raiser = 

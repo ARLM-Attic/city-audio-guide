@@ -2,6 +2,7 @@ package com.gerken.audioGuide.presenters;
 
 import java.io.IOException;
 import java.util.TimerTask;
+import java.util.concurrent.Executor;
 
 import com.gerken.audioGuide.R;
 import com.gerken.audioGuide.containers.FileInfo;
@@ -15,6 +16,7 @@ import com.gerken.audioGuide.interfaces.Scheduler;
 import com.gerken.audioGuide.interfaces.views.AudioPlayerView;
 import com.gerken.audioGuide.objectModel.Sight;
 import com.gerken.audioGuide.objectModel.SightLook;
+import com.gerken.audioGuide.util.ParametrizedRunnable;
 
 public class AudioPlayerPresenter {
 	private final int AUDIO_PLAYER_POLLING_INTERVAL_MS = 250;
@@ -29,6 +31,7 @@ public class AudioPlayerPresenter {
 	private Logger _logger;
 	private Scheduler _audioUpdateScheduler;
 	private Scheduler _rewindScheduler;
+	private Executor _longTaskExecutor;
 	
 	private boolean _resumePlayerAfterRewinding = false;
 	
@@ -105,6 +108,10 @@ public class AudioPlayerPresenter {
 		_logger = logger;
 	}
 	
+	public void setLongTaskExecutor(Executor longTaskExecutor) {
+		_longTaskExecutor = longTaskExecutor;
+	}
+	
 	public void setAudioUpdateScheduler(Scheduler scheduler) {
 		_audioUpdateScheduler = scheduler;
 	}
@@ -131,8 +138,9 @@ public class AudioPlayerPresenter {
 			}			
 		}
 	}
-	
+	/*
 	private void prepareNewAudio(String audioFileName) {
+
 		try {
 			FileInfo fi = _mediaAssetManager.prepareAudioAsset(audioFileName);
 			_audioPlayer.prepareAudioAsset(fi);
@@ -144,6 +152,31 @@ public class AudioPlayerPresenter {
         	logError(logMsg, ex);
         	_audioPlayerView.displayError(R.string.error_invalid_sight_audio);
     	}
+
+	}
+	*/
+	
+	private void prepareNewAudio(String audioFileName) {
+		Runnable r =
+			new ParametrizedRunnable<String>(audioFileName) {
+				public void run(String audioFileName) {
+					try {
+						FileInfo fi = _mediaAssetManager.prepareAudioAsset(audioFileName);
+						_audioPlayer.prepareAudioAsset(fi);
+						fi.close();
+						initPlayerDisplayedDuration();
+					}
+					catch(Exception ex){ 
+			        	String logMsg=String.format("Error when setting %s as the new MediaPlayer datasource", audioFileName);
+			        	logError(logMsg, ex);
+			        	_audioPlayerView.displayError(R.string.error_invalid_sight_audio);
+			    	}
+				}
+			};
+		if(_longTaskExecutor != null)
+			_longTaskExecutor.execute(r);
+		else
+			r.run();
 	}
 	
 	private void handlePlayButtonClick() {
