@@ -1,9 +1,6 @@
 package com.gerken.audioGuide.services;
 
-import java.util.ArrayList;
 import java.util.TimerTask;
-
-import android.os.Handler;
 
 import com.gerken.audioGuide.interfaces.NewSightLookGotInRangeRaiser;
 import com.gerken.audioGuide.interfaces.OnSightLookGotInRangeListener;

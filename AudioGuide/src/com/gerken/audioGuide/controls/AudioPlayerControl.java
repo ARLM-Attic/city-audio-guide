@@ -53,6 +53,8 @@ public class AudioPlayerControl extends RelativeLayout implements AudioPlayerVie
 	
 	private ControlUpdater<Integer> _toastShower;
 	
+	private String _defaultFormattedAudioPosition = "0:00";
+	
 	public AudioPlayerControl(Context context) {
 		super(context);
 		init(context);
@@ -139,6 +141,8 @@ public class AudioPlayerControl extends RelativeLayout implements AudioPlayerVie
         
         _handler = new Handler();
         
+        _defaultFormattedAudioPosition = context.getString(R.string.audio_formatted_position_default);
+        
 		findControls();
 		initPlayButton();
 		initStopButton();
@@ -190,18 +194,13 @@ public class AudioPlayerControl extends RelativeLayout implements AudioPlayerVie
     
     private void initControlUpdaters() {
     	 _audioPlayedUpdater = new ControlUpdater<String>(
-    				new TextViewUpdater(_audioPlayed), 
-    				"0:00"//MainActivity.this.getString(R.string.audio_formatted_position_default)
-    			);
+			new TextViewUpdater(_audioPlayed), 	_defaultFormattedAudioPosition);
     	 
     	 _audioDurationUpdater = new ControlUpdater<String>(
-			new TextViewUpdater(_audioDuration), 
-    				"0:00"
-    			);
+			new TextViewUpdater(_audioDuration), _defaultFormattedAudioPosition);
     	 
     	 _audioProgressBarUpdater = new ControlUpdater<Integer>(
     				new ControlUpdater.Updater<Integer>() {
-    					@Override
     					public void Update(Integer param) {
     						 _audioProgressBar.setProgress(param);
     					}
@@ -219,7 +218,6 @@ public class AudioPlayerControl extends RelativeLayout implements AudioPlayerVie
     	 
     	 _toastShower = new ControlUpdater<Integer>(
     				new ControlUpdater.Updater<Integer>(){
-    					@Override
     					public void Update(Integer param) {
     						Toast.makeText(getContext(), param, Toast.LENGTH_SHORT).show();
     					}
