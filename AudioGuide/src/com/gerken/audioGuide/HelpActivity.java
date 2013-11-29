@@ -2,8 +2,10 @@ package com.gerken.audioGuide;
 
 import com.gerken.audioGuide.interfaces.BitmapContainer;
 import com.gerken.audioGuide.interfaces.views.AuxiliaryView;
+import com.gerken.audioGuide.util.SightIntentExtraWrapper;
 
 import android.os.Bundle;
+import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -19,6 +21,7 @@ public class HelpActivity extends BasicGuideActivity implements AuxiliaryView {
 		
 		_rootView = findViewById(R.id.rootLayout);
 		findViewById(R.id.buttonHelpClose).setOnClickListener(_closeButtonOnClickListener);
+		findViewById(R.id.buttonHelpDemo).setOnClickListener(_demoButtonOnClickListener);
 		
 		((GuideApplication)getApplication()).getPresenterContainer().initHelpPresenter(this);
 		onInitialized();
@@ -40,4 +43,13 @@ public class HelpActivity extends BasicGuideActivity implements AuxiliaryView {
 			finish();			
 		}
 	};	
+	
+	private OnClickListener _demoButtonOnClickListener = new OnClickListener() {		
+		@Override
+		public void onClick(View v) {
+			Intent sightIntent = new Intent(HelpActivity.this, SightActivity.class);
+			new SightIntentExtraWrapper(sightIntent).setIsDemoMode(true);
+    		startActivity(sightIntent);			
+		}
+	};
 }

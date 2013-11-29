@@ -21,12 +21,6 @@ public class DemoSightLookGotInRangeRaiser implements NewSightLookGotInRangeRais
 	
 	private int _signalDelayMs = DEFAULT_SIGNAL_DELAY_MS;
 	
-	private ArrayList<OnSightLookGotInRangeListener> _sightLookGotInRangeListeners = 
-			new ArrayList<OnSightLookGotInRangeListener>();
-	
-	private TimerTask _signalTask = null;
-	private Handler _handler;
-	
 	public DemoSightLookGotInRangeRaiser(City city, Scheduler scheduler) {
 		_city = city;
 		_scheduler = scheduler;
@@ -36,17 +30,6 @@ public class DemoSightLookGotInRangeRaiser implements NewSightLookGotInRangeRais
 			if(!demoSight.getSightLooks().isEmpty())
 				_demoSightLook = demoSight.getSightLooks().get(0);
 		}
-		
-		if(_demoSightLook != null) {
-			_signalTask = new TimerTask() {
-			
-				@Override
-				public void run() {
-					postSignal();					
-				}
-			};
-		}
-		_handler = new Handler();
 	}
 	
 	public void setSignalDelay(int signalDelayMs) {
@@ -55,28 +38,26 @@ public class DemoSightLookGotInRangeRaiser implements NewSightLookGotInRangeRais
 
 	@Override
 	public void addSightLookGotInRangeListener(OnSightLookGotInRangeListener listener) {
-		_sightLookGotInRangeListeners.add(listener);
+		if(_demoSightLook != null) {
+			_scheduler.schedule(
+				new NewSightLookGotInRangeNotificationTask(listener, _demoSightLook),
+				_signalDelayMs
+			);
+		}	
+	}
+	
+	private class NewSightLookGotInRangeNotificationTask extends TimerTask {
+		private SightLook _sightLook;
+		private OnSightLookGotInRangeListener _listener;
 		
-		_scheduler.schedule(_signalTask, _signalDelayMs);	
-	}
-	
-	private void postSignal() {
-		_handler.post(_postSignalRunnable);
-	}
-	
-	private void sendSightLookGotInRangeSignal() {
-		if(_demoSightLook != null)
-			for(OnSightLookGotInRangeListener l : _sightLookGotInRangeListeners)
-				l.onSightLookGotInRange(_demoSightLook);
-	}
-	
-	private Runnable _postSignalRunnable = new Runnable() {
-		
-		@Override
-		public void run() {
-			sendSightLookGotInRangeSignal();
-			
+		public NewSightLookGotInRangeNotificationTask(
+				OnSightLookGotInRangeListener listener, SightLook sightLook) {
+			_sightLook = sightLook;
+			_listener = listener;
 		}
-	};
-
+		
+		public void run() {
+			_listener.onSightLookGotInRange(_sightLook);					
+		}
+	}
 }

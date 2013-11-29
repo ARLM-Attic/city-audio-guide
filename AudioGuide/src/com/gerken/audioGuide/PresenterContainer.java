@@ -10,6 +10,7 @@ import com.gerken.audioGuide.services.AndroidDownscalingBitmapLoader;
 import com.gerken.audioGuide.services.AndroidLocationManagerFacade;
 import com.gerken.audioGuide.services.AndroidMediaPlayerFacade;
 import com.gerken.audioGuide.services.AndroidMediaPlayerNotifier;
+import com.gerken.audioGuide.services.DemoSightLookGotInRangeRaiser;
 import com.gerken.audioGuide.services.Log4JAdapter;
 import com.gerken.audioGuide.services.PlainMediaAssetManager;
 import com.gerken.audioGuide.services.SchedulerService;
@@ -45,28 +46,48 @@ public class PresenterContainer {
 	}
 	
 	
-	public void initSightPresenter(SightView sightView, AudioPlayerView playerView){
+	public void initSightPresenter(SightView sightView, AudioPlayerView playerView, boolean isDemo){
 		_sightPresenter = new SightPresenter(getCity(), sightView, playerView);
 		_sightPresenter.setAudioPlayer(_player);
 		_sightPresenter.setAudioNotifier(new AndroidMediaPlayerNotifier(_context));
 		_sightPresenter.setBitmapLoader(_bitmapLoader);
 		_sightPresenter.setApplicationSettingsStorage(_settingsStorage);
-		_sightPresenter.setNewSightLookGotInRangeRaiser(
-				new SightLookFinderByLocation(getCity(), _defaultLocationTracker));
 		_sightPresenter.setPlayerPanelHidingScheduler(new SchedulerService());
 		_sightPresenter.setMediaAssetManager(_assetManager);
 		_sightPresenter.setLocationTracker(_defaultLocationTracker);
 		_sightPresenter.setLogger(createLogger(SightPresenter.class));
+		
+		if(isDemo) {
+			DemoSightLookGotInRangeRaiser raiser = 
+					new DemoSightLookGotInRangeRaiser(getCity(), new SchedulerService());
+			_sightPresenter.setNewSightLookGotInRangeRaiser(raiser);
+		}
+		else {			
+			SightLookFinderByLocation finder = 
+					new SightLookFinderByLocation(getCity(), _defaultLocationTracker);
+			finder.setLogger(createLogger(SightLookFinderByLocation.class));
+			_sightPresenter.setNewSightLookGotInRangeRaiser(finder);
+		}
 	}
 	
-	public void initAudioPlayerPresenter(AudioPlayerView playerView){
+	public void initAudioPlayerPresenter(AudioPlayerView playerView, boolean isDemo){
 		_audioPlayerPresenter = new AudioPlayerPresenter(playerView, _player);
 		_audioPlayerPresenter.setMediaAssetManager(_assetManager);        
         _audioPlayerPresenter.setAudioUpdateScheduler(new SchedulerService());
         _audioPlayerPresenter.setAudioRewindScheduler(new SchedulerService());
-        _audioPlayerPresenter.setNewSightLookGotInRangeRaiser(
-        		new SightLookFinderByLocation(getCity(), _defaultLocationTracker));
         _audioPlayerPresenter.setLogger(new Log4JAdapter(AudioPlayerPresenter.class));
+        
+        if(isDemo) {
+			DemoSightLookGotInRangeRaiser raiser = 
+					new DemoSightLookGotInRangeRaiser(getCity(), new SchedulerService());
+			_audioPlayerPresenter.setNewSightLookGotInRangeRaiser(raiser);
+		}
+		else {			
+			SightLookFinderByLocation finder = 
+					new SightLookFinderByLocation(getCity(), _defaultLocationTracker);
+			finder.setLogger(createLogger(SightLookFinderByLocation.class));
+			_audioPlayerPresenter.setNewSightLookGotInRangeRaiser(finder);
+		}
 	}
 	
 	public void initHelpPresenter(AuxiliaryView helpView){

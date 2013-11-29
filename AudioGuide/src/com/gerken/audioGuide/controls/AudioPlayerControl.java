@@ -45,6 +45,14 @@ public class AudioPlayerControl extends RelativeLayout implements AudioPlayerVie
 	private ArrayList<OnEventListener> _rewindPressedListeners = new ArrayList<OnEventListener>();
 	private ArrayList<OnEventListener> _rewindReleasedListeners = new ArrayList<OnEventListener>();
 	
+	private ControlUpdater<String> _audioPlayedUpdater;	
+	private ControlUpdater<String> _audioDurationUpdater;
+	
+	private ControlUpdater<Integer> _audioProgressBarUpdater;	
+	private ControlUpdater<Integer> _audioProgressBarMaximumUpdater;
+	
+	private ControlUpdater<Integer> _toastShower;
+	
 	public AudioPlayerControl(Context context) {
 		super(context);
 		init(context);
@@ -69,7 +77,8 @@ public class AudioPlayerControl extends RelativeLayout implements AudioPlayerVie
 
 	@Override
 	public void setAudioProgressMaximum(int ms) {
-		_audioProgressBar.setMax(ms);		
+		_audioProgressBarMaximumUpdater.setStatus(ms);
+		_handler.post(_audioProgressBarMaximumUpdater);
 	}
 
 	@Override
@@ -80,7 +89,8 @@ public class AudioPlayerControl extends RelativeLayout implements AudioPlayerVie
 
 	@Override
 	public void setAudioDuration(String formattedDuration) {
-		_audioDuration.setText(formattedDuration);		
+		_audioDurationUpdater.setStatus(formattedDuration);
+		_handler.post(_audioDurationUpdater);
 	}
 
 	@Override
@@ -111,7 +121,9 @@ public class AudioPlayerControl extends RelativeLayout implements AudioPlayerVie
 	
 	@Override
 	public void displayError(int messageResourceId) {
-		Toast.makeText(getContext(), messageResourceId, Toast.LENGTH_SHORT).show();
+		//Toast.makeText(getContext(), messageResourceId, Toast.LENGTH_SHORT).show();
+		_toastShower.setStatus(messageResourceId);
+		_handler.post(_toastShower);
 	}
 	
 	@Override
@@ -130,7 +142,8 @@ public class AudioPlayerControl extends RelativeLayout implements AudioPlayerVie
 		findControls();
 		initPlayButton();
 		initStopButton();
-		initRewindButton();		
+		initRewindButton();
+		initControlUpdaters();
 	}
 	
 	private void findControls() {
@@ -175,6 +188,45 @@ public class AudioPlayerControl extends RelativeLayout implements AudioPlayerVie
         _rewindButton.setOnTouchListener(_rewindButtonTouchListener);
     }
     
+    private void initControlUpdaters() {
+    	 _audioPlayedUpdater = new ControlUpdater<String>(
+    				new TextViewUpdater(_audioPlayed), 
+    				"0:00"//MainActivity.this.getString(R.string.audio_formatted_position_default)
+    			);
+    	 
+    	 _audioDurationUpdater = new ControlUpdater<String>(
+			new TextViewUpdater(_audioDuration), 
+    				"0:00"
+    			);
+    	 
+    	 _audioProgressBarUpdater = new ControlUpdater<Integer>(
+    				new ControlUpdater.Updater<Integer>() {
+    					@Override
+    					public void Update(Integer param) {
+    						 _audioProgressBar.setProgress(param);
+    					}
+    				}, 
+    				0
+    			);
+    	 _audioProgressBarMaximumUpdater = new ControlUpdater<Integer>(
+    				new ControlUpdater.Updater<Integer>() {
+    					public void Update(Integer param) {
+    						 _audioProgressBar.setMax(param);
+    					}
+    				}, 
+    				0
+    			);
+    	 
+    	 _toastShower = new ControlUpdater<Integer>(
+    				new ControlUpdater.Updater<Integer>(){
+    					@Override
+    					public void Update(Integer param) {
+    						Toast.makeText(getContext(), param, Toast.LENGTH_SHORT).show();
+    					}
+    				}, 0
+    			);
+    }
+    
     private <T> T findControl(int controlId) {
     	T control = (T)findViewById(controlId);
     	return control;
@@ -214,25 +266,4 @@ public class AudioPlayerControl extends RelativeLayout implements AudioPlayerVie
 			return false;
 		}
 	};
-	
-	private ControlUpdater<String> _audioPlayedUpdater = new ControlUpdater<String>(
-			new ControlUpdater.Updater<String>() {
-				@Override
-				public void Update(String param) {
-					_audioPlayed.setText(param);
-				}
-			}, 
-			"0:00"//MainActivity.this.getString(R.string.audio_formatted_position_default)
-		);
-	
-	private ControlUpdater<Integer> _audioProgressBarUpdater = new ControlUpdater<Integer>(
-			new ControlUpdater.Updater<Integer>() {
-				@Override
-				public void Update(Integer param) {
-					 _audioProgressBar.setProgress(param);
-				}
-			}, 
-			0
-		);
-
 }
