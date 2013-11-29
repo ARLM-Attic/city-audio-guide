@@ -20,6 +20,7 @@
 You can choose in the application settings whether you prefer to stroll freely or to follow a specific route. In the latter case you can see the direction to the next sight on the route after finishing the audio comment for the current sight or after pressing the Stop button. 
 
 We wish you an enjoyable stay in Prague."</string>
+    <string name="button_text_demo">Demo</string>
     <string name="button_text_close">Close</string>
 
 </resources>

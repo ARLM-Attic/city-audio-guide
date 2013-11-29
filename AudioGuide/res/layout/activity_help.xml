@@ -25,7 +25,7 @@
 	        android:layout_marginLeft="@dimen/help_text_container_margin"
 	        android:layout_marginRight="@dimen/help_text_container_margin"
 	        android:layout_marginBottom="@dimen/help_text_container_margin"
-	        android:layout_above="@+id/buttonHelpClose"
+	        android:layout_above="@+id/helpButtonsBlock"
 	        android:layout_alignParentTop="true">
 	
 			<TextView
@@ -39,15 +39,31 @@
 	
 	    </ScrollView>
 	
-	    <Button
-	        style="@style/DefaultButton"
-	        android:id="@+id/buttonHelpClose"
+	    <LinearLayout
+	        android:id="@+id/helpButtonsBlock"
+	        android:orientation="horizontal"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_marginTop="@dimen/help_buttons_margin_top"  
+	        android:layout_marginBottom="@dimen/help_buttons_margin"
 	        android:layout_centerHorizontal="true"
-	        android:layout_alignParentBottom="true"
-	        android:layout_marginTop="@dimen/help_buton_close_margin_top"        
-	        android:layout_marginBottom="@dimen/help_buton_close_margin_bottom"
-	        android:textStyle="bold"
-	        android:text="@string/button_text_close" />
+	        android:layout_alignParentBottom="true">
+			<Button
+		        style="@style/DefaultButton"
+		        android:id="@+id/buttonHelpDemo"
+		        android:layout_marginLeft="@dimen/help_buttons_margin"
+	            android:layout_marginRight="@dimen/help_buttons_margin"
+		        android:textStyle="bold"
+		        android:text="@string/button_text_demo" />
+			
+		    <Button
+		        style="@style/DefaultButton"
+		        android:id="@+id/buttonHelpClose"
+		        android:layout_marginLeft="@dimen/help_buttons_margin"
+	            android:layout_marginRight="@dimen/help_buttons_margin"
+		        android:textStyle="bold"
+		        android:text="@string/button_text_close" />
+	    </LinearLayout>
     </RelativeLayout>
 
 </RelativeLayout>
