@@ -16,7 +16,16 @@
         aguide:arrowWidth="@dimen/sight_route_arrow_width"
         aguide:arrowHeight="@dimen/sight_route_arrow_height" />
     
-    <!--  android:layout_gravity="bottom" -->
+    <Button
+        android:id="@+id/sightExitDemoButton"
+        android:layout_gravity="top"
+        android:layout_width="@dimen/sight_button_exit_demo_width"
+        android:layout_height="@dimen/sight_button_exit_demo_height"
+        android:layout_marginLeft="@dimen/sight_button_exit_demo_margin"
+        android:layout_marginTop="@dimen/sight_button_exit_demo_margin"
+        android:text="@string/button_text_exit_demo"
+        android:background="#8000FF00" />
+    
     <LinearLayout
 	    android:id="@+id/playerInfoPanel"
 	    android:orientation="vertical"

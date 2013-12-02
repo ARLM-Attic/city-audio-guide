@@ -22,5 +22,6 @@ You can choose in the application settings whether you prefer to stroll freely o
 We wish you an enjoyable stay in Prague."</string>
     <string name="button_text_demo">Demo</string>
     <string name="button_text_close">Close</string>
+    <string name="button_text_exit_demo">exit demo</string>
 
 </resources>

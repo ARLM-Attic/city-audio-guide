@@ -16,6 +16,9 @@
     <dimen name="sight_route_arrow_padding_bottom">34dp</dimen>
     <dimen name="sight_route_arrow_width">60dp</dimen>
     <dimen name="sight_route_arrow_height">80dp</dimen>
+    <dimen name="sight_button_exit_demo_width">80dp</dimen>
+    <dimen name="sight_button_exit_demo_height">20dp</dimen>
+    <dimen name="sight_button_exit_demo_margin">20dp</dimen>
     
     <dimen name="player_panel_height">128dp</dimen>
     <dimen name="player_button_play_width">80dp</dimen>
