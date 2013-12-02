@@ -7,6 +7,7 @@ import java.util.concurrent.Executor;
 import com.gerken.audioGuide.R;
 import com.gerken.audioGuide.containers.FileInfo;
 import com.gerken.audioGuide.interfaces.AudioPlayer;
+import com.gerken.audioGuide.interfaces.LockProvider;
 import com.gerken.audioGuide.interfaces.Logger;
 import com.gerken.audioGuide.interfaces.MediaAssetManager;
 import com.gerken.audioGuide.interfaces.NewSightLookGotInRangeRaiser;
@@ -32,6 +33,7 @@ public class AudioPlayerPresenter {
 	private Scheduler _audioUpdateScheduler;
 	private Scheduler _rewindScheduler;
 	private Executor _longTaskExecutor;
+	private LockProvider _lockProvider;
 	
 	private boolean _resumePlayerAfterRewinding = false;
 	
@@ -107,9 +109,13 @@ public class AudioPlayerPresenter {
 	public void setLogger(Logger logger) {
 		_logger = logger;
 	}
-	
+
 	public void setLongTaskExecutor(Executor longTaskExecutor) {
 		_longTaskExecutor = longTaskExecutor;
+	}
+	
+	public void setLockProvider(LockProvider lockProvider) {
+		_lockProvider = lockProvider;
 	}
 	
 	public void setAudioUpdateScheduler(Scheduler scheduler) {
@@ -138,32 +144,17 @@ public class AudioPlayerPresenter {
 			}			
 		}
 	}
-	/*
-	private void prepareNewAudio(String audioFileName) {
-
-		try {
-			FileInfo fi = _mediaAssetManager.prepareAudioAsset(audioFileName);
-			_audioPlayer.prepareAudioAsset(fi);
-			fi.close();
-			initPlayerDisplayedDuration();
-		}
-		catch(Exception ex){ 
-        	String logMsg=String.format("Error when setting %s as the new MediaPlayer datasource", audioFileName);
-        	logError(logMsg, ex);
-        	_audioPlayerView.displayError(R.string.error_invalid_sight_audio);
-    	}
-
-	}
-	*/
 	
 	private void prepareNewAudio(String audioFileName) {
 		Runnable r =
 			new ParametrizedRunnable<String>(audioFileName) {
-				public void run(String audioFileName) {
+				public void run(String audioFileName) {	
+					lockAudioPlayer();
 					try {
 						FileInfo fi = _mediaAssetManager.prepareAudioAsset(audioFileName);
 						_audioPlayer.prepareAudioAsset(fi);
 						fi.close();
+
 						initPlayerDisplayedDuration();
 					}
 					catch(Exception ex){ 
@@ -171,12 +162,24 @@ public class AudioPlayerPresenter {
 			        	logError(logMsg, ex);
 			        	_audioPlayerView.displayError(R.string.error_invalid_sight_audio);
 			    	}
+					finally {
+						unlockAudioPlayer();
+					}
 				}
 			};
 		if(_longTaskExecutor != null)
 			_longTaskExecutor.execute(r);
 		else
 			r.run();
+	}
+	
+	private void lockAudioPlayer() {
+		if(_lockProvider != null)
+			_lockProvider.acquireAudioPreparationLock();
+	}
+	private void unlockAudioPlayer() {
+		if(_lockProvider != null)
+			_lockProvider.releaseAudioPreparationLock();
 	}
 	
 	private void handlePlayButtonClick() {

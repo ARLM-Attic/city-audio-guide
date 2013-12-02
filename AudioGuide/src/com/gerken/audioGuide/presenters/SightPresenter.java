@@ -26,6 +26,7 @@ public class SightPresenter {
 	private LocationTracker _locationTracker;
 	private Logger _logger;
 	private Executor _longTaskExecutor;
+	private LockProvider _lockProvider;
 	
 	private Sight _currentSight = null;
 	private SightLook _currentSightLook = null;	
@@ -206,6 +207,10 @@ public class SightPresenter {
 		_longTaskExecutor = longTaskExecutor;
 	}
 	
+	public void setLockProvider(LockProvider lockProvider) {
+		_lockProvider = lockProvider;
+	}
+	
 	private void handleSightLookIsInRange(SightLook sightLook) {
 		if(sightLook != null) {
 			if(!sightLook.equals(_currentSightLook)) {
@@ -270,6 +275,7 @@ public class SightPresenter {
 	}
 	
 	private void handleSightViewTouch() {
+		ensureAudioPepared();
 		if(isSightInRange() && !_isPlayerPanelVisible) {
 			_sightView.showPlayerPanel();
 			_isPlayerPanelVisible = true;
@@ -280,6 +286,13 @@ public class SightPresenter {
 				_sightView.setInfoPanelCaptionText(_currentSight.getName());
 				_isNextRoutePointInfoShown = false;
 			}
+		}
+	}
+	
+	private void ensureAudioPepared() {
+		if(_lockProvider != null) {
+			_lockProvider.acquireAudioPreparationLock();
+			_lockProvider.releaseAudioPreparationLock();
 		}
 	}
 	

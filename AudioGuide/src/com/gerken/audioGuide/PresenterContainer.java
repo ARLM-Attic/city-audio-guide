@@ -13,6 +13,7 @@ import com.gerken.audioGuide.services.AndroidDownscalingBitmapLoader;
 import com.gerken.audioGuide.services.AndroidLocationManagerFacade;
 import com.gerken.audioGuide.services.AndroidMediaPlayerFacade;
 import com.gerken.audioGuide.services.AndroidMediaPlayerNotifier;
+import com.gerken.audioGuide.services.DefaultLockProvider;
 import com.gerken.audioGuide.services.DemoSightLookGotInRangeRaiser;
 import com.gerken.audioGuide.services.Log4JAdapter;
 import com.gerken.audioGuide.services.PlainMediaAssetManager;
@@ -37,6 +38,7 @@ public class PresenterContainer {
 	private AudioPlayer _demoPlayer;
 	private LocationTracker _defaultLocationTracker;
 	private Executor _longTaskExecutor;
+	private LockProvider _lockProvider;
 	
 	public PresenterContainer(Context ctx, GuideApplication app){
 		_context = ctx;
@@ -49,6 +51,7 @@ public class PresenterContainer {
 
 		_defaultLocationTracker = createLocationTracker();
 		_longTaskExecutor = Executors.newCachedThreadPool();
+		_lockProvider = new DefaultLockProvider();
 	}
 	
 	private synchronized AudioPlayer getDemoAudioPlayer() {
@@ -70,6 +73,7 @@ public class PresenterContainer {
 		_sightPresenter.setLocationTracker(_defaultLocationTracker);
 		_sightPresenter.setLogger(createLogger(SightPresenter.class));
 		_sightPresenter.setLongTaskExecutor(_longTaskExecutor);
+		_sightPresenter.setLockProvider(_lockProvider);
 		
 		if(isDemo) {
 			DemoSightLookGotInRangeRaiser raiser = 
@@ -92,6 +96,7 @@ public class PresenterContainer {
         _audioPlayerPresenter.setAudioRewindScheduler(new SchedulerService());
         _audioPlayerPresenter.setLogger(new Log4JAdapter(AudioPlayerPresenter.class));
         _audioPlayerPresenter.setLongTaskExecutor(_longTaskExecutor);
+        _audioPlayerPresenter.setLockProvider(_lockProvider);
         
         if(isDemo) {
 			DemoSightLookGotInRangeRaiser raiser = 
