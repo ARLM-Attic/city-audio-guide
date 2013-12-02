@@ -55,6 +55,8 @@ public class AudioPlayerControl extends RelativeLayout implements AudioPlayerVie
 	
 	private String _defaultFormattedAudioPosition = "0:00";
 	
+	private Object _presenter;
+	
 	public AudioPlayerControl(Context context) {
 		super(context);
 		init(context);
@@ -133,6 +135,10 @@ public class AudioPlayerControl extends RelativeLayout implements AudioPlayerVie
 		super.setClickable(clickable);
 		_playButton.setClickable(clickable);
 		_stopButton.setClickable(clickable);
+	}
+	
+	public void setPresenter(Object presenter){
+		_presenter = presenter;
 	}
 	
 	private void init(Context context) {

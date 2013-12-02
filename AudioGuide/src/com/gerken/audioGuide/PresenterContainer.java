@@ -24,12 +24,6 @@ import com.gerken.audioGuide.services.SightLookFinderByLocation;
 public class PresenterContainer {
 	private Context _context;
 	private GuideApplication _application;
-
-	private SightPresenter _sightPresenter;
-	private AudioPlayerPresenter _audioPlayerPresenter;
-	private AuxiliaryPresenter _helpPresenter;
-	private MainPreferencePresenter _mainPreferencePresenter;
-	private RouteMapPresenter _routeMapPresenter;
 	
 	private MediaAssetManager _assetManager;
 	private ApplicationSettingsStorage _settingsStorage;
@@ -58,77 +52,81 @@ public class PresenterContainer {
 		if(_demoPlayer == null)
 			_demoPlayer = new AndroidMediaPlayerFacade();
 		return _demoPlayer;
-	}
-	
+	}	
 	
 	public void initSightPresenter(SightView sightView, AudioPlayerView playerView, boolean isDemo){
 		AudioPlayer player = isDemo ? getDemoAudioPlayer() : _player;
-		_sightPresenter = new SightPresenter(getCity(), sightView, playerView);
-		_sightPresenter.setAudioPlayer(player);
-		_sightPresenter.setAudioNotifier(new AndroidMediaPlayerNotifier(_context));
-		_sightPresenter.setBitmapLoader(_bitmapLoader);
-		_sightPresenter.setApplicationSettingsStorage(_settingsStorage);
-		_sightPresenter.setPlayerPanelHidingScheduler(new SchedulerService());
-		_sightPresenter.setMediaAssetManager(_assetManager);
-		_sightPresenter.setLocationTracker(_defaultLocationTracker);
-		_sightPresenter.setLogger(createLogger(SightPresenter.class));
-		_sightPresenter.setLongTaskExecutor(_longTaskExecutor);
-		_sightPresenter.setLockProvider(_lockProvider);
+		SightPresenter sightPresenter = new SightPresenter(getCity(), sightView, playerView);
+		sightPresenter.setAudioPlayer(player);
+		sightPresenter.setAudioNotifier(new AndroidMediaPlayerNotifier(_context));
+		sightPresenter.setBitmapLoader(_bitmapLoader);
+		sightPresenter.setApplicationSettingsStorage(_settingsStorage);
+		sightPresenter.setPlayerPanelHidingScheduler(new SchedulerService());
+		sightPresenter.setMediaAssetManager(_assetManager);
+		sightPresenter.setLocationTracker(_defaultLocationTracker);
+		sightPresenter.setLogger(createLogger(SightPresenter.class));
+		sightPresenter.setLongTaskExecutor(_longTaskExecutor);
+		sightPresenter.setLockProvider(_lockProvider);
 		
 		if(isDemo) {
 			DemoSightLookGotInRangeRaiser raiser = 
 					new DemoSightLookGotInRangeRaiser(getCity(), new SchedulerService());
-			_sightPresenter.setNewSightLookGotInRangeRaiser(raiser);
+			sightPresenter.setNewSightLookGotInRangeRaiser(raiser);
 		}
 		else {			
 			SightLookFinderByLocation finder = 
 					new SightLookFinderByLocation(getCity(), _defaultLocationTracker);
 			finder.setLogger(createLogger(SightLookFinderByLocation.class));
-			_sightPresenter.setNewSightLookGotInRangeRaiser(finder);
+			sightPresenter.setNewSightLookGotInRangeRaiser(finder);
 		}
-	}
+		sightView.setPresenter(sightPresenter);
+	}	
 	
 	public void initAudioPlayerPresenter(AudioPlayerView playerView, boolean isDemo){
 		AudioPlayer player = isDemo ? getDemoAudioPlayer() : _player;
-		_audioPlayerPresenter = new AudioPlayerPresenter(playerView, player);
-		_audioPlayerPresenter.setMediaAssetManager(_assetManager);        
-        _audioPlayerPresenter.setAudioUpdateScheduler(new SchedulerService());
-        _audioPlayerPresenter.setAudioRewindScheduler(new SchedulerService());
-        _audioPlayerPresenter.setLogger(new Log4JAdapter(AudioPlayerPresenter.class));
-        _audioPlayerPresenter.setLongTaskExecutor(_longTaskExecutor);
-        _audioPlayerPresenter.setLockProvider(_lockProvider);
+		AudioPlayerPresenter audioPlayerPresenter = new AudioPlayerPresenter(playerView, player);
+		audioPlayerPresenter.setMediaAssetManager(_assetManager);        
+        audioPlayerPresenter.setAudioUpdateScheduler(new SchedulerService());
+        audioPlayerPresenter.setAudioRewindScheduler(new SchedulerService());
+        audioPlayerPresenter.setLogger(new Log4JAdapter(AudioPlayerPresenter.class));
+        audioPlayerPresenter.setLongTaskExecutor(_longTaskExecutor);
+        audioPlayerPresenter.setLockProvider(_lockProvider);
         
         if(isDemo) {
 			DemoSightLookGotInRangeRaiser raiser = 
 					new DemoSightLookGotInRangeRaiser(getCity(), new SchedulerService());
-			_audioPlayerPresenter.setNewSightLookGotInRangeRaiser(raiser);
+			audioPlayerPresenter.setNewSightLookGotInRangeRaiser(raiser);
 		}
 		else {			
 			SightLookFinderByLocation finder = 
 					new SightLookFinderByLocation(getCity(), _defaultLocationTracker);
 			finder.setLogger(createLogger(SightLookFinderByLocation.class));
-			_audioPlayerPresenter.setNewSightLookGotInRangeRaiser(finder);
+			audioPlayerPresenter.setNewSightLookGotInRangeRaiser(finder);
 		}
+        playerView.setPresenter(audioPlayerPresenter);
 	}
 	
 	public void initHelpPresenter(AuxiliaryView helpView){
-		_helpPresenter = new AuxiliaryPresenter(helpView, getCity());
-		_helpPresenter.setBitmapLoader(_bitmapLoader);
-		_helpPresenter.setLogger(createLogger(AuxiliaryPresenter.class));
+		AuxiliaryPresenter auxPresenter = new AuxiliaryPresenter(helpView, getCity());
+		auxPresenter.setBitmapLoader(_bitmapLoader);
+		auxPresenter.setLogger(createLogger(AuxiliaryPresenter.class));
+		helpView.setPresenter(auxPresenter);
 	}
 	
 	public void initMainPreferencePresenter(MainPreferenceView mainPreferenceView) {
-		_mainPreferencePresenter = new MainPreferencePresenter(getCity(),
+		MainPreferencePresenter mainPreferencePresenter = new MainPreferencePresenter(getCity(),
 			mainPreferenceView, _settingsStorage);
-		_mainPreferencePresenter.setBitmapLoader(_bitmapLoader);
-		_mainPreferencePresenter.setLogger(createLogger(MainPreferencePresenter.class));
+		mainPreferencePresenter.setBitmapLoader(_bitmapLoader);
+		mainPreferencePresenter.setLogger(createLogger(MainPreferencePresenter.class));
+		mainPreferenceView.setPresenter(mainPreferencePresenter);
 	}
 	
 	public void initRouteMapPresenter(RouteMapView routeMapView) {
-		_routeMapPresenter = new RouteMapPresenter(getCity(), routeMapView,
+		RouteMapPresenter routeMapPresenter = new RouteMapPresenter(getCity(), routeMapView,
 			_assetManager);
-		_routeMapPresenter.setLocationTracker(createLocationTracker());
-		_routeMapPresenter.setLogger(createLogger(RouteMapPresenter.class));
+		routeMapPresenter.setLocationTracker(createLocationTracker());
+		routeMapPresenter.setLogger(createLogger(RouteMapPresenter.class));
+		routeMapView.setPresenter(routeMapPresenter);
 	}
 	
 	private Logger createLogger(Class cls) {

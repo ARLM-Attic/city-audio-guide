@@ -3,8 +3,9 @@ package com.gerken.audioGuide.interfaces.views;
 import java.io.InputStream;
 
 import com.gerken.audioGuide.interfaces.OnEventListener;
+import com.gerken.audioGuide.interfaces.PresenterLifetimeManager;
 
-public interface RouteMapView extends Measurable<Integer> {
+public interface RouteMapView extends Measurable<Integer>, PresenterLifetimeManager {
 	int getRouteId();
 	
 	int getMapWidth();

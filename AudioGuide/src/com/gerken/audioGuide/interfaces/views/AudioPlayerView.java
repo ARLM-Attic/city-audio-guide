@@ -1,8 +1,9 @@
 package com.gerken.audioGuide.interfaces.views;
 
 import com.gerken.audioGuide.interfaces.OnEventListener;
+import com.gerken.audioGuide.interfaces.PresenterLifetimeManager;
 
-public interface AudioPlayerView {
+public interface AudioPlayerView extends PresenterLifetimeManager {
 	void displayPlayerPlaying();
 	void displayPlayerStopped();
 	
