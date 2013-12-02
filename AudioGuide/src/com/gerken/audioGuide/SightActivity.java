@@ -58,18 +58,30 @@ public class SightActivity extends BasicGuideActivity implements SightView {
         _audioPlayerControl = findControl(R.id.playerPanel);
         
         _sightIntentExtraWrapper = new SightIntentExtraWrapper(getIntent());
+        boolean isDemoMode = _sightIntentExtraWrapper.getIsDemoMode();
         
         GuideApplication app = (GuideApplication)getApplication();
         app.getPresenterContainer().initSightPresenter(
-        		this, _audioPlayerControl, _sightIntentExtraWrapper.getIsDemoMode());
+        		this, _audioPlayerControl, isDemoMode);
         app.getPresenterContainer().initAudioPlayerPresenter(
-        		_audioPlayerControl, _sightIntentExtraWrapper.getIsDemoMode()); 
+        		_audioPlayerControl, isDemoMode); 
         
         _playerPanelHeight = calculatePlayerPanelHeight();
         playPlayerPanelHidingAnimation(1);
-        setPlayerButtonsClickable(false);       
+        setPlayerButtonsClickable(false);   
+        initExitDemoButton(isDemoMode);
         
         onInitialized();
+    }
+    
+    private void initExitDemoButton(boolean isDemoMode) {
+    	Button exitDemoButton = findControl(R.id.sightExitDemoButton);
+    	exitDemoButton.setVisibility(isDemoMode ? View.VISIBLE : View.INVISIBLE);
+    	exitDemoButton.setOnClickListener(new OnClickListener() {			
+			public void onClick(View v) {
+				finish();				
+			}
+		});
     }
 
     private float calculatePlayerPanelHeight() {
