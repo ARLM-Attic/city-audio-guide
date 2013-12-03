@@ -4,4 +4,8 @@
 		<attr name="arrowWidth" format="dimension" />
 		<attr name="arrowHeight" format="dimension" />
 	</declare-styleable>
+	<declare-styleable name="ExitDemoButton">
+		<attr name="fillColor" format="color" />
+		<attr name="strokeColor" format="color" />
+	</declare-styleable>
 </resources>

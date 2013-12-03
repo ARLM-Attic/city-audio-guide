@@ -16,7 +16,7 @@
         aguide:arrowWidth="@dimen/sight_route_arrow_width"
         aguide:arrowHeight="@dimen/sight_route_arrow_height" />
     
-    <Button
+    <com.gerken.audioGuide.controls.ExitDemoButton
         android:id="@+id/sightExitDemoButton"
         android:layout_gravity="top"
         android:layout_width="@dimen/sight_button_exit_demo_width"
@@ -24,7 +24,11 @@
         android:layout_marginLeft="@dimen/sight_button_exit_demo_margin"
         android:layout_marginTop="@dimen/sight_button_exit_demo_margin"
         android:text="@string/button_text_exit_demo"
-        android:background="#8000FF00" />
+        android:textColor="#FF00FF33"
+        android:textSize="@dimen/sight_button_exit_demo_text_size"
+        android:background="#00000000" 
+        aguide:fillColor = "#B4802B80"
+        aguide:strokeColor = "#FF00FF33" />
     
     <LinearLayout
 	    android:id="@+id/playerInfoPanel"
