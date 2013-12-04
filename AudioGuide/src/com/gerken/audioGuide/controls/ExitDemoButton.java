@@ -6,8 +6,6 @@ import com.gerken.audioGuide.graphics.ExitDemoButtonShape;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.shapes.OvalShape;
 import android.util.AttributeSet;
 import android.widget.Button;
 
@@ -36,6 +34,5 @@ public class ExitDemoButton extends Button {
     	arr.recycle();
     	
     	setBackgroundDrawable(new ExitDemoButtonDrawable(new ExitDemoButtonShape(), _fillColor, _strokeColor));
-    	//setBackgroundDrawable(new ShapeDrawable(new OvalShape()));
     }
 }
