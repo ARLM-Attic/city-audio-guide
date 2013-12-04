@@ -16,7 +16,7 @@
     <dimen name="sight_route_arrow_padding_bottom">34dp</dimen>
     <dimen name="sight_route_arrow_width">60dp</dimen>
     <dimen name="sight_route_arrow_height">80dp</dimen>
-    <dimen name="sight_button_exit_demo_width">104dp</dimen>
+    <dimen name="sight_button_exit_demo_width">100dp</dimen>
     <dimen name="sight_button_exit_demo_height">26dp</dimen>
     <dimen name="sight_button_exit_demo_margin">22dp</dimen>
     <dimen name="sight_button_exit_demo_text_size">16sp</dimen>
