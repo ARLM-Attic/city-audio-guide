@@ -2,9 +2,12 @@ package com.gerken.audioGuide.controls;
 
 import com.gerken.audioGuide.R;
 import com.gerken.audioGuide.graphics.ExitDemoButtonDrawable;
+import com.gerken.audioGuide.graphics.ExitDemoButtonShape;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.OvalShape;
 import android.util.AttributeSet;
 import android.widget.Button;
 
@@ -32,6 +35,7 @@ public class ExitDemoButton extends Button {
     	_strokeColor = arr.getColor(R.styleable.ExitDemoButton_strokeColor, DEF_COLOR);    	
     	arr.recycle();
     	
-    	setBackgroundDrawable(new ExitDemoButtonDrawable(_fillColor, _strokeColor));
+    	setBackgroundDrawable(new ExitDemoButtonDrawable(new ExitDemoButtonShape(), _fillColor, _strokeColor));
+    	//setBackgroundDrawable(new ShapeDrawable(new OvalShape()));
     }
 }

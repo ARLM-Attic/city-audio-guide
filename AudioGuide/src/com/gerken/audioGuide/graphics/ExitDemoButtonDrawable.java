@@ -1,42 +1,64 @@
 package com.gerken.audioGuide.graphics;
 
+import android.graphics.BlurMaskFilter;
+import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.Shape;
 
-public class ExitDemoButtonDrawable extends LayerDrawable {
-
-	public ExitDemoButtonDrawable(int fillColor, int strokeColor) {
-		super(createLayers(fillColor, strokeColor));
+public class ExitDemoButtonDrawable extends ShapeDrawable {
+	private int _fillColor;
+	private int _strokeColor;
+	private Shape _s;
+	
+	private Paint _fillPaint;
+	private Paint _strokePaint;
+	private Paint _crossPaint;
+	
+	public ExitDemoButtonDrawable(Shape s, int fillColor, int strokeColor) {
+		super(s);
+		_s = s;
+		_fillColor = fillColor;
+		_strokeColor = strokeColor;
+		
+		_fillPaint = new Paint(this.getPaint());
+		_fillPaint.setStyle(Style.FILL);
+		_fillPaint.setColor(_fillColor);
+		_fillPaint.setAntiAlias(true);
+		
+		_strokePaint = new Paint(this.getPaint());
+		_strokePaint.setStyle(Style.STROKE);
+		_strokePaint.setColor(_strokeColor);
+		_strokePaint.setAntiAlias(true);
+		_strokePaint.setStrokeWidth(1.0f);
+		_strokePaint.setStrokeJoin(Paint.Join.ROUND);
+		_strokePaint.setStrokeCap(Paint.Cap.ROUND);
+		//_strokePaint.setMaskFilter(new BlurMaskFilter(1.0f, BlurMaskFilter.Blur.NORMAL));
+		
+		_crossPaint = new Paint(this.getPaint());
+		_crossPaint.setStyle(Style.STROKE);
+		_crossPaint.setColor(strokeColor);
+		_crossPaint.setAntiAlias(true);
+		_crossPaint.setStrokeWidth(1.6f);
+		_crossPaint.setStrokeJoin(Paint.Join.ROUND);
+		_crossPaint.setStrokeCap(Paint.Cap.ROUND);
 	}
 	
-	private static Drawable[] createLayers(int fillColor, int strokeColor) {
-		ShapeDrawable fill = new ShapeDrawable(new ExitDemoButtonShape());
-		Paint fillPaint = fill.getPaint();
-		fillPaint.setStyle(Style.FILL);
-		fillPaint.setColor(fillColor);
-		fillPaint.setAntiAlias(true);
+	@Override
+    protected void onDraw(Shape shape, Canvas canvas, Paint paint) {
+		_s.draw(canvas, _fillPaint);
+		_s.draw(canvas, _strokePaint);
 		
-		ShapeDrawable stroke = new ShapeDrawable(new ExitDemoButtonShape());
-		Paint strokePaint = stroke.getPaint();
-		strokePaint.setStyle(Style.STROKE);
-		strokePaint.setColor(strokeColor);
-		strokePaint.setAntiAlias(true);
-		strokePaint.setStrokeWidth(1.5f);
-		strokePaint.setStrokeJoin(Paint.Join.ROUND);
-		strokePaint.setStrokeCap(Paint.Cap.ROUND);
+		float h = canvas.getClipBounds().bottom;
+		float hh = 0.5f*h;
+		float chh = 0.15f*h;
 		
-		ShapeDrawable cross = new ShapeDrawable(new ExitDemoButtonCrossShape());
-		Paint crossPaint = cross.getPaint();
-		crossPaint.setStyle(Style.STROKE);
-		crossPaint.setColor(strokeColor);
-		crossPaint.setAntiAlias(true);
-		crossPaint.setStrokeWidth(1.5f);
-		crossPaint.setStrokeJoin(Paint.Join.ROUND);
-		crossPaint.setStrokeCap(Paint.Cap.ROUND);
-		
-		return new Drawable[] { stroke, cross, fill };
+		canvas.drawLine(hh, hh, hh+chh, hh+chh, _crossPaint);
+		canvas.drawLine(hh, hh, hh-chh, hh+chh, _crossPaint);
+		canvas.drawLine(hh, hh, hh+chh, hh-chh, _crossPaint);
+		canvas.drawLine(hh, hh, hh-chh, hh-chh, _crossPaint);
 	}
 }
