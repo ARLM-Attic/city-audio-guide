@@ -9,11 +9,22 @@ public class SchedulerService implements Scheduler {
 	private Timer _timer;
 	
 	private boolean _isTimerStarted = false;
+	private Object _lock = new Object();
 	
 	@Override
 	public void schedule(TimerTask task, long delay) {
 		if(!_isTimerStarted) {
 			_timer = new Timer();
+			_timer.schedule(decorateWithResetter(task),	delay);
+			_isTimerStarted = true;
+		}
+	}
+	
+	@Override
+	public void scheduleWithoutCheck(TimerTask task, long delay) {
+		synchronized(_lock) {
+			if(_timer == null)
+				_timer = new Timer();
 			_timer.schedule(decorateWithResetter(task),	delay);
 			_isTimerStarted = true;
 		}
