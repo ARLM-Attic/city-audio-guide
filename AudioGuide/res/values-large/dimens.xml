@@ -10,7 +10,13 @@
 	<dimen name="sight_caption_text_padding_top">1.4dp</dimen>
 	<dimen name="sight_route_arrow_padding_bottom">34dp</dimen>
 	<dimen name="sight_route_arrow_width">84dp</dimen>
-    <dimen name="sight_route_arrow_height">110dp</dimen>
+    <dimen name="sight_route_arrow_height">110dp</dimen>    
+    <dimen name="sight_button_exit_demo_width">138dp</dimen>
+    <dimen name="sight_button_exit_demo_height">36dp</dimen>
+    <dimen name="sight_button_exit_demo_margin">30dp</dimen>
+    <dimen name="sight_button_exit_demo_text_padding_right">6dp</dimen>
+    <dimen name="sight_button_exit_demo_text_size">22sp</dimen>
+    <dimen name="sight_button_exit_demo_stroke_width">1.4dp</dimen>
 	
 	<dimen name="player_panel_height">176dp</dimen>
 	<dimen name="player_button_play_width">110dp</dimen>

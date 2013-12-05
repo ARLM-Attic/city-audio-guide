@@ -23,14 +23,15 @@
         android:layout_height="@dimen/sight_button_exit_demo_height"
         android:layout_marginLeft="@dimen/sight_button_exit_demo_margin"
         android:layout_marginTop="@dimen/sight_button_exit_demo_margin"
-        android:paddingRight="4dp"
+        android:paddingRight="@dimen/sight_button_exit_demo_text_padding_right"
         android:text="@string/button_text_exit_demo"
         android:gravity="right|center_vertical"
         android:textColor="#E000FF33"
         android:textSize="@dimen/sight_button_exit_demo_text_size"
         android:background="#200000FF" 
         aguide:fillColor = "#B4802B80"
-        aguide:strokeColor = "#D000FF33" />
+        aguide:strokeColor = "#D000FF33"
+        aguide:strokeWidth = "@dimen/sight_button_exit_demo_stroke_width" />
     
     <LinearLayout
 	    android:id="@+id/playerInfoPanel"
