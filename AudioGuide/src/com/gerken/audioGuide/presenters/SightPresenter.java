@@ -215,8 +215,7 @@ public class SightPresenter {
 		if(sightLook != null) {
 			if(!sightLook.equals(_currentSightLook)) {
 				if(!sightLook.getSight().equals(_currentSight)) {
-					if(_audioNotifier != null)
-						_audioNotifier.signalSightInRange();
+					playAudioNotification();
 					notifyViewAboutNewSight(sightLook);
 					_currentSight = sightLook.getSight();
 				}					
@@ -234,6 +233,16 @@ public class SightPresenter {
 			_currentSightLook = null;
 		}
 		_isNextRoutePointInfoShown = false;
+	}
+	
+	private void playAudioNotification() {
+		if(_audioNotifier != null) {
+			if(_lockProvider != null)
+				_lockProvider.acquireAudioPreparationLock();
+			_audioNotifier.signalSightInRange();
+			if(_lockProvider != null)
+				_lockProvider.releaseAudioPreparationLock();
+		}
 	}
 
 	private void handleStopButtonClick() {
