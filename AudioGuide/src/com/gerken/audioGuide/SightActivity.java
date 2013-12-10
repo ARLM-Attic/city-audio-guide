@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import com.gerken.audioGuide.R;
 import com.gerken.audioGuide.controls.AudioPlayerControl;
 import com.gerken.audioGuide.controls.ControlUpdater;
+import com.gerken.audioGuide.controls.TextViewUpdater;
 import com.gerken.audioGuide.graphics.*;
 import com.gerken.audioGuide.interfaces.BitmapContainer;
 import com.gerken.audioGuide.interfaces.OnEventListener;
@@ -30,6 +31,7 @@ public class SightActivity extends BasicGuideActivity implements SightView {
 	private View _rootView;
 	private View _playerInfoPanel;
 	private AudioPlayerControl _audioPlayerControl;
+	private TextView _captionTextView;
 	
 	private RouteArrowsView _nextSightPointerArrow;
 	private Bitmap _backgroundBitmap;
@@ -42,6 +44,11 @@ public class SightActivity extends BasicGuideActivity implements SightView {
 	private ArrayList<OnEventListener> _viewTouchedListeners = new ArrayList<OnEventListener>();
 	private ArrayList<OnEventListener> _viewDestroyedListeners = new ArrayList<OnEventListener>();
 	private ArrayList<OnEventListener> _viewRestartedListeners = new ArrayList<OnEventListener>();
+	
+	private ControlUpdater<String> _captionSetter;
+	private ControlUpdater<Drawable> _backgroundImageSetter;
+	
+	private Object _backgroundBitmapLock = new Object();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,12 +57,8 @@ public class SightActivity extends BasicGuideActivity implements SightView {
         
         _handler = new Handler();    
         
-        _rootView = findViewById(R.id.rootLayout);
-        _rootView.setOnClickListener(_rootViewClickListener);
-       
-        _nextSightPointerArrow = findControl(R.id.nextSightPointerArrow);
-        _playerInfoPanel = findControl(R.id.playerInfoPanel);
-        _audioPlayerControl = findControl(R.id.playerPanel);
+        findControls();
+        initControlUpdaters();
         
         _sightIntentExtraWrapper = new SightIntentExtraWrapper(getIntent());
         boolean isDemoMode = _sightIntentExtraWrapper.getIsDemoMode();
@@ -72,6 +75,30 @@ public class SightActivity extends BasicGuideActivity implements SightView {
         initExitDemoButton(isDemoMode);
         
         onInitialized();
+    }
+    
+    private void findControls() {
+    	_rootView = findViewById(R.id.rootLayout);
+        _rootView.setOnClickListener(_rootViewClickListener);
+       
+        _nextSightPointerArrow = findControl(R.id.nextSightPointerArrow);
+        _playerInfoPanel = findControl(R.id.playerInfoPanel);
+        _audioPlayerControl = findControl(R.id.playerPanel);
+        _captionTextView = findControl(R.id.sightCaption);;
+    }
+    
+    private void initControlUpdaters() {
+    	_captionSetter = new ControlUpdater<String>(
+			new TextViewUpdater(_captionTextView), "");
+    	
+    	_backgroundImageSetter = new ControlUpdater<Drawable>(
+    			new ControlUpdater.Updater<Drawable>(){
+    				@Override
+    				public void Update(Drawable param) {
+    					_rootView.setBackgroundDrawable(param);
+    				}
+    			}, null
+    		);
     }
     
     private void initExitDemoButton(boolean isDemoMode) {
@@ -122,7 +149,6 @@ public class SightActivity extends BasicGuideActivity implements SightView {
     	switch(item.getItemId()) {
     	case R.id.action_settings:
     		Intent intent = new Intent(this, MainPreferenceActivity.class);
-    		//Intent intent = new Intent(this, RouteMapActivity.class);
     		startActivity(intent);
     		break;
     	case R.id.action_help:
@@ -151,11 +177,12 @@ public class SightActivity extends BasicGuideActivity implements SightView {
 
 	@Override
 	public void setBackgroundImage(BitmapContainer bitmapContainer) {
-		if(_backgroundBitmap != null)
-			_backgroundBitmap.recycle();
-		
-		_backgroundBitmap = bitmapContainer.getBitmap();
-		//_rootView.setBackgroundDrawable(new BitmapDrawable(_backgroundBitmap));
+		synchronized(_backgroundBitmapLock) {
+			Bitmap newBackgroundBitmap = bitmapContainer.getBitmap();
+			if(_backgroundBitmap != null)
+				_backgroundBitmap.recycle();		
+			_backgroundBitmap = newBackgroundBitmap;
+		}
 		
 		_backgroundImageSetter.setStatus(new BitmapDrawable(_backgroundBitmap));
 		_handler.post(_backgroundImageSetter);
@@ -163,8 +190,6 @@ public class SightActivity extends BasicGuideActivity implements SightView {
 	
 	@Override
 	public void setInfoPanelCaptionText(String text) {
-		//TextView caption = findControl(R.id.sightCaption);
-        //caption.setText(text);
 		_captionSetter.setStatus(text);
 		_handler.post(_captionSetter);
 	}	
@@ -275,22 +300,5 @@ public class SightActivity extends BasicGuideActivity implements SightView {
 			500L
 		);
 	
-	private ControlUpdater<String> _captionSetter = new ControlUpdater<String>(
-			new ControlUpdater.Updater<String>(){
-				@Override
-				public void Update(String param) {
-					TextView caption = findControl(R.id.sightCaption);
-			        caption.setText(param);
-				}
-			}, ""
-		);
-	
-	private ControlUpdater<Drawable> _backgroundImageSetter = new ControlUpdater<Drawable>(
-			new ControlUpdater.Updater<Drawable>(){
-				@Override
-				public void Update(Drawable param) {
-					_rootView.setBackgroundDrawable(param);
-				}
-			}, null
-		);
+
 }
