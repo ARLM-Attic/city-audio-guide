@@ -24,6 +24,7 @@
         android:layout_marginLeft="@dimen/sight_button_exit_demo_margin"
         android:layout_marginTop="@dimen/sight_button_exit_demo_margin"
         android:paddingRight="@dimen/sight_button_exit_demo_text_padding_right"
+        android:paddingBottom="@dimen/sight_button_exit_demo_text_padding_bottom"
         android:text="@string/button_text_exit_demo"
         android:gravity="right|center_vertical"
         android:textColor="#E000FF33"

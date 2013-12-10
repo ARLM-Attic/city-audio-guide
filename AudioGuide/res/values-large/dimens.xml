@@ -15,6 +15,7 @@
     <dimen name="sight_button_exit_demo_height">36dp</dimen>
     <dimen name="sight_button_exit_demo_margin">30dp</dimen>
     <dimen name="sight_button_exit_demo_text_padding_right">6dp</dimen>
+    <dimen name="sight_button_exit_demo_text_padding_bottom">2dp</dimen>
     <dimen name="sight_button_exit_demo_text_size">23sp</dimen>
     <dimen name="sight_button_exit_demo_stroke_width">1.4dp</dimen>
 	
