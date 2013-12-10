@@ -10,7 +10,8 @@ import android.graphics.drawable.shapes.Shape;
 
 public class ExitDemoButtonDrawable extends ShapeDrawable {
 	private static final int DEF_COLOR = 0;
-	private static final float DEF_STROKE_WIDTH = 1.0f;	
+	private static final float DEF_STROKE_WIDTH = 1.0f;
+	private static final float CROSS_STROKE_RATIO = 1.6f;	
 	
 	private int _fillColor = DEF_COLOR;
 	private int _strokeColor = DEF_COLOR;
@@ -38,13 +39,12 @@ public class ExitDemoButtonDrawable extends ShapeDrawable {
 		_strokePaint.setStrokeWidth(_strokeWidth);
 		_strokePaint.setStrokeJoin(Paint.Join.ROUND);
 		_strokePaint.setStrokeCap(Paint.Cap.ROUND);
-		//_strokePaint.setMaskFilter(new BlurMaskFilter(1.0f, BlurMaskFilter.Blur.NORMAL));
 		
 		_crossPaint = new Paint(this.getPaint());
 		_crossPaint.setStyle(Style.STROKE);
 		_crossPaint.setColor(_strokeColor);
 		_crossPaint.setAntiAlias(true);
-		_crossPaint.setStrokeWidth(1.6f*_strokeWidth);
+		_crossPaint.setStrokeWidth(CROSS_STROKE_RATIO*_strokeWidth);
 		_crossPaint.setStrokeJoin(Paint.Join.ROUND);
 		_crossPaint.setStrokeCap(Paint.Cap.ROUND);
 	}
@@ -63,7 +63,7 @@ public class ExitDemoButtonDrawable extends ShapeDrawable {
 	public void setStrokeWidth(float strokeWidth) {
 		_strokeWidth = strokeWidth;
 		_strokePaint.setStrokeWidth(_strokeWidth);
-		_crossPaint.setStrokeWidth(1.6f*_strokeWidth);
+		_crossPaint.setStrokeWidth(CROSS_STROKE_RATIO*_strokeWidth);
 	}
 	
 	@Override
@@ -71,15 +71,20 @@ public class ExitDemoButtonDrawable extends ShapeDrawable {
 		_s.resize(canvas.getClipBounds().right, canvas.getClipBounds().bottom);
 		_s.draw(canvas, _fillPaint);
 		
-		float strokeWidth = _strokeWidth;
+		drawCross(canvas);
+		
+		float shrink = 0.5f*_strokeWidth;
 		Matrix matrix = new Matrix();
 	    matrix.setRectToRect(
 	    		new RectF(0, 0, canvas.getClipBounds().right, canvas.getClipBounds().bottom),
-	            new RectF(strokeWidth/2.0f, strokeWidth/2.0f, canvas.getClipBounds().right - strokeWidth/2.0f,
-	                    canvas.getClipBounds().bottom - strokeWidth/2.0f),
+	            new RectF(shrink, shrink, canvas.getClipBounds().right - shrink,
+	                    canvas.getClipBounds().bottom - shrink),
 	            Matrix.ScaleToFit.FILL);
-	    canvas.concat(matrix);
-		
+	    canvas.concat(matrix);		
+		_s.draw(canvas, _strokePaint);		
+	}
+	
+	private void drawCross(Canvas canvas) {
 		float h = canvas.getClipBounds().bottom;
 		float hh = 0.5f*h;
 		float chh = 0.15f*h;
@@ -87,8 +92,6 @@ public class ExitDemoButtonDrawable extends ShapeDrawable {
 		canvas.drawLine(hh, hh, hh+chh, hh+chh, _crossPaint);
 		canvas.drawLine(hh, hh, hh-chh, hh+chh, _crossPaint);
 		canvas.drawLine(hh, hh, hh+chh, hh-chh, _crossPaint);
-		canvas.drawLine(hh, hh, hh-chh, hh-chh, _crossPaint);		
-
-		_s.draw(canvas, _strokePaint);		
+		canvas.drawLine(hh, hh, hh-chh, hh-chh, _crossPaint);	
 	}
 }

@@ -30,7 +30,7 @@
         android:textSize="@dimen/sight_button_exit_demo_text_size"
         android:background="#200000FF" 
         aguide:fillColor = "#B4802B80"
-        aguide:strokeColor = "#D000FF33"
+        aguide:strokeColor = "#C000FF33"
         aguide:strokeWidth = "@dimen/sight_button_exit_demo_stroke_width" />
     
     <LinearLayout
