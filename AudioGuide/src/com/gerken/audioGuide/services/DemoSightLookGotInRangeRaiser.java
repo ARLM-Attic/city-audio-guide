@@ -12,7 +12,7 @@ import com.gerken.audioGuide.objectModel.Sight;
 import com.gerken.audioGuide.objectModel.SightLook;
 
 public class DemoSightLookGotInRangeRaiser implements NewSightLookGotInRangeRaiser {
-	private final int DEFAULT_FIRST_SIGNAL_DELAY_MS = 5000;
+	private final int DEFAULT_FIRST_SIGNAL_DELAY_MS = 2000;
 	private final int DEFAULT_SUBSEQUENT_SIGNAL_DELAY_MS = 10000; 
 	
 	private City _city;

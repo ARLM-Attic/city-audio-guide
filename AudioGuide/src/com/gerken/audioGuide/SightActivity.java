@@ -34,7 +34,8 @@ public class SightActivity extends BasicGuideActivity implements SightView {
 	private TextView _captionTextView;
 	
 	private RouteArrowsView _nextSightPointerArrow;
-	private Bitmap _backgroundBitmap;
+	private Bitmap _backgroundBitmap = null;
+	private Bitmap _oldBackgroundBitmap = null;
 	
 	private Handler _handler;
 	private SightIntentExtraWrapper _sightIntentExtraWrapper;
@@ -48,7 +49,8 @@ public class SightActivity extends BasicGuideActivity implements SightView {
 	private ControlUpdater<String> _captionSetter;
 	private ControlUpdater<Drawable> _backgroundImageSetter;
 	
-	private Object _backgroundBitmapLock = new Object();
+	private final Object _backgroundBitmapSettingLock = new Object();
+	private final Object _backgroundBitmapRecyclingLock = new Object();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,9 +97,17 @@ public class SightActivity extends BasicGuideActivity implements SightView {
     			new ControlUpdater.Updater<Drawable>(){
     				@Override
     				public void Update(Drawable param) {
-    					_rootView.setBackgroundDrawable(param);
+    					synchronized(_backgroundBitmapRecyclingLock) {   					
+	    					_rootView.setBackgroundDrawable(param);
+	    					
+	    					if(_oldBackgroundBitmap != null) {
+	    						_oldBackgroundBitmap.recycle();
+	    						_oldBackgroundBitmap = null;
+	    					}
+    					}
     				}
-    			}, null
+    			}, 
+    			null
     		);
     }
     
@@ -139,7 +149,6 @@ public class SightActivity extends BasicGuideActivity implements SightView {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
@@ -177,10 +186,9 @@ public class SightActivity extends BasicGuideActivity implements SightView {
 
 	@Override
 	public void setBackgroundImage(BitmapContainer bitmapContainer) {
-		synchronized(_backgroundBitmapLock) {
+		synchronized(_backgroundBitmapSettingLock) {
 			Bitmap newBackgroundBitmap = bitmapContainer.getBitmap();
-			if(_backgroundBitmap != null)
-				_backgroundBitmap.recycle();		
+			_oldBackgroundBitmap = _backgroundBitmap;
 			_backgroundBitmap = newBackgroundBitmap;
 		}
 		
