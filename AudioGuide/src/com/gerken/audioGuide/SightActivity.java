@@ -41,6 +41,7 @@ public class SightActivity extends BasicGuideActivity implements SightView {
 	private SightIntentExtraWrapper _sightIntentExtraWrapper;
 	
 	private float _playerPanelHeight = 0.0f;
+	private boolean _isInDemoMode;
 	
 	private ArrayList<OnEventListener> _viewTouchedListeners = new ArrayList<OnEventListener>();
 	private ArrayList<OnEventListener> _viewDestroyedListeners = new ArrayList<OnEventListener>();
@@ -63,18 +64,18 @@ public class SightActivity extends BasicGuideActivity implements SightView {
         initControlUpdaters();
         
         _sightIntentExtraWrapper = new SightIntentExtraWrapper(getIntent());
-        boolean isDemoMode = _sightIntentExtraWrapper.getIsDemoMode();
+        _isInDemoMode = _sightIntentExtraWrapper.getIsDemoMode();
         
         GuideApplication app = (GuideApplication)getApplication();
         app.getPresenterContainer().initSightPresenter(
-        		this, _audioPlayerControl, isDemoMode);
+        		this, _audioPlayerControl, _isInDemoMode);
         app.getPresenterContainer().initAudioPlayerPresenter(
-        		_audioPlayerControl, isDemoMode); 
+        		_audioPlayerControl, _isInDemoMode); 
         
         _playerPanelHeight = calculatePlayerPanelHeight();
         playPlayerPanelHidingAnimation(1);
         setPlayerButtonsClickable(false);   
-        initExitDemoButton(isDemoMode);
+        initExitDemoButton(_isInDemoMode);
         
         onInitialized();
     }
@@ -149,8 +150,11 @@ public class SightActivity extends BasicGuideActivity implements SightView {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
+    	if(!_isInDemoMode) {
+	        getMenuInflater().inflate(R.menu.main, menu);
+	        return true;
+    	}
+    	return false;
     }
     
     @Override
@@ -198,8 +202,15 @@ public class SightActivity extends BasicGuideActivity implements SightView {
 	
 	@Override
 	public void setInfoPanelCaptionText(String text) {
-		_captionSetter.setStatus(text);
-		_handler.post(_captionSetter);
+		boolean isCalledFromUiThread = 
+				(_handler.getLooper().getThread().getId() == Thread.currentThread().getId());
+		
+		if(isCalledFromUiThread)
+			_captionTextView.setText(text);
+		else {
+			_captionSetter.setStatus(text);
+			_handler.post(_captionSetter);
+		}
 	}	
     
 
