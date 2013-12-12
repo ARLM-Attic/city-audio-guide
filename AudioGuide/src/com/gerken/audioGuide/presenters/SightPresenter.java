@@ -214,15 +214,14 @@ public class SightPresenter {
 	private void handleSightLookIsInRange(SightLook sightLook) {
 		if(sightLook != null) {
 			if(!sightLook.equals(_currentSightLook)) {
+				_currentSightLook = sightLook;
 				if(!sightLook.getSight().equals(_currentSight)) {
-					playAudioNotification();
-					notifyViewAboutNewSight(sightLook);
 					_currentSight = sightLook.getSight();
+					playAudioNotification();
+					notifyViewAboutNewSight(sightLook);					
 				}					
 				else
-					notifyViewAboutNewSightLook(sightLook);
-				
-				_currentSightLook = sightLook;
+					notifyViewAboutNewSightLook(sightLook);	
 			}
 		}
 		else if(_currentSightLook != null) {
