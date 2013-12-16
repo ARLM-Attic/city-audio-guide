@@ -49,6 +49,7 @@ public class SightActivity extends BasicGuideActivity implements SightView {
 	
 	private ControlUpdater<String> _captionSetter;
 	private ControlUpdater<Drawable> _backgroundImageSetter;
+	private ControlUpdater<Integer> _routeArrowVisibilitySetter;
 	
 	private final Object _backgroundBitmapSettingLock = new Object();
 	private final Object _backgroundBitmapRecyclingLock = new Object();
@@ -110,6 +111,16 @@ public class SightActivity extends BasicGuideActivity implements SightView {
     			}, 
     			null
     		);
+    	
+    	_routeArrowVisibilitySetter = new ControlUpdater<Integer>(
+    			new ControlUpdater.Updater<Integer>() {
+    				@Override
+    				public void Update(Integer param) {
+    					_nextSightPointerArrow.setVisibility(param);
+    				}
+    			}, 
+    			View.INVISIBLE
+			);
     }
     
     private void initExitDemoButton(boolean isDemoMode) {
@@ -223,7 +234,8 @@ public class SightActivity extends BasicGuideActivity implements SightView {
 	
 	@Override
 	public void hideNextSightDirection() {
-		_nextSightPointerArrow.setVisibility(View.INVISIBLE);
+		_routeArrowVisibilitySetter.setStatus(View.INVISIBLE);
+		_handler.post(_routeArrowVisibilitySetter);
 	}
 	
 	@Override
