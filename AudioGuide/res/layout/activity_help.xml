@@ -48,21 +48,20 @@
 	        android:layout_marginBottom="@dimen/help_buttons_margin"
 	        android:layout_centerHorizontal="true"
 	        android:layout_alignParentBottom="true">
-			<Button
-		        style="@style/DefaultButton"
-		        android:id="@+id/buttonHelpDemo"
-		        android:layout_marginLeft="@dimen/help_buttons_margin"
-	            android:layout_marginRight="@dimen/help_buttons_margin"
-		        android:textStyle="bold"
-		        android:text="@string/button_text_demo" />
 			
 		    <Button
 		        style="@style/DefaultButton"
 		        android:id="@+id/buttonHelpClose"
 		        android:layout_marginLeft="@dimen/help_buttons_margin"
 	            android:layout_marginRight="@dimen/help_buttons_margin"
-		        android:textStyle="bold"
 		        android:text="@string/button_text_close" />
+    		<Button
+		        style="@style/DefaultButton"
+		        android:id="@+id/buttonHelpDemo"
+		        android:layout_marginLeft="@dimen/help_buttons_margin"
+	            android:layout_marginRight="@dimen/help_buttons_margin"
+		        android:textStyle="bold"
+		        android:text="@string/button_text_demo" />		
 	    </LinearLayout>
     </RelativeLayout>
 
