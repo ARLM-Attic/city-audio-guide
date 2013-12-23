@@ -10,16 +10,26 @@ import com.gerken.audioGuide.interfaces.OnSightLookGotInRangeListener;
 import com.gerken.audioGuide.objectModel.City;
 import com.gerken.audioGuide.objectModel.Sight;
 import com.gerken.audioGuide.objectModel.SightLook;
+import com.gerken.audioGuide.util.BoundedNonBlockingQueue;
 
 public class SightLookFinderByLocation implements NewSightLookGotInRangeRaiser {
-	private final float DEFAULT_SIGHT_ACTIVATION_RADIUS_M = 60.0f;
-	private final double EARTH_RADIUS_M = 6371000.0;
+	private static final float DEFAULT_SIGHT_ACTIVATION_RADIUS_M = 60.0f;
+	private static final double EARTH_RADIUS_M = 6371000.0;
+	private static final int DEFAULT_FOUND_SIGHT_LOOK_QUEUE_CAPACITY = 3;	
 	
 	private City _city;
 	private LocationTracker _locationTracker;
 	private Logger _logger;
 	
+	private BoundedNonBlockingQueue<SightLook> _foundSightLooksQueue;
+	private SightLook[] _foundSightLooksArray;
+	private final SightLook _nullSightLook = new SightLook(Double.NaN, Double.NaN, "null");
+	
 	private float _sightActivationRadius = DEFAULT_SIGHT_ACTIVATION_RADIUS_M;
+	private int _foundSightLookQueueCapacity = DEFAULT_FOUND_SIGHT_LOOK_QUEUE_CAPACITY;
+	private int _sightLookMissingCountThreshold = DEFAULT_FOUND_SIGHT_LOOK_QUEUE_CAPACITY;
+	private boolean _wasAnyListenerNotificationSent = false;
+	private boolean _lastListenerNotificationWasNull = false;
 	
 	private ArrayList<OnSightLookGotInRangeListener> _sightLookGotInRangeListeners = 
 			new ArrayList<OnSightLookGotInRangeListener>();
@@ -35,6 +45,9 @@ public class SightLookFinderByLocation implements NewSightLookGotInRangeRaiser {
 		_city = city;
 		_locationTracker = locationTracker;
 		_locationTracker.addLocationChangedListener(_locationChangedListener);
+		
+		_foundSightLooksQueue = new BoundedNonBlockingQueue<SightLook>(DEFAULT_FOUND_SIGHT_LOOK_QUEUE_CAPACITY);
+		_foundSightLooksArray = new SightLook[DEFAULT_FOUND_SIGHT_LOOK_QUEUE_CAPACITY];
 	}
 	
 	public void setLogger(Logger logger) {
@@ -43,6 +56,13 @@ public class SightLookFinderByLocation implements NewSightLookGotInRangeRaiser {
 	
 	public void setSightActivationRadius(float radiusInMeters) {
 		_sightActivationRadius = radiusInMeters;
+	}
+	
+	public void setSightLookMissingCountThreshold(int threshold) {
+		_sightLookMissingCountThreshold = threshold;
+		_foundSightLookQueueCapacity = threshold;
+		_foundSightLooksQueue = new BoundedNonBlockingQueue<SightLook>(_foundSightLookQueueCapacity);
+		_foundSightLooksArray = new SightLook[_foundSightLookQueueCapacity];
 	}
 
 	@Override
@@ -53,13 +73,53 @@ public class SightLookFinderByLocation implements NewSightLookGotInRangeRaiser {
 	
 	private void handleLocationChanged(double latitude, double longitude) {
 		SightLook sightLook = findClosestSightLookInRange(latitude, longitude);
+		logSightLook(sightLook);
 		
-		if(sightLook != null)
-			logDebug(String.format("Found sight look \"%s\" at %f,%f", 
-				sightLook.getSight().getName(), sightLook.getLatitude(), sightLook.getLongitude()));
+		if(sightLook == null) {
+			handleLocationHasNoSightLook();
+		}
+		else {
+			_foundSightLooksQueue.offer(sightLook);
+			notifyListeners(sightLook);
+			_lastListenerNotificationWasNull = false;
+			_wasAnyListenerNotificationSent = true;
+		}		
+	}
+	
+	private void handleLocationHasNoSightLook() {
+		_foundSightLooksQueue.offer(_nullSightLook);
 		
+		if(!_wasAnyListenerNotificationSent)
+			return;
+
+		if(!_lastListenerNotificationWasNull && _foundSightLooksQueue.size() >= _sightLookMissingCountThreshold) {
+			boolean queueTailNullCountReachedThreshold = true;
+			_foundSightLooksArray = _foundSightLooksQueue.toArray(_foundSightLooksArray);
+			int stIdx = _foundSightLooksQueue.size() - 1;
+			int enIdx = _foundSightLooksQueue.size() - _sightLookMissingCountThreshold;
+			for(int i=stIdx; i>=enIdx; i--) {
+				if(!isSightLookNull(_foundSightLooksArray[i])) {
+					queueTailNullCountReachedThreshold = false;
+					break;
+				}
+			}
+			
+			if(queueTailNullCountReachedThreshold) {
+				notifyListeners(null);
+				logDebug("Sent NULL to listeners");
+				_lastListenerNotificationWasNull = true;
+				_wasAnyListenerNotificationSent = true;
+			}
+		}
+	}
+	
+	private void notifyListeners(SightLook sightLook) {
 		for(OnSightLookGotInRangeListener l : _sightLookGotInRangeListeners)
 			l.onSightLookGotInRange(sightLook);
+	}
+	
+	private boolean isSightLookNull(SightLook sightLook) {
+		return (Double.isNaN(sightLook.getLatitude()) && Double.isNaN(sightLook.getLongitude()));
 	}
 
 	private SightLook findClosestSightLookInRange(double latitude, double longitude){
@@ -91,6 +151,14 @@ public class SightLookFinderByLocation implements NewSightLookGotInRangeRaiser {
 	
 	private double deg2rad(double deg) {
 		return deg * (Math.PI/180.0);
+	}
+	
+	private void logSightLook(SightLook sightLook) {
+		if(sightLook != null)
+			logDebug(String.format("Found sight look \"%s\" at %f,%f", 
+				sightLook.getSight().getName(), sightLook.getLatitude(), sightLook.getLongitude()));
+		else
+			logDebug("No sight look found");
 	}
 	
 	private void logDebug(String message) {
