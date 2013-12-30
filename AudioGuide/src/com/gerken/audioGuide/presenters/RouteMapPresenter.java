@@ -3,11 +3,13 @@ package com.gerken.audioGuide.presenters;
 import java.io.InputStream;
 
 import com.gerken.audioGuide.R;
+import com.gerken.audioGuide.containers.Point;
 import com.gerken.audioGuide.interfaces.LocationTracker;
 import com.gerken.audioGuide.interfaces.MediaAssetManager;
 import com.gerken.audioGuide.interfaces.Logger;
 import com.gerken.audioGuide.interfaces.OnEventListener;
 import com.gerken.audioGuide.interfaces.OnLocationChangedListener;
+import com.gerken.audioGuide.interfaces.OnMultiTouchListener;
 import com.gerken.audioGuide.interfaces.views.RouteMapView;
 import com.gerken.audioGuide.objectModel.City;
 import com.gerken.audioGuide.objectModel.MapBounds;
@@ -23,6 +25,11 @@ public class RouteMapPresenter {
 	private Route _currentRoute;
 	private boolean _isScrollingToCurrentLocationDone = false;
 	private boolean _shouldHandleRestoringInstance = false;
+	
+	private float _multiTouchDownDistance;
+	private float _originalScale = 1f;
+	private float _currentScale = 1f;
+	private Point<Float> _mapScalingCenter = new Point<Float>(0f, 0f);
 	
 	private OnEventListener _viewInitializedListener = new OnEventListener() {		
 		@Override
@@ -62,6 +69,18 @@ public class RouteMapPresenter {
 		}
 	};
 	
+	private OnMultiTouchListener _multiTouchListener = new OnMultiTouchListener() {
+		public void onMultiTouchDown(Point<Float>[] touchPoints) {
+			handleMultiTouchDown(touchPoints);			
+		}
+		public void onMultiTouchMove(Point<Float>[] touchPoints) {
+			handleMultiTouchMove(touchPoints);
+		}
+		public void onMultiTouchUp() {
+			handleMultiTouchUp();
+		}
+	};
+	
 	public RouteMapPresenter(City city, RouteMapView view, 
 			MediaAssetManager assetStreamProvider) {
 		_city = city;
@@ -73,6 +92,7 @@ public class RouteMapPresenter {
 		_view.addViewStartedListener(_viewStartedListener);
 		_view.addViewStoppedListener(_viewStoppedListener);
 		_view.addViewInstanceStateRestoredListener(_viewInstanceStateRestoredListener);
+		_view.addViewMultiTouchListener(_multiTouchListener);
 	}
 
 	public void setLocationTracker(LocationTracker tracker) {
@@ -145,6 +165,41 @@ public class RouteMapPresenter {
 			_view.hideLocationPointer();
 	}
 	
+	private void handleMultiTouchDown(Point<Float>[] touchPoints) {
+		if(touchPoints.length < 2)
+			return;
+		_multiTouchDownDistance = getDistance(touchPoints[0], touchPoints[1]);
+		_mapScalingCenter = new Point<Float>(
+			0.5f*(touchPoints[0].getX()+touchPoints[1].getX()), 
+			0.5f*(touchPoints[0].getY()+touchPoints[1].getY())
+		);
+		logDebug(String.format("MultiTouchDown: center=%.1f,%.1f; dist=%.1f", 
+				_mapScalingCenter.getX(), _mapScalingCenter.getY(), _multiTouchDownDistance));
+	}
+	
+	private void handleMultiTouchMove(Point<Float>[] touchPoints) {
+		if(touchPoints.length < 2)
+			return;
+		float newDistance = getDistance(touchPoints[0], touchPoints[1]);
+		float newScaleRatio = newDistance / _multiTouchDownDistance;
+		float newScale = _originalScale * newScaleRatio;
+		logDebug(String.format("MultiTouchMove: newScaleRatio=%.4f newScale=%.4f", newScaleRatio, newScale));
+		if(newScale < 1f) {
+			_currentScale = newScale;
+			_view.setMapScale(newScale, _mapScalingCenter);
+		}
+	}
+	
+	private void handleMultiTouchUp() {
+		_originalScale = _currentScale;
+	}
+	
+	private float getDistance(Point<Float> p0, Point<Float> p1) {
+		float dx = p1.getX()-p0.getX();
+		float dy = p1.getY()-p0.getY();
+		return (float)Math.sqrt(dx*dx + dx*dy);
+	}
+	
 	private void scrollTo(int dx, int dy) {
 		int sx = Math.max(0, dx - _view.getWidth()/2);
 		int sy = Math.max(0, dy - _view.getHeight()/2);
@@ -177,6 +232,10 @@ public class RouteMapPresenter {
 	private void logWarning(String message) {
 		if(_logger != null)
 			_logger.logWarning(message);
+	}
+	private void logDebug(String message) {
+		if(_logger != null)
+			_logger.logDebug(message);
 	}
 
 }

@@ -3,15 +3,21 @@ package com.gerken.audioGuide;
 import java.io.InputStream;
 import java.util.ArrayList;
 
+import com.gerken.audioGuide.containers.Point;
 import com.gerken.audioGuide.interfaces.OnEventListener;
+import com.gerken.audioGuide.interfaces.OnMultiTouchListener;
 import com.gerken.audioGuide.interfaces.views.RouteMapView;
 import com.gerken.audioGuide.util.IntentExtraManager;
 
 import android.os.Bundle;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnTouchListener;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.AbsoluteLayout;
@@ -35,13 +41,24 @@ public class RouteMapActivity extends BasicGuideActivity implements RouteMapView
 	private ScrollView _verticalScrollView;
 	private View _mapPointer;
 	
+	private Matrix mapOriginalMatrix = new Matrix();
+	
 	private int _restoredScrollX = 0;
 	private int _restoredScrollY = 0;
 	private int _restoredPointerX = 0;
 	private int _restoredPointerY = 0;
 	private boolean _restoredPointerVisible = false;
 	
+	private boolean _isMapZoomStarted = false;
+	
 	private ArrayList<OnEventListener> _viewInstanceStateRestoredListeners = new ArrayList<OnEventListener>();
+	private ArrayList<OnMultiTouchListener> _viewMultiTouchListeners = new ArrayList<OnMultiTouchListener>();
+	
+	private OnTouchListener _mapTouchListener = new OnTouchListener() {
+		public boolean onTouch(View v, MotionEvent event) {
+			return handleMapImageTouch(v, event);
+		}
+	};
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +72,9 @@ public class RouteMapActivity extends BasicGuideActivity implements RouteMapView
 		_mapPointer = findViewById(R.id.mapPointerImage);;
 		
 		_intentExtraManager = new IntentExtraManager(getIntent());
-		_mapPointerAnimation = createMapPointerAnimation();		
+		_mapPointerAnimation = createMapPointerAnimation();
+		
+		_mapImage.setOnTouchListener(_mapTouchListener);
 		
 		((GuideApplication)getApplication()).getPresenterContainer().initRouteMapPresenter(this);
 		
@@ -195,6 +214,21 @@ public class RouteMapActivity extends BasicGuideActivity implements RouteMapView
 		_viewInstanceStateRestoredListeners.add(listener);
 	}
 
+	@Override
+	public void addViewMultiTouchListener(OnMultiTouchListener listener) {
+		_viewMultiTouchListeners.add(listener);		
+	}
+
+	@Override
+	public void setMapScale(float scale, Point<Float> scalingCenter) {
+		Matrix scaleMatrix = new Matrix();
+		scaleMatrix.postScale(scale, scale, scalingCenter.getX(), scalingCenter.getY());
+		Log.d("RouteMapActivity", String.format("Scale %.3f at %.1f,%.1f", scale,
+				scalingCenter.getX(), scalingCenter.getY())
+		);
+		_mapImage.setImageMatrix(scaleMatrix);
+	}
+
 	private Animation createMapPointerAnimation() {
 		Animation anim = new AlphaAnimation(0.0f, 1.0f);
         anim.setDuration(1000);
@@ -204,4 +238,50 @@ public class RouteMapActivity extends BasicGuideActivity implements RouteMapView
         return anim;
 	}
 
+	private boolean handleMapImageTouch(View v, MotionEvent event) {
+		int action = event.getAction() & MotionEvent.ACTION_MASK;
+		Log.d("RouteMapActivity", "handleMapImageTouch start " + String.valueOf(action) + " / " + String.valueOf(event.getAction()));
+		switch (action) {
+		case MotionEvent.ACTION_DOWN:
+			Log.d("RouteMapActivity", "handleMapImageTouch ACTION_DOWN");
+            v.getParent().requestDisallowInterceptTouchEvent(true);
+            return true;
+		case MotionEvent.ACTION_POINTER_DOWN:
+			Log.d("RouteMapActivity", "handleMapImageTouch ACTION_POINTER_DOWN");
+			_isMapZoomStarted = true;
+			for(OnMultiTouchListener l: _viewMultiTouchListeners)
+				l.onMultiTouchDown(getTouchEventPoints(event));
+			return true;
+		case MotionEvent.ACTION_MOVE:
+			Log.d("RouteMapActivity", "handleMapImageTouch ACTION_MOVE");
+			if(_isMapZoomStarted) {
+				for(OnMultiTouchListener l: _viewMultiTouchListeners)
+					l.onMultiTouchMove(getTouchEventPoints(event));
+				return true;
+			}
+			else
+				v.getParent().requestDisallowInterceptTouchEvent(false);
+			break;
+		case MotionEvent.ACTION_UP:
+	    case MotionEvent.ACTION_POINTER_UP:
+	    	Log.d("RouteMapActivity", "handleMapImageTouch ACTION_UP");
+	    	v.getParent().requestDisallowInterceptTouchEvent(false);
+	    	if(_isMapZoomStarted) {
+	    		_isMapZoomStarted = false;
+	    		for(OnMultiTouchListener l: _viewMultiTouchListeners)
+					l.onMultiTouchUp();
+	    		return true;
+	    	}
+	    	break;
+		}
+		
+		return true;
+	}
+	
+	private Point<Float>[] getTouchEventPoints(MotionEvent event) {
+		Point<Float>[] res = (Point<Float>[])new Point[event.getPointerCount()];
+		for(int i=0; i<event.getPointerCount(); i++)
+			res[i] = new Point<Float>(event.getX(i), event.getY(i));
+		return res;
+	}
 }
