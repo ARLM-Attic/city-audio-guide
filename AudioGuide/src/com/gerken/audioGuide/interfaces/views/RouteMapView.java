@@ -14,8 +14,8 @@ public interface RouteMapView extends Measurable<Integer>, PresenterLifetimeMana
 	int getOriginalMapHeight();
 	int getMapWidth();
 	int getMapHeight();
-	int getPointerWidth();
-	int getPointerHeight();
+	int getOriginalMapPointerWidth();
+	int getOriginalMapPointerHeight();
 	
 	int getRestoredScrollX();
 	int getRestoredScrollY();
@@ -30,8 +30,10 @@ public interface RouteMapView extends Measurable<Integer>, PresenterLifetimeMana
 	void hideLocationPointer();
 	void scrollTo(int x, int y);
 	void setMapScale(float scale);
+	void setMapPointerScale(float scale);
 	void setMapSize(int width, int height);
 	void setMapPointerContainerSize(int width, int height);
+	void setMapPointerSize(int width, int height);
 	
 	void displayMap(InputStream mapStream) throws Exception;
 	void displayError(int messageResourceId);

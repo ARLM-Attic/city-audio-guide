@@ -22,7 +22,6 @@ import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.AbsoluteLayout;
-import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.ScrollView;
@@ -41,11 +40,9 @@ public class RouteMapActivity extends BasicGuideActivity implements RouteMapView
 	private Animation _mapPointerAnimation;
 	private HorizontalScrollView _horizontalScrollView;
 	private ScrollView _verticalScrollView;
-	private View _mapPointer;
+	private ImageView _mapPointer;
 	private View _mapContainer;
 	private View _mapPointerContainer;
-	
-	private Matrix mapOriginalMatrix = new Matrix();
 	
 	private int _restoredScrollX = 0;
 	private int _restoredScrollY = 0;
@@ -55,6 +52,8 @@ public class RouteMapActivity extends BasicGuideActivity implements RouteMapView
 	
 	private int _originalMapWidth = 0;
 	private int _originalMapHeight = 0;
+	private int _originalMapPointerWidth = 0;
+	private int _originalMapPointerHeight = 0;
 	
 	private boolean _isMapZoomStarted = false;
 	
@@ -76,7 +75,7 @@ public class RouteMapActivity extends BasicGuideActivity implements RouteMapView
 		_mapImage = (ImageView)findViewById(R.id.mapImage);
 		_horizontalScrollView = (HorizontalScrollView)findViewById(R.id.routeMapHorizontalScroller);
 		_verticalScrollView = (ScrollView)findViewById(R.id.routeMapMainView);
-		_mapPointer = findViewById(R.id.mapPointerImage);
+		_mapPointer = (ImageView)findViewById(R.id.mapPointerImage);
 		_mapContainer = findViewById(R.id.mapContainer);
 		_mapPointerContainer = findViewById(R.id.mapPointerContainer);
 		
@@ -84,6 +83,9 @@ public class RouteMapActivity extends BasicGuideActivity implements RouteMapView
 		_mapPointerAnimation = createMapPointerAnimation();
 		
 		_mapImage.setOnTouchListener(_mapTouchListener);
+		
+		_originalMapPointerWidth = _mapPointer.getWidth();
+		_originalMapPointerHeight = _mapPointer.getHeight();
 		
 		((GuideApplication)getApplication()).getPresenterContainer().initRouteMapPresenter(this);
 		
@@ -163,12 +165,12 @@ public class RouteMapActivity extends BasicGuideActivity implements RouteMapView
 	
 
 	@Override
-	public int getPointerWidth() {
-		return _mapPointer.getWidth();
+	public int getOriginalMapPointerWidth() {
+		return _originalMapPointerWidth;
 	}
 	@Override
-	public int getPointerHeight() {
-		return _mapPointer.getHeight();
+	public int getOriginalMapPointerHeight() {
+		return _originalMapPointerHeight;
 	}
 
 	@Override
@@ -259,12 +261,25 @@ public class RouteMapActivity extends BasicGuideActivity implements RouteMapView
 		_mapContainer.setMinimumHeight(height);
 	}
 	
+	public void setMapPointerSize(int width, int height) {
+		setViewLayoutSize(_mapPointer, width, height);
+		_mapPointer.setMinimumWidth(width);
+		_mapPointer.setMinimumHeight(height);
+	}
+	
+	@Override
+	public void setMapPointerScale(float scale) {
+		Matrix scaleMatrix = new Matrix();
+		scaleMatrix.postScale(scale, scale, 0, 0);
+		_mapPointer.setImageMatrix(scaleMatrix);
+	}
+	
 	private void setViewLayoutSize(View view, int width, int height) {
 		ViewGroup.LayoutParams view_lp = view.getLayoutParams();
 		view_lp.width = width;
 		view_lp.height = height;
 		view.setLayoutParams(view_lp);
-	}
+	}	
 
 	private Animation createMapPointerAnimation() {
 		Animation anim = new AlphaAnimation(0.0f, 1.0f);
