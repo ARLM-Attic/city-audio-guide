@@ -10,6 +10,9 @@ import com.gerken.audioGuide.interfaces.Logger;
 import com.gerken.audioGuide.interfaces.OnEventListener;
 import com.gerken.audioGuide.interfaces.OnLocationChangedListener;
 import com.gerken.audioGuide.interfaces.OnMultiTouchListener;
+import com.gerken.audioGuide.interfaces.ViewStateContainer;
+import com.gerken.audioGuide.interfaces.listeners.OnViewStateRestoreListener;
+import com.gerken.audioGuide.interfaces.listeners.OnViewStateSaveListener;
 import com.gerken.audioGuide.interfaces.views.RouteMapView;
 import com.gerken.audioGuide.objectModel.City;
 import com.gerken.audioGuide.objectModel.MapBounds;
@@ -23,9 +26,10 @@ public class RouteMapPresenter {
 	private Logger _logger;
 	
 	private Route _currentRoute;
-	private boolean _isScrollingToCurrentLocationDone = false;
-	private boolean _shouldHandleRestoringInstance = false;
+	private boolean _isScrollingToCurrentLocationDone = false;	
 	private boolean _isMapPointerVisible = false;
+	
+	private ViewStateContainer _viewInstanceRestoringData = null;
 	
 	private float _multiTouchDownDistance;
 	private float _originalScale = 1f;
@@ -58,10 +62,17 @@ public class RouteMapPresenter {
 			handleViewStopped();
 		}
 	};
-	private OnEventListener _viewInstanceStateRestoredListener = new OnEventListener() {		
+	
+	private OnViewStateSaveListener _viewInstanceStateSavedListener = new OnViewStateSaveListener() {		
 		@Override
-		public void onEvent() {
-			_shouldHandleRestoringInstance = true;
+		public void onStateSave(ViewStateContainer stateContainer) {
+			handleViewStateSave(stateContainer);
+		}
+	};
+	private OnViewStateRestoreListener _viewInstanceStateRestoredListener = new OnViewStateRestoreListener() {		
+		@Override
+		public void onStateRestore(ViewStateContainer stateContainer) {
+			_viewInstanceRestoringData = stateContainer;
 		}
 	};
 	
@@ -94,6 +105,7 @@ public class RouteMapPresenter {
 		_view.addViewLayoutCompleteListener(_viewLayoutCompleteListener);
 		_view.addViewStartedListener(_viewStartedListener);
 		_view.addViewStoppedListener(_viewStoppedListener);
+		_view.addViewInstanceStateSavedListener(_viewInstanceStateSavedListener);
 		_view.addViewInstanceStateRestoredListener(_viewInstanceStateRestoredListener);
 		_view.addViewMultiTouchListener(_multiTouchListener);
 	}
@@ -121,13 +133,14 @@ public class RouteMapPresenter {
 	}
 	
 	private void handleViewLayoutComplete() {
-		if(_shouldHandleRestoringInstance) {
-			_view.scrollTo(_view.getRestoredScrollX(), _view.getRestoredScrollY());
-			if(_view.isRestoredPointerVisible())
-				_view.showLocationPointerAt(_view.getRestoredPointerX(), _view.getRestoredPointerY());
+		if(_viewInstanceRestoringData != null) {
+			RouteMapViewStateContainer rmc = new RouteMapViewStateContainer(_viewInstanceRestoringData);
+			_view.scrollTo(rmc.getViewScrollX(), rmc.getViewScrollY());
+			if(rmc.isMapPointerVisible())
+				_view.showLocationPointerAt(rmc.getMapPointerX(), rmc.getMapPointerY());
 			else
 				_view.hideLocationPointer();
-			_shouldHandleRestoringInstance = false;
+			_viewInstanceRestoringData = null;
 		}
 	}
 
@@ -201,11 +214,14 @@ public class RouteMapPresenter {
 		if(newScale < 1f && mapExceedsScreen) {
 			_currentScale = newScale;
 			_view.setMapScale(newScale);
-			_view.setMapPointerScale(newScale);
-			
+			_view.setMapPointerScale(newScale);			
 			
 			_view.setMapSize(newMapWidth, newMapHeight);
 			_view.setMapPointerContainerSize(newMapWidth, newMapHeight);
+			
+			int mpw = (int)(((float)_view.getOriginalMapPointerWidth()) * newScale);
+			int mph = (int)(((float)_view.getOriginalMapPointerHeight()) * newScale);
+			_view.setMapPointerSize(mpw, mph);
 			
 			float hw = _view.getWidth()/2f;
 			float hh = _view.getHeight()/2f;
@@ -221,6 +237,14 @@ public class RouteMapPresenter {
 	
 	private void handleMultiTouchUp() {
 		_originalScale = _currentScale;
+	}
+	
+	private void handleViewStateSave(ViewStateContainer stateContainer) {
+		RouteMapViewStateContainer rmc = new RouteMapViewStateContainer(stateContainer);
+		rmc.setViewScroll(_view.getScrollX(), _view.getScrollY());
+		rmc.setScale(_currentScale);
+		rmc.setMapPointerVisible(_isMapPointerVisible);
+		// TODO: pointer pos
 	}
 	
 	private float getDistance(Point<Float> p0, Point<Float> p1) {
@@ -268,4 +292,56 @@ public class RouteMapPresenter {
 			_logger.logDebug(message);
 	}
 
+	private class RouteMapViewStateContainer {
+		private static final String KEY_SCROLL_X = "ScrollX";
+		private static final String KEY_SCROLL_Y = "ScrollY";
+		private static final String KEY_MAP_POINTER_X = "PointerX";
+		private static final String KEY_MAP_POINTER_Y = "PointerY";
+		private static final String KEY_MAP_POINTER_VISIBLE = "PointerVisible";
+		private static final String KEY_SCALE = "Scale";
+		
+		private ViewStateContainer _container;
+		
+		public RouteMapViewStateContainer(ViewStateContainer genericContainer) {
+			_container = genericContainer;
+		}
+		
+		public int getViewScrollX() {
+			return _container.getInt(KEY_SCROLL_X);
+		}
+		public int getViewScrollY() {
+			return _container.getInt(KEY_SCROLL_Y);
+		}
+		
+		public boolean isMapPointerVisible() {
+			return _container.getBoolean(KEY_MAP_POINTER_VISIBLE);
+		}
+		public int getMapPointerX() {
+			return _container.getInt(KEY_MAP_POINTER_X);
+		}
+		public int getMapPointerY() {
+			return _container.getInt(KEY_MAP_POINTER_Y);
+		}
+		
+		public float getScale() {
+			return _container.getFloat(KEY_SCALE);
+		}
+		
+		public void setViewScroll(int x, int y) {
+			_container.putInt(KEY_SCROLL_X, x);
+			_container.putInt(KEY_SCROLL_Y, y);
+		}
+		
+		public void setMapPointerVisible(boolean isVisible) {
+			_container.putBoolean(KEY_MAP_POINTER_VISIBLE, isVisible);
+		}
+		public void setMapPointerPosition(int x, int y) {
+			_container.putInt(KEY_MAP_POINTER_X, x);
+			_container.putInt(KEY_MAP_POINTER_Y, y);
+		}
+		
+		public void setScale(float scale){
+			_container.putFloat(KEY_SCALE, scale);
+		}
+	}
 }

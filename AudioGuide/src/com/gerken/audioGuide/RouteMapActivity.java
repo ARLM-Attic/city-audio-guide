@@ -6,7 +6,10 @@ import java.util.ArrayList;
 import com.gerken.audioGuide.containers.Point;
 import com.gerken.audioGuide.interfaces.OnEventListener;
 import com.gerken.audioGuide.interfaces.OnMultiTouchListener;
+import com.gerken.audioGuide.interfaces.listeners.OnViewStateRestoreListener;
+import com.gerken.audioGuide.interfaces.listeners.OnViewStateSaveListener;
 import com.gerken.audioGuide.interfaces.views.RouteMapView;
+import com.gerken.audioGuide.util.BundleViewStateContainer;
 import com.gerken.audioGuide.util.IntentExtraManager;
 
 import android.os.Bundle;
@@ -28,12 +31,6 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 public class RouteMapActivity extends BasicGuideActivity implements RouteMapView {
-	private static final String KEY_SCROLL_X = "ScrollX";
-	private static final String KEY_SCROLL_Y = "ScrollY";
-	private static final String KEY_POINTER_X = "PointerX";
-	private static final String KEY_POINTER_Y = "PointerY";
-	private static final String KEY_POINTER_VISIBLE = "PointerVisible";
-	
 	private View _rootView;	
 	private ImageView _mapImage;
 	private IntentExtraManager _intentExtraManager;	
@@ -44,12 +41,6 @@ public class RouteMapActivity extends BasicGuideActivity implements RouteMapView
 	private View _mapContainer;
 	private View _mapPointerContainer;
 	
-	private int _restoredScrollX = 0;
-	private int _restoredScrollY = 0;
-	private int _restoredPointerX = 0;
-	private int _restoredPointerY = 0;
-	private boolean _restoredPointerVisible = false;
-	
 	private int _originalMapWidth = 0;
 	private int _originalMapHeight = 0;
 	private int _originalMapPointerWidth = 0;
@@ -57,7 +48,8 @@ public class RouteMapActivity extends BasicGuideActivity implements RouteMapView
 	
 	private boolean _isMapZoomStarted = false;
 	
-	private ArrayList<OnEventListener> _viewInstanceStateRestoredListeners = new ArrayList<OnEventListener>();
+	private ArrayList<OnViewStateSaveListener> _viewInstanceStateSavedListeners = new ArrayList<OnViewStateSaveListener>();
+	private ArrayList<OnViewStateRestoreListener> _viewInstanceStateRestoredListeners = new ArrayList<OnViewStateRestoreListener>();
 	private ArrayList<OnMultiTouchListener> _viewMultiTouchListeners = new ArrayList<OnMultiTouchListener>();
 	
 	private OnTouchListener _mapTouchListener = new OnTouchListener() {
@@ -95,27 +87,15 @@ public class RouteMapActivity extends BasicGuideActivity implements RouteMapView
 	@Override
 	public void onSaveInstanceState(Bundle savedInstanceState) {
 	  super.onSaveInstanceState(savedInstanceState);
-	  savedInstanceState.putInt(KEY_SCROLL_X, _horizontalScrollView.getScrollX());
-	  savedInstanceState.putInt(KEY_SCROLL_Y, _verticalScrollView.getScrollY());
-	  
-	  AbsoluteLayout.LayoutParams pointerLp = (AbsoluteLayout.LayoutParams)_mapPointer.getLayoutParams();
-	  savedInstanceState.putInt(KEY_POINTER_X, pointerLp.x);
-	  savedInstanceState.putInt(KEY_POINTER_Y, pointerLp.y);
-	  savedInstanceState.putBoolean(KEY_POINTER_VISIBLE, 
-			  (_mapPointer.getVisibility() == View.VISIBLE));
+	  for(OnViewStateSaveListener l : _viewInstanceStateSavedListeners)
+	  		l.onStateSave(new BundleViewStateContainer(savedInstanceState));
 	}
 	
 	@Override
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
-	  super.onRestoreInstanceState(savedInstanceState);
-	  _restoredScrollX = savedInstanceState.getInt(KEY_SCROLL_X);
-	  _restoredScrollY = savedInstanceState.getInt(KEY_SCROLL_Y);
-	  _restoredPointerX = savedInstanceState.getInt(KEY_POINTER_X);
-	  _restoredPointerY = savedInstanceState.getInt(KEY_POINTER_Y);
-	  _restoredPointerVisible = savedInstanceState.getBoolean(KEY_POINTER_VISIBLE);
-	  
-	  for(OnEventListener l : _viewInstanceStateRestoredListeners)
-      	l.onEvent();	  
+		super.onRestoreInstanceState(savedInstanceState);
+	  	for(OnViewStateRestoreListener l : _viewInstanceStateRestoredListeners)
+	  		l.onStateRestore(new BundleViewStateContainer(savedInstanceState));
 	}
 
 	@Override
@@ -174,31 +154,10 @@ public class RouteMapActivity extends BasicGuideActivity implements RouteMapView
 	}
 
 	@Override
-	public int getRestoredPointerX() {
-		return _restoredPointerX;
-	}
-
-	@Override
-	public int getRestoredPointerY() {
-		return _restoredPointerY;
-	}
-	@Override
-	public boolean isRestoredPointerVisible() {
-		return _restoredPointerVisible;
-	}
-	
-	@Override
-	public int getRestoredScrollX() {
-		return _restoredScrollX;
-	}
-	@Override
-	public int getRestoredScrollY() {
-		return _restoredScrollY;
-	}
-	
 	public int getScrollX() {
 		return _horizontalScrollView.getScrollX();
 	}
+	@Override
 	public int getScrollY() {
 		return _verticalScrollView.getScrollY();
 	}
@@ -235,7 +194,11 @@ public class RouteMapActivity extends BasicGuideActivity implements RouteMapView
 	}
 	
 	@Override
-	public void addViewInstanceStateRestoredListener(OnEventListener listener) {
+	public void  addViewInstanceStateSavedListener(OnViewStateSaveListener listener) {
+		_viewInstanceStateSavedListeners.add(listener);
+	}
+	@Override
+	public void addViewInstanceStateRestoredListener(OnViewStateRestoreListener listener) {
 		_viewInstanceStateRestoredListeners.add(listener);
 	}
 

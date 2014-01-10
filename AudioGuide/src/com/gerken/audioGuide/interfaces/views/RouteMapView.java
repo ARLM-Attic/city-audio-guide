@@ -6,6 +6,8 @@ import com.gerken.audioGuide.containers.Point;
 import com.gerken.audioGuide.interfaces.OnEventListener;
 import com.gerken.audioGuide.interfaces.OnMultiTouchListener;
 import com.gerken.audioGuide.interfaces.PresenterLifetimeManager;
+import com.gerken.audioGuide.interfaces.listeners.OnViewStateRestoreListener;
+import com.gerken.audioGuide.interfaces.listeners.OnViewStateSaveListener;
 
 public interface RouteMapView extends Measurable<Integer>, PresenterLifetimeManager {
 	int getRouteId();
@@ -16,12 +18,6 @@ public interface RouteMapView extends Measurable<Integer>, PresenterLifetimeMana
 	int getMapHeight();
 	int getOriginalMapPointerWidth();
 	int getOriginalMapPointerHeight();
-	
-	int getRestoredScrollX();
-	int getRestoredScrollY();
-	int getRestoredPointerX();
-	int getRestoredPointerY();
-	boolean isRestoredPointerVisible();
 	
 	int getScrollX();
 	int getScrollY();	
@@ -42,6 +38,7 @@ public interface RouteMapView extends Measurable<Integer>, PresenterLifetimeMana
 	void addViewLayoutCompleteListener(OnEventListener listener);
 	void addViewStartedListener(OnEventListener listener);
 	void addViewStoppedListener(OnEventListener listener);
-	void addViewInstanceStateRestoredListener(OnEventListener listener);
+	void addViewInstanceStateSavedListener(OnViewStateSaveListener listener);
+	void addViewInstanceStateRestoredListener(OnViewStateRestoreListener listener);
 	void addViewMultiTouchListener(OnMultiTouchListener listener);
 }
