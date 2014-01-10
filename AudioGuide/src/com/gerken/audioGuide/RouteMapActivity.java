@@ -18,9 +18,11 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
+import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.AbsoluteLayout;
+import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.ScrollView;
@@ -40,6 +42,8 @@ public class RouteMapActivity extends BasicGuideActivity implements RouteMapView
 	private HorizontalScrollView _horizontalScrollView;
 	private ScrollView _verticalScrollView;
 	private View _mapPointer;
+	private View _mapContainer;
+	private View _mapPointerContainer;
 	
 	private Matrix mapOriginalMatrix = new Matrix();
 	
@@ -48,6 +52,9 @@ public class RouteMapActivity extends BasicGuideActivity implements RouteMapView
 	private int _restoredPointerX = 0;
 	private int _restoredPointerY = 0;
 	private boolean _restoredPointerVisible = false;
+	
+	private int _originalMapWidth = 0;
+	private int _originalMapHeight = 0;
 	
 	private boolean _isMapZoomStarted = false;
 	
@@ -69,7 +76,9 @@ public class RouteMapActivity extends BasicGuideActivity implements RouteMapView
 		_mapImage = (ImageView)findViewById(R.id.mapImage);
 		_horizontalScrollView = (HorizontalScrollView)findViewById(R.id.routeMapHorizontalScroller);
 		_verticalScrollView = (ScrollView)findViewById(R.id.routeMapMainView);
-		_mapPointer = findViewById(R.id.mapPointerImage);;
+		_mapPointer = findViewById(R.id.mapPointerImage);
+		_mapContainer = findViewById(R.id.mapContainer);
+		_mapPointerContainer = findViewById(R.id.mapPointerContainer);
 		
 		_intentExtraManager = new IntentExtraManager(getIntent());
 		_mapPointerAnimation = createMapPointerAnimation();
@@ -111,21 +120,19 @@ public class RouteMapActivity extends BasicGuideActivity implements RouteMapView
 	public void displayMap(InputStream mapStream) throws Exception {
 		Bitmap bmp = BitmapFactory.decodeStream(mapStream);		
 		mapStream.close();
-		int mapWidth = bmp.getWidth();
-		int mapHeight = bmp.getHeight();
+		_originalMapWidth = bmp.getWidth();
+		_originalMapHeight = bmp.getHeight();
 		
 		_mapImage.setImageDrawable(
 				new BitmapDrawable(getApplicationContext().getResources(), bmp));
 
 		findViewById(R.id.routeMapErrorMessage).setVisibility(View.INVISIBLE);
 		
-		View mapContainer = findViewById(R.id.mapContainer);
-		mapContainer.setMinimumWidth(mapWidth);
-		mapContainer.setMinimumHeight(mapHeight);
+		_mapContainer.setMinimumWidth(_originalMapWidth);
+		_mapContainer.setMinimumHeight(_originalMapHeight);
 		
-		View mapPointerContainer = findViewById(R.id.mapPointerContainer);
-		mapPointerContainer.setMinimumWidth(mapWidth);
-		mapPointerContainer.setMinimumHeight(mapHeight);
+		_mapPointerContainer.setMinimumWidth(_originalMapWidth);
+		_mapPointerContainer.setMinimumHeight(_originalMapHeight);
 	}	
 
 	@Override
@@ -134,7 +141,16 @@ public class RouteMapActivity extends BasicGuideActivity implements RouteMapView
 		
 		((TextView)findViewById(R.id.routeMapErrorMessage)).setText(
 				getString(messageResourceId));		
-	}	
+	}
+	
+	@Override
+	public int getOriginalMapWidth() {
+		return _originalMapWidth;
+	}
+	@Override
+	public int getOriginalMapHeight() {
+		return _originalMapHeight;
+	}
 	
 	@Override
 	public int getMapWidth() {
@@ -176,6 +192,13 @@ public class RouteMapActivity extends BasicGuideActivity implements RouteMapView
 	@Override
 	public int getRestoredScrollY() {
 		return _restoredScrollY;
+	}
+	
+	public int getScrollX() {
+		return _horizontalScrollView.getScrollX();
+	}
+	public int getScrollY() {
+		return _verticalScrollView.getScrollY();
 	}
 
 	@Override
@@ -220,13 +243,27 @@ public class RouteMapActivity extends BasicGuideActivity implements RouteMapView
 	}
 
 	@Override
-	public void setMapScale(float scale, Point<Float> scalingCenter) {
+	public void setMapScale(float scale) {
 		Matrix scaleMatrix = new Matrix();
-		scaleMatrix.postScale(scale, scale, scalingCenter.getX(), scalingCenter.getY());
-		Log.d("RouteMapActivity", String.format("Scale %.3f at %.1f,%.1f", scale,
-				scalingCenter.getX(), scalingCenter.getY())
-		);
+		scaleMatrix.postScale(scale, scale, 0, 0);
 		_mapImage.setImageMatrix(scaleMatrix);
+	}
+	
+	public void setMapSize(int width, int height) {
+		setViewLayoutSize(_mapImage, width, height);
+	}
+	
+	public void setMapPointerContainerSize(int width, int height) {
+		setViewLayoutSize(_mapPointerContainer, width, height);
+		_mapContainer.setMinimumWidth(width);
+		_mapContainer.setMinimumHeight(height);
+	}
+	
+	private void setViewLayoutSize(View view, int width, int height) {
+		ViewGroup.LayoutParams view_lp = view.getLayoutParams();
+		view_lp.width = width;
+		view_lp.height = height;
+		view.setLayoutParams(view_lp);
 	}
 
 	private Animation createMapPointerAnimation() {

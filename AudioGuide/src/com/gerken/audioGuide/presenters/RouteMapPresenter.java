@@ -29,6 +29,7 @@ public class RouteMapPresenter {
 	private float _multiTouchDownDistance;
 	private float _originalScale = 1f;
 	private float _currentScale = 1f;
+	private Point<Integer> _originalScrollPosition = new Point<Integer>(0, 0);
 	private Point<Float> _mapScalingCenter = new Point<Float>(0f, 0f);
 	
 	private OnEventListener _viewInitializedListener = new OnEventListener() {		
@@ -168,6 +169,8 @@ public class RouteMapPresenter {
 	private void handleMultiTouchDown(Point<Float>[] touchPoints) {
 		if(touchPoints.length < 2)
 			return;
+		_originalScrollPosition = new Point<Integer>(_view.getScrollX(), _view.getScrollY());
+		logDebug(String.format("oscroll: %d,%d", _view.getScrollX(), _view.getScrollY()));
 		_multiTouchDownDistance = getDistance(touchPoints[0], touchPoints[1]);
 		_mapScalingCenter = new Point<Float>(
 			0.5f*(touchPoints[0].getX()+touchPoints[1].getX()), 
@@ -186,7 +189,19 @@ public class RouteMapPresenter {
 		logDebug(String.format("MultiTouchMove: newScaleRatio=%.4f newScale=%.4f", newScaleRatio, newScale));
 		if(newScale < 1f) {
 			_currentScale = newScale;
-			_view.setMapScale(newScale, _mapScalingCenter);
+			_view.setMapScale(newScale);
+			
+			int newMapWidth = (int)(((float)_view.getOriginalMapWidth())*newScale);
+			int newMapHeight = (int)(((float)_view.getOriginalMapHeight())*newScale);
+			_view.setMapSize(newMapWidth, newMapHeight);
+			_view.setMapPointerContainerSize(newMapWidth, newMapHeight);
+			
+			float hw = _view.getWidth()/2f;
+			float hh = _view.getHeight()/2f;
+			int sx = (int)(((float)_originalScrollPosition.getX()+hw)*newScale - hw);
+			int sy = (int)(((float)_originalScrollPosition.getY()+hh)*newScale - hh);
+			_view.scrollTo(sx, sy);
+			logDebug(String.format("nscroll: %d,%d", sx, sy));
 		}
 	}
 	

@@ -10,6 +10,8 @@ import com.gerken.audioGuide.interfaces.PresenterLifetimeManager;
 public interface RouteMapView extends Measurable<Integer>, PresenterLifetimeManager {
 	int getRouteId();
 	
+	int getOriginalMapWidth();
+	int getOriginalMapHeight();
 	int getMapWidth();
 	int getMapHeight();
 	int getPointerWidth();
@@ -21,10 +23,15 @@ public interface RouteMapView extends Measurable<Integer>, PresenterLifetimeMana
 	int getRestoredPointerY();
 	boolean isRestoredPointerVisible();
 	
+	int getScrollX();
+	int getScrollY();	
+	
 	void showLocationPointerAt(int x, int y);
 	void hideLocationPointer();
 	void scrollTo(int x, int y);
-	void setMapScale(float scale, Point<Float> scalingCenter);
+	void setMapScale(float scale);
+	void setMapSize(int width, int height);
+	void setMapPointerContainerSize(int width, int height);
 	
 	void displayMap(InputStream mapStream) throws Exception;
 	void displayError(int messageResourceId);
