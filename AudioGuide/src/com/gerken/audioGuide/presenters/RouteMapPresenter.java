@@ -225,8 +225,8 @@ public class RouteMapPresenter {
 			
 			float hw = _view.getWidth()/2f;
 			float hh = _view.getHeight()/2f;
-			int sx = (int)(((float)_originalScrollPosition.getX()+hw)*newScale - hw);
-			int sy = (int)(((float)_originalScrollPosition.getY()+hh)*newScale - hh);
+			int sx = (int)(((float)_originalScrollPosition.getX()+hw)*newScaleRatio - hw);
+			int sy = (int)(((float)_originalScrollPosition.getY()+hh)*newScaleRatio - hh);
 			_view.scrollTo(sx, sy);
 			logDebug(String.format("nscroll: %d,%d", sx, sy));
 			

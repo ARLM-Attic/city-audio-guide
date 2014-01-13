@@ -4,7 +4,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 
 import com.gerken.audioGuide.containers.Point;
-import com.gerken.audioGuide.interfaces.OnEventListener;
 import com.gerken.audioGuide.interfaces.OnMultiTouchListener;
 import com.gerken.audioGuide.interfaces.listeners.OnViewStateRestoreListener;
 import com.gerken.audioGuide.interfaces.listeners.OnViewStateSaveListener;
@@ -17,7 +16,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
@@ -255,20 +253,16 @@ public class RouteMapActivity extends BasicGuideActivity implements RouteMapView
 
 	private boolean handleMapImageTouch(View v, MotionEvent event) {
 		int action = event.getAction() & MotionEvent.ACTION_MASK;
-		Log.d("RouteMapActivity", "handleMapImageTouch start " + String.valueOf(action) + " / " + String.valueOf(event.getAction()));
 		switch (action) {
 		case MotionEvent.ACTION_DOWN:
-			Log.d("RouteMapActivity", "handleMapImageTouch ACTION_DOWN");
             v.getParent().requestDisallowInterceptTouchEvent(true);
             return true;
 		case MotionEvent.ACTION_POINTER_DOWN:
-			Log.d("RouteMapActivity", "handleMapImageTouch ACTION_POINTER_DOWN");
 			_isMapZoomStarted = true;
 			for(OnMultiTouchListener l: _viewMultiTouchListeners)
 				l.onMultiTouchDown(getTouchEventPoints(event));
 			return true;
 		case MotionEvent.ACTION_MOVE:
-			Log.d("RouteMapActivity", "handleMapImageTouch ACTION_MOVE");
 			if(_isMapZoomStarted) {
 				for(OnMultiTouchListener l: _viewMultiTouchListeners)
 					l.onMultiTouchMove(getTouchEventPoints(event));
@@ -279,7 +273,6 @@ public class RouteMapActivity extends BasicGuideActivity implements RouteMapView
 			break;
 		case MotionEvent.ACTION_UP:
 	    case MotionEvent.ACTION_POINTER_UP:
-	    	Log.d("RouteMapActivity", "handleMapImageTouch ACTION_UP");
 	    	v.getParent().requestDisallowInterceptTouchEvent(false);
 	    	if(_isMapZoomStarted) {
 	    		_isMapZoomStarted = false;
