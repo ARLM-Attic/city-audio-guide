@@ -34,7 +34,7 @@ public class RouteMapPresenter {
 	private float _multiTouchDownDistance;
 	private float _originalScale = 1f;
 	private float _currentScale = 1f;
-	private Point<Integer> _originalScrollPosition = new Point<Integer>(0, 0);
+	private Point<Integer> _originalScreenCenterAbsolutePosition = new Point<Integer>(0, 0);
 	private Point<Float> _mapScalingCenter = new Point<Float>(0f, 0f);
 	private Point<Integer> _mapPointerPosition = new Point<Integer>(0, 0);
 	
@@ -126,7 +126,7 @@ public class RouteMapPresenter {
 			_view.displayMap(str);
 		} 
 		catch (Exception e) {
-			String emsg = String.format("Cannot display map for the route %d", getCurrentRoute().getId());
+			String emsg = "Cannot display map for the route " + String.valueOf(getCurrentRoute().getId());
 			logError(emsg, e);
 			_view.displayError(R.string.route_map_cannot_read);
 		}	
@@ -136,8 +136,12 @@ public class RouteMapPresenter {
 		if(_viewInstanceRestoringData != null) {
 			RouteMapViewStateContainer rmc = new RouteMapViewStateContainer(_viewInstanceRestoringData);
 			_view.scrollTo(rmc.getViewScrollX(), rmc.getViewScrollY());
-			if(rmc.isMapPointerVisible())
-				_view.showLocationPointerAt(rmc.getMapPointerX(), rmc.getMapPointerY());
+			_currentScale = _originalScale = rmc.getScale();			
+			_view.setMapScale(_originalScale);
+			if(rmc.isMapPointerVisible()) {
+				_view.setMapPointerScale(_originalScale);
+				showLocationPointerAt(rmc.getMapPointerX(), rmc.getMapPointerY(), _originalScale);
+			}
 			else
 				_view.hideLocationPointer();
 			_viewInstanceRestoringData = null;
@@ -172,10 +176,11 @@ public class RouteMapPresenter {
 		_mapPointerPosition = new Point<Integer>(dx, dy);
 		
 		if(dx >= 0 && dx < _view.getMapWidth() && dy >=0 && dy < _view.getMapHeight()){
+			_mapPointerPosition = new Point<Integer>(dx, dy);
 			showLocationPointerAt(dx, dy, _currentScale);
 			_isMapPointerVisible = true;
 			if(!_isScrollingToCurrentLocationDone) {
-				scrollTo(dx, dy);
+				scrollToShowScreenCenterAt(dx, dy, _currentScale);
 				_isScrollingToCurrentLocationDone = true;
 			}
 		}
@@ -188,8 +193,9 @@ public class RouteMapPresenter {
 	private void handleMultiTouchDown(Point<Float>[] touchPoints) {
 		if(touchPoints.length < 2)
 			return;
-		_originalScrollPosition = new Point<Integer>(_view.getScrollX(), _view.getScrollY());
-		logDebug(String.format("oscroll: %d,%d", _view.getScrollX(), _view.getScrollY()));
+		_originalScreenCenterAbsolutePosition = getScreenCenterAbsolutePosition();
+		logDebug(String.format("oscroll: %d,%d - %d,%d", _view.getScrollX(), _view.getScrollY(),
+				_originalScreenCenterAbsolutePosition.getX(), _originalScreenCenterAbsolutePosition.getY()));
 		_multiTouchDownDistance = getDistance(touchPoints[0], touchPoints[1]);
 		_mapScalingCenter = new Point<Float>(
 			0.5f*(touchPoints[0].getX()+touchPoints[1].getX()), 
@@ -197,6 +203,13 @@ public class RouteMapPresenter {
 		);
 		logDebug(String.format("MultiTouchDown: center=%.1f,%.1f; dist=%.1f", 
 				_mapScalingCenter.getX(), _mapScalingCenter.getY(), _multiTouchDownDistance));
+	}
+	
+	private Point<Integer> getScreenCenterAbsolutePosition() {
+		return new Point<Integer>(
+			(int)(_view.getScrollX()/_currentScale)+getViewHalfWidth(), 
+			(int)(_view.getScrollY()/_currentScale)+getViewHalfHeight()
+		);
 	}
 	
 	private void handleMultiTouchMove(Point<Float>[] touchPoints) {
@@ -219,12 +232,8 @@ public class RouteMapPresenter {
 			_view.setMapSize(newMapWidth, newMapHeight);
 			_view.setMapPointerContainerSize(newMapWidth, newMapHeight);
 			
-			float hw = _view.getWidth()/2f;
-			float hh = _view.getHeight()/2f;
-			int sx = (int)(((float)_originalScrollPosition.getX()+hw)*newScaleRatio - hw);
-			int sy = (int)(((float)_originalScrollPosition.getY()+hh)*newScaleRatio - hh);
-			_view.scrollTo(sx, sy);
-			logDebug(String.format("nscroll: %d,%d", sx, sy));
+			scrollToShowScreenCenterAt(_originalScreenCenterAbsolutePosition.getX(), 
+					_originalScreenCenterAbsolutePosition.getY(), newScale);			
 			
 			if(_isMapPointerVisible)
 				showLocationPointerAt(_mapPointerPosition.getX(), _mapPointerPosition.getY(), _currentScale);
@@ -240,7 +249,7 @@ public class RouteMapPresenter {
 		rmc.setViewScroll(_view.getScrollX(), _view.getScrollY());
 		rmc.setScale(_currentScale);
 		rmc.setMapPointerVisible(_isMapPointerVisible);
-		// TODO: pointer pos
+		rmc.setMapPointerPosition(_mapPointerPosition.getX(), _mapPointerPosition.getY());
 	}
 	
 	private float getDistance(Point<Float> p0, Point<Float> p1) {
@@ -249,10 +258,11 @@ public class RouteMapPresenter {
 		return (float)Math.sqrt(dx*dx + dx*dy);
 	}
 	
-	private void scrollTo(int dx, int dy) {
-		int sx = Math.max(0, dx - _view.getWidth()/2);
-		int sy = Math.max(0, dy - _view.getHeight()/2);
+	private void scrollToShowScreenCenterAt(int scx, int scy, float scale) {
+		int sx = Math.max(0, (int)((scx- getViewHalfWidth())*scale) );
+		int sy = Math.max(0, (int)((scy- getViewHalfHeight())*scale) );		
 		_view.scrollTo(sx, sy);
+		logDebug(String.format("nscroll: %d,%d", sx, sy));
 	}
 	
 	private void showLocationPointerAt(int x, int y, float scale) {
@@ -272,6 +282,13 @@ public class RouteMapPresenter {
 				return r;
 		}
 		return null;
+	}
+	
+	private int getViewHalfWidth() {
+		return _view.getWidth()/2;
+	}
+	private int getViewHalfHeight() {
+		return _view.getHeight()/2;
 	}
 
 	private void logError(String message, Throwable ex) {
