@@ -28,7 +28,6 @@ public interface RouteMapView extends Measurable<Integer>, PresenterLifetimeMana
 	void setMapPointerScale(float scale);
 	void setMapSize(int width, int height);
 	void setMapPointerContainerSize(int width, int height);
-	void setMapPointerSize(int width, int height);
 	
 	void displayMap(InputStream mapStream) throws Exception;
 	void displayError(int messageResourceId);

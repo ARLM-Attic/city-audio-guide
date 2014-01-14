@@ -219,10 +219,6 @@ public class RouteMapPresenter {
 			_view.setMapSize(newMapWidth, newMapHeight);
 			_view.setMapPointerContainerSize(newMapWidth, newMapHeight);
 			
-			int mpw = (int)(((float)_view.getOriginalMapPointerWidth()) * newScale);
-			int mph = (int)(((float)_view.getOriginalMapPointerHeight()) * newScale);
-			_view.setMapPointerSize(mpw, mph);
-			
 			float hw = _view.getWidth()/2f;
 			float hh = _view.getHeight()/2f;
 			int sx = (int)(((float)_originalScrollPosition.getX()+hw)*newScaleRatio - hw);

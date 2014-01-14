@@ -212,20 +212,16 @@ public class RouteMapActivity extends BasicGuideActivity implements RouteMapView
 		_mapImage.setImageMatrix(scaleMatrix);
 	}
 	
+	@Override
 	public void setMapSize(int width, int height) {
 		setViewLayoutSize(_mapImage, width, height);
 	}
 	
+	@Override
 	public void setMapPointerContainerSize(int width, int height) {
 		setViewLayoutSize(_mapPointerContainer, width, height);
 		_mapContainer.setMinimumWidth(width);
 		_mapContainer.setMinimumHeight(height);
-	}
-	
-	public void setMapPointerSize(int width, int height) {
-		setViewLayoutSize(_mapPointer, width, height);
-		_mapPointer.setMinimumWidth(width);
-		_mapPointer.setMinimumHeight(height);
 	}
 	
 	@Override
