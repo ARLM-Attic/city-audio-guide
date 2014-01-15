@@ -135,15 +135,17 @@ public class RouteMapPresenter {
 	private void handleViewLayoutComplete() {
 		if(_viewInstanceRestoringData != null) {
 			RouteMapViewStateContainer rmc = new RouteMapViewStateContainer(_viewInstanceRestoringData);
-			_view.scrollTo(rmc.getViewScrollX(), rmc.getViewScrollY());
-			_currentScale = _originalScale = rmc.getScale();			
-			_view.setMapScale(_originalScale);
+			_currentScale = _originalScale = rmc.getScale();
+			scrollToShowScreenCenterAt(rmc.getScreenCenterAbsX(), rmc.getScreenCenterAbsY(), _currentScale);
+			_view.setMapScale(_currentScale);
 			if(rmc.isMapPointerVisible()) {
 				_view.setMapPointerScale(_originalScale);
 				showLocationPointerAt(rmc.getMapPointerX(), rmc.getMapPointerY(), _originalScale);
 			}
 			else
 				_view.hideLocationPointer();
+			
+			_isScrollingToCurrentLocationDone = rmc.isScrollingToCurrentLocactionDone();
 			_viewInstanceRestoringData = null;
 		}
 	}
@@ -167,15 +169,14 @@ public class RouteMapPresenter {
 		if(bounds.getNorth() <= bounds.getSouth())
 			logWarning("North <= South bound for the route " + currentRoute.getName());
 		
-		int dx = (int)( (double)_view.getMapWidth() * 
+		int dx = (int)( (double)_view.getOriginalMapWidth() * 
 			(longitude - bounds.getWest()) / (bounds.getEast() - bounds.getWest()) 
 		);
-		int dy = (int)( (double)_view.getMapHeight() *
+		int dy = (int)( (double)_view.getOriginalMapHeight() *
 			(bounds.getNorth() - latitude) / (bounds.getNorth() - bounds.getSouth())
 		);
-		_mapPointerPosition = new Point<Integer>(dx, dy);
 		
-		if(dx >= 0 && dx < _view.getMapWidth() && dy >=0 && dy < _view.getMapHeight()){
+		if(dx >= 0 && dx < _view.getOriginalMapWidth() && dy >=0 && dy < _view.getOriginalMapHeight()){
 			_mapPointerPosition = new Point<Integer>(dx, dy);
 			showLocationPointerAt(dx, dy, _currentScale);
 			_isMapPointerVisible = true;
@@ -246,10 +247,12 @@ public class RouteMapPresenter {
 	
 	private void handleViewStateSave(ViewStateContainer stateContainer) {
 		RouteMapViewStateContainer rmc = new RouteMapViewStateContainer(stateContainer);
-		rmc.setViewScroll(_view.getScrollX(), _view.getScrollY());
+		Point<Integer> sc = getScreenCenterAbsolutePosition();
+		rmc.setScreenCenterAbs(sc.getX(), sc.getY());
 		rmc.setScale(_currentScale);
 		rmc.setMapPointerVisible(_isMapPointerVisible);
 		rmc.setMapPointerPosition(_mapPointerPosition.getX(), _mapPointerPosition.getY());
+		rmc.setScrollingToCurrentLocactionDone(_isScrollingToCurrentLocationDone);
 	}
 	
 	private float getDistance(Point<Float> p0, Point<Float> p1) {
@@ -270,6 +273,7 @@ public class RouteMapPresenter {
 		int px = (int)(scale*x - ratio*_view.getOriginalMapPointerWidth());
 		int py = (int)(scale*y - ratio*_view.getOriginalMapPointerHeight());
 		_view.showLocationPointerAt(px, py);
+		_view.setMapPointerScale(scale);
 	}
 	
 	private Route getCurrentRoute() {
@@ -306,12 +310,13 @@ public class RouteMapPresenter {
 	}
 
 	private class RouteMapViewStateContainer {
-		private static final String KEY_SCROLL_X = "ScrollX";
-		private static final String KEY_SCROLL_Y = "ScrollY";
+		private static final String KEY_SCREEN_CENTER_ABS_X = "ScrollX";
+		private static final String KEY_SCREEN_CENTER_ABS_Y = "ScrollY";
 		private static final String KEY_MAP_POINTER_X = "PointerX";
 		private static final String KEY_MAP_POINTER_Y = "PointerY";
 		private static final String KEY_MAP_POINTER_VISIBLE = "PointerVisible";
 		private static final String KEY_SCALE = "Scale";
+		private static final String KEY_SCROLLING_TO_CURRENT_LOC_DONE = "ScrollingToCurLocDone";
 		
 		private ViewStateContainer _container;
 		
@@ -319,11 +324,11 @@ public class RouteMapPresenter {
 			_container = genericContainer;
 		}
 		
-		public int getViewScrollX() {
-			return _container.getInt(KEY_SCROLL_X);
+		public int getScreenCenterAbsX() {
+			return _container.getInt(KEY_SCREEN_CENTER_ABS_X);
 		}
-		public int getViewScrollY() {
-			return _container.getInt(KEY_SCROLL_Y);
+		public int getScreenCenterAbsY() {
+			return _container.getInt(KEY_SCREEN_CENTER_ABS_Y);
 		}
 		
 		public boolean isMapPointerVisible() {
@@ -340,9 +345,13 @@ public class RouteMapPresenter {
 			return _container.getFloat(KEY_SCALE);
 		}
 		
-		public void setViewScroll(int x, int y) {
-			_container.putInt(KEY_SCROLL_X, x);
-			_container.putInt(KEY_SCROLL_Y, y);
+		public boolean isScrollingToCurrentLocactionDone() {
+			return _container.getBoolean(KEY_SCROLLING_TO_CURRENT_LOC_DONE);
+		}
+		
+		public void setScreenCenterAbs(int x, int y) {
+			_container.putInt(KEY_SCREEN_CENTER_ABS_X, x);
+			_container.putInt(KEY_SCREEN_CENTER_ABS_Y, y);
 		}
 		
 		public void setMapPointerVisible(boolean isVisible) {
@@ -355,6 +364,10 @@ public class RouteMapPresenter {
 		
 		public void setScale(float scale){
 			_container.putFloat(KEY_SCALE, scale);
+		}
+		
+		public void setScrollingToCurrentLocactionDone(boolean isDone) {
+			_container.putBoolean(KEY_SCROLLING_TO_CURRENT_LOC_DONE, isDone);
 		}
 	}
 }
