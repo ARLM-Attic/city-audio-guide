@@ -7,23 +7,35 @@ import com.gerken.audioGuide.interfaces.listeners.OnEventListener;
 import com.gerken.audioGuide.interfaces.listeners.OnLocationChangedListener;
 
 public class DummyFixedPlaceLocationTracker implements LocationTracker {
-	private final double FIXED_LATITUDE = 50.08693;
-	private final double FIXED_LONGITUDE = 14.42079;
-	private final int DELAY_MS = 10000;
+	private final double FIRST_FIXED_LATITUDE = 50.08693;
+	private final double FIRST_FIXED_LONGITUDE = 14.42079;
+	private final int FIRST_DELAY_MS = 7000;
+	
+	private final double SECOND_FIXED_LATITUDE = 50.08771;
+	private final double SECOND_FIXED_LONGITUDE = 14.42143;
+	private final int SECOND_DELAY_MS = 15000;
 	
 	private ArrayList<OnLocationChangedListener> _locationChangedListeners = 
 			new ArrayList<OnLocationChangedListener>();
 	
-	private OnEventListener _dummyDelayFinishListener = new OnEventListener() {		
+	private OnEventListener _dummyFirstDelayFinishListener = new OnEventListener() {		
 		public void onEvent() {
 			for(OnLocationChangedListener l : _locationChangedListeners)
-				l.onLocationChanged(FIXED_LATITUDE, FIXED_LONGITUDE);
+				l.onLocationChanged(FIRST_FIXED_LATITUDE, FIRST_FIXED_LONGITUDE);
+		}
+	};
+	
+	private OnEventListener _dummySecondDelayFinishListener = new OnEventListener() {		
+		public void onEvent() {
+			for(OnLocationChangedListener l : _locationChangedListeners)
+				l.onLocationChanged(SECOND_FIXED_LATITUDE, SECOND_FIXED_LONGITUDE);
 		}
 	};
 
 	@Override
 	public void startTracking() {
-		new DummyWaitTask(DELAY_MS, _dummyDelayFinishListener).execute();		
+		new DummyWaitTask(FIRST_DELAY_MS, _dummyFirstDelayFinishListener).execute();
+		new DummyWaitTask(SECOND_DELAY_MS, _dummySecondDelayFinishListener).execute();
 	}
 
 	@Override
