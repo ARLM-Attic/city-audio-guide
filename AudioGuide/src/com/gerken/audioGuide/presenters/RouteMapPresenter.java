@@ -253,8 +253,8 @@ public class RouteMapPresenter {
 	
 	private Point<Integer> getScreenCenterAbsolutePosition() {
 		return new Point<Integer>(
-			(int)(_view.getScrollX()/_currentScale)+getViewHalfWidth(), 
-			(int)(_view.getScrollY()/_currentScale)+getViewHalfHeight()
+			(int)((_view.getScrollX()+getViewHalfWidth())/_currentScale), 
+			(int)((_view.getScrollY()+getViewHalfHeight())/_currentScale)
 		);
 	}
 	
@@ -271,8 +271,8 @@ public class RouteMapPresenter {
 	}
 	
 	private void scrollToShowScreenCenterAt(int scx, int scy, float scale) {
-		int sx = Math.max(0, (int)((scx- getViewHalfWidth())*scale) );
-		int sy = Math.max(0, (int)((scy- getViewHalfHeight())*scale) );		
+		int sx = Math.max(0, (int)(scx*scale) - getViewHalfWidth() );
+		int sy = Math.max(0, (int)(scy*scale) - getViewHalfHeight() );		
 		_view.scrollTo(sx, sy);
 		logDebug(String.format("nscroll: %d,%d", sx, sy));
 	}
