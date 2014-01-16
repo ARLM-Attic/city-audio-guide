@@ -143,7 +143,6 @@ public class RouteMapPresenter {
 			
 			_isMapPointerVisible = rmc.isMapPointerVisible();
 			if(_isMapPointerVisible) {
-				_view.setMapPointerScale(_currentScale);
 				_mapPointerPosition = new Point<Integer>(rmc.getMapPointerX(), rmc.getMapPointerY());
 				showLocationPointerAt(rmc.getMapPointerX(), rmc.getMapPointerY(), _currentScale);
 			}
@@ -221,6 +220,8 @@ public class RouteMapPresenter {
 		
 		Size<Integer> newMapSize = getScaledMapSize(newScale);
 		boolean mapExceedsScreen = (newMapSize.getWidth() > _view.getWidth() || newMapSize.getHeight() > _view.getHeight());
+		logDebug(String.format("exceeds=%b; newMapSize: w=%d h=%d; scr: w=%d h=%d", 
+			mapExceedsScreen, newMapSize.getWidth(), newMapSize.getHeight(), _view.getWidth(), _view.getHeight()));
 		
 		if(newScale < 1f && mapExceedsScreen) {
 			_currentScale = newScale;
@@ -323,7 +324,7 @@ public class RouteMapPresenter {
 			_logger.logDebug(message);
 	}
 
-	private class RouteMapViewStateContainer {
+	public static class RouteMapViewStateContainer {
 		private static final String KEY_SCREEN_CENTER_ABS_X = "ScrollX";
 		private static final String KEY_SCREEN_CENTER_ABS_Y = "ScrollY";
 		private static final String KEY_MAP_POINTER_X = "PointerX";
