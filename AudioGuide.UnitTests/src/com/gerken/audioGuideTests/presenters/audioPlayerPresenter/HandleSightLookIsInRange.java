@@ -12,7 +12,7 @@ import com.gerken.audioGuide.containers.FileInfo;
 import com.gerken.audioGuide.interfaces.AudioPlayer;
 import com.gerken.audioGuide.interfaces.MediaAssetManager;
 import com.gerken.audioGuide.interfaces.NewSightLookGotInRangeRaiser;
-import com.gerken.audioGuide.interfaces.OnSightLookGotInRangeListener;
+import com.gerken.audioGuide.interfaces.listeners.OnSightLookGotInRangeListener;
 import com.gerken.audioGuide.interfaces.views.AudioPlayerView;
 import com.gerken.audioGuide.objectModel.*;
 import com.gerken.audioGuide.presenters.AudioPlayerPresenter;

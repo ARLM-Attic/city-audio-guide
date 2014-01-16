@@ -6,12 +6,10 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
 import com.gerken.audioGuide.interfaces.AudioPlayer;
-import com.gerken.audioGuide.interfaces.Logger;
 import com.gerken.audioGuide.interfaces.MediaAssetManager;
-import com.gerken.audioGuide.interfaces.OnEventListener;
+import com.gerken.audioGuide.interfaces.listeners.OnEventListener;
 import com.gerken.audioGuide.interfaces.views.AudioPlayerView;
 import com.gerken.audioGuide.presenters.AudioPlayerPresenter;
-
 
 public class HandleStopButtonClick {
 	

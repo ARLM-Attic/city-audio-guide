@@ -8,8 +8,8 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
 import com.gerken.audioGuide.interfaces.LocationTracker;
-import com.gerken.audioGuide.interfaces.OnLocationChangedListener;
-import com.gerken.audioGuide.interfaces.OnSightLookGotInRangeListener;
+import com.gerken.audioGuide.interfaces.listeners.OnLocationChangedListener;
+import com.gerken.audioGuide.interfaces.listeners.OnSightLookGotInRangeListener;
 import com.gerken.audioGuide.objectModel.*;
 import com.gerken.audioGuide.services.SightLookFinderByLocation;
 

@@ -10,7 +10,7 @@ import org.mockito.ArgumentCaptor;
 
 import com.gerken.audioGuide.interfaces.AudioPlayer;
 import com.gerken.audioGuide.interfaces.MediaAssetManager;
-import com.gerken.audioGuide.interfaces.OnEventListener;
+import com.gerken.audioGuide.interfaces.listeners.OnEventListener;
 import com.gerken.audioGuide.interfaces.Scheduler;
 import com.gerken.audioGuide.interfaces.views.AudioPlayerView;
 import com.gerken.audioGuide.presenters.AudioPlayerPresenter;

@@ -8,7 +8,7 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
 import com.gerken.audioGuide.interfaces.DownscalingBitmapLoader;
-import com.gerken.audioGuide.interfaces.OnEventListener;
+import com.gerken.audioGuide.interfaces.listeners.OnEventListener;
 import com.gerken.audioGuide.interfaces.views.AuxiliaryView;
 import com.gerken.audioGuide.objectModel.City;
 import com.gerken.audioGuide.objectModel.CityConfiguration;
