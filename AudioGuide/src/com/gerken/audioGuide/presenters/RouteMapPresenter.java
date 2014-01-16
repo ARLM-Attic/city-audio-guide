@@ -4,6 +4,7 @@ import java.io.InputStream;
 
 import com.gerken.audioGuide.R;
 import com.gerken.audioGuide.containers.Point;
+import com.gerken.audioGuide.containers.Size;
 import com.gerken.audioGuide.interfaces.LocationTracker;
 import com.gerken.audioGuide.interfaces.MediaAssetManager;
 import com.gerken.audioGuide.interfaces.Logger;
@@ -138,9 +139,13 @@ public class RouteMapPresenter {
 			_currentScale = _originalScale = rmc.getScale();
 			scrollToShowScreenCenterAt(rmc.getScreenCenterAbsX(), rmc.getScreenCenterAbsY(), _currentScale);
 			_view.setMapScale(_currentScale);
-			if(rmc.isMapPointerVisible()) {
-				_view.setMapPointerScale(_originalScale);
-				showLocationPointerAt(rmc.getMapPointerX(), rmc.getMapPointerY(), _originalScale);
+			resizeMap(getScaledMapSize(_currentScale));
+			
+			_isMapPointerVisible = rmc.isMapPointerVisible();
+			if(_isMapPointerVisible) {
+				_view.setMapPointerScale(_currentScale);
+				_mapPointerPosition = new Point<Integer>(rmc.getMapPointerX(), rmc.getMapPointerY());
+				showLocationPointerAt(rmc.getMapPointerX(), rmc.getMapPointerY(), _currentScale);
 			}
 			else
 				_view.hideLocationPointer();
@@ -205,14 +210,7 @@ public class RouteMapPresenter {
 		logDebug(String.format("MultiTouchDown: center=%.1f,%.1f; dist=%.1f", 
 				_mapScalingCenter.getX(), _mapScalingCenter.getY(), _multiTouchDownDistance));
 	}
-	
-	private Point<Integer> getScreenCenterAbsolutePosition() {
-		return new Point<Integer>(
-			(int)(_view.getScrollX()/_currentScale)+getViewHalfWidth(), 
-			(int)(_view.getScrollY()/_currentScale)+getViewHalfHeight()
-		);
-	}
-	
+
 	private void handleMultiTouchMove(Point<Float>[] touchPoints) {
 		if(touchPoints.length < 2)
 			return;
@@ -221,17 +219,15 @@ public class RouteMapPresenter {
 		float newScale = _originalScale * newScaleRatio;
 		logDebug(String.format("MultiTouchMove: newScaleRatio=%.4f newScale=%.4f", newScaleRatio, newScale));
 		
-		int newMapWidth = (int)(((float)_view.getOriginalMapWidth())*newScale);
-		int newMapHeight = (int)(((float)_view.getOriginalMapHeight())*newScale);
-		boolean mapExceedsScreen = (newMapWidth > _view.getWidth() || newMapHeight > _view.getHeight());
+		Size<Integer> newMapSize = getScaledMapSize(newScale);
+		boolean mapExceedsScreen = (newMapSize.getWidth() > _view.getWidth() || newMapSize.getHeight() > _view.getHeight());
 		
 		if(newScale < 1f && mapExceedsScreen) {
 			_currentScale = newScale;
 			_view.setMapScale(newScale);
 			_view.setMapPointerScale(newScale);			
 			
-			_view.setMapSize(newMapWidth, newMapHeight);
-			_view.setMapPointerContainerSize(newMapWidth, newMapHeight);
+			resizeMap(newMapSize);
 			
 			scrollToShowScreenCenterAt(_originalScreenCenterAbsolutePosition.getX(), 
 					_originalScreenCenterAbsolutePosition.getY(), newScale);			
@@ -255,6 +251,19 @@ public class RouteMapPresenter {
 		rmc.setScrollingToCurrentLocactionDone(_isScrollingToCurrentLocationDone);
 	}
 	
+	private Point<Integer> getScreenCenterAbsolutePosition() {
+		return new Point<Integer>(
+			(int)(_view.getScrollX()/_currentScale)+getViewHalfWidth(), 
+			(int)(_view.getScrollY()/_currentScale)+getViewHalfHeight()
+		);
+	}
+	
+	private Size<Integer> getScaledMapSize(float newScale) {
+		int newMapWidth = (int)(((float)_view.getOriginalMapWidth())*newScale);
+		int newMapHeight = (int)(((float)_view.getOriginalMapHeight())*newScale);
+		return new Size<Integer>(newMapWidth, newMapHeight);
+	}
+	
 	private float getDistance(Point<Float> p0, Point<Float> p1) {
 		float dx = p1.getX()-p0.getX();
 		float dy = p1.getY()-p0.getY();
@@ -274,6 +283,11 @@ public class RouteMapPresenter {
 		int py = (int)(scale*y - ratio*_view.getOriginalMapPointerHeight());
 		_view.showLocationPointerAt(px, py);
 		_view.setMapPointerScale(scale);
+	}
+	
+	private void resizeMap(Size<Integer> newMapSize) {
+		_view.setMapSize(newMapSize.getWidth(), newMapSize.getHeight());
+		_view.setMapPointerContainerSize(newMapSize.getWidth(), newMapSize.getHeight());
 	}
 	
 	private Route getCurrentRoute() {
