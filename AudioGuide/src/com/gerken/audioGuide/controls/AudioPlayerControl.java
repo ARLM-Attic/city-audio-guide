@@ -18,7 +18,7 @@ import android.widget.Toast;
 
 import com.gerken.audioGuide.R;
 import com.gerken.audioGuide.graphics.PlayerButtonDrawableFactory;
-import com.gerken.audioGuide.interfaces.OnEventListener;
+import com.gerken.audioGuide.interfaces.listeners.OnEventListener;
 import com.gerken.audioGuide.interfaces.views.AudioPlayerView;
 
 public class AudioPlayerControl extends RelativeLayout implements AudioPlayerView {

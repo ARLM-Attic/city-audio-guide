@@ -3,7 +3,7 @@ package com.gerken.audioGuide.presenters;
 import com.gerken.audioGuide.graphics.BitmapDownscalingResult;
 import com.gerken.audioGuide.interfaces.DownscalingBitmapLoader;
 import com.gerken.audioGuide.interfaces.Logger;
-import com.gerken.audioGuide.interfaces.OnEventListener;
+import com.gerken.audioGuide.interfaces.listeners.OnEventListener;
 import com.gerken.audioGuide.interfaces.views.AuxiliaryView;
 import com.gerken.audioGuide.objectModel.City;
 

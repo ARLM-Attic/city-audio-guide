@@ -3,6 +3,7 @@ package com.gerken.audioGuide.interfaces;
 import java.io.IOException;
 
 import com.gerken.audioGuide.containers.FileInfo;
+import com.gerken.audioGuide.interfaces.listeners.OnEventListener;
 
 public interface AudioPlayer {	
 	void prepareAudioAsset(FileInfo assetFileInfo) throws Exception;

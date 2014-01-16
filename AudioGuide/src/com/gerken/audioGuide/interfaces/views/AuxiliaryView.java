@@ -1,7 +1,7 @@
 package com.gerken.audioGuide.interfaces.views;
 
 import com.gerken.audioGuide.interfaces.BitmapContainer;
-import com.gerken.audioGuide.interfaces.OnEventListener;
+import com.gerken.audioGuide.interfaces.listeners.OnEventListener;
 import com.gerken.audioGuide.interfaces.PresenterLifetimeManager;
 
 public interface AuxiliaryView extends Measurable<Integer>, PresenterLifetimeManager {

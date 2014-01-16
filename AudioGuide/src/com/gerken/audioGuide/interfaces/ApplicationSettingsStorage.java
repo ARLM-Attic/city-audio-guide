@@ -1,5 +1,7 @@
 package com.gerken.audioGuide.interfaces;
 
+import com.gerken.audioGuide.interfaces.listeners.OnEventListener;
+
 public interface ApplicationSettingsStorage {
 	boolean isRouteChosen();
 	int getCurrentRouteId();

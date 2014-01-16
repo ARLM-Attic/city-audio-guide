@@ -8,7 +8,7 @@ import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.preference.PreferenceManager;
 
-import com.gerken.audioGuide.interfaces.OnEventListener;
+import com.gerken.audioGuide.interfaces.listeners.OnEventListener;
 import com.gerken.audioGuide.interfaces.ApplicationSettingsStorage;
 
 public class SharedPreferenceManager implements ApplicationSettingsStorage, OnSharedPreferenceChangeListener {

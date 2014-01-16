@@ -6,7 +6,7 @@ import com.gerken.audioGuide.interfaces.LocationTracker;
 import com.gerken.audioGuide.interfaces.Logger;
 import com.gerken.audioGuide.interfaces.NewSightLookGotInRangeRaiser;
 import com.gerken.audioGuide.interfaces.listeners.OnLocationChangedListener;
-import com.gerken.audioGuide.interfaces.OnSightLookGotInRangeListener;
+import com.gerken.audioGuide.interfaces.listeners.OnSightLookGotInRangeListener;
 import com.gerken.audioGuide.objectModel.City;
 import com.gerken.audioGuide.objectModel.Sight;
 import com.gerken.audioGuide.objectModel.SightLook;

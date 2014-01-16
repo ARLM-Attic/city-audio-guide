@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import com.gerken.audioGuide.controls.FlexiRadioGroup;
 import com.gerken.audioGuide.interfaces.BitmapContainer;
-import com.gerken.audioGuide.interfaces.OnEventListener;
+import com.gerken.audioGuide.interfaces.listeners.OnEventListener;
 import com.gerken.audioGuide.interfaces.views.MainPreferenceView;
 import com.gerken.audioGuide.util.IntentExtraManager;
 

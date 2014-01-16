@@ -8,7 +8,7 @@ import android.media.MediaPlayer.OnCompletionListener;
 
 import com.gerken.audioGuide.containers.FileInfo;
 import com.gerken.audioGuide.interfaces.AudioPlayer;
-import com.gerken.audioGuide.interfaces.OnEventListener;
+import com.gerken.audioGuide.interfaces.listeners.OnEventListener;
 
 public class AndroidMediaPlayerFacade implements AudioPlayer {	
 

@@ -3,7 +3,7 @@ package com.gerken.audioGuide.services;
 import java.util.ArrayList;
 
 import com.gerken.audioGuide.interfaces.LocationTracker;
-import com.gerken.audioGuide.interfaces.OnEventListener;
+import com.gerken.audioGuide.interfaces.listeners.OnEventListener;
 import com.gerken.audioGuide.interfaces.listeners.OnLocationChangedListener;
 
 public class DummyFixedPlaceLocationTracker implements LocationTracker {

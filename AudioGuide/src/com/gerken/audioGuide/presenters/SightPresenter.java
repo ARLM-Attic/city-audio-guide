@@ -5,6 +5,8 @@ import java.util.concurrent.Executor;
 
 import com.gerken.audioGuide.graphics.BitmapDownscalingResult;
 import com.gerken.audioGuide.interfaces.*;
+import com.gerken.audioGuide.interfaces.listeners.OnEventListener;
+import com.gerken.audioGuide.interfaces.listeners.OnSightLookGotInRangeListener;
 import com.gerken.audioGuide.interfaces.views.AudioPlayerView;
 import com.gerken.audioGuide.interfaces.views.SightView;
 import com.gerken.audioGuide.objectModel.*;
