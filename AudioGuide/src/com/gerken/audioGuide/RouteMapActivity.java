@@ -4,9 +4,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 
 import com.gerken.audioGuide.containers.Point;
-import com.gerken.audioGuide.interfaces.OnMultiTouchListener;
-import com.gerken.audioGuide.interfaces.listeners.OnViewStateRestoreListener;
-import com.gerken.audioGuide.interfaces.listeners.OnViewStateSaveListener;
+import com.gerken.audioGuide.interfaces.listeners.*;
 import com.gerken.audioGuide.interfaces.views.RouteMapView;
 import com.gerken.audioGuide.util.BundleViewStateContainer;
 import com.gerken.audioGuide.util.IntentExtraManager;

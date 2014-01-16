@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import com.gerken.audioGuide.interfaces.LocationTracker;
 import com.gerken.audioGuide.interfaces.Logger;
-import com.gerken.audioGuide.interfaces.OnLocationChangedListener;
+import com.gerken.audioGuide.interfaces.listeners.OnLocationChangedListener;
 
 import android.content.Context;
 import android.location.Location;

@@ -3,7 +3,7 @@ package com.gerken.audioGuide.interfaces.views;
 import java.io.InputStream;
 
 import com.gerken.audioGuide.interfaces.OnEventListener;
-import com.gerken.audioGuide.interfaces.OnMultiTouchListener;
+import com.gerken.audioGuide.interfaces.listeners.OnMultiTouchListener;
 import com.gerken.audioGuide.interfaces.PresenterLifetimeManager;
 import com.gerken.audioGuide.interfaces.listeners.OnViewStateRestoreListener;
 import com.gerken.audioGuide.interfaces.listeners.OnViewStateSaveListener;

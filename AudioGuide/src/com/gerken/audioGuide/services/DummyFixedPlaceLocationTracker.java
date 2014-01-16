@@ -4,12 +4,12 @@ import java.util.ArrayList;
 
 import com.gerken.audioGuide.interfaces.LocationTracker;
 import com.gerken.audioGuide.interfaces.OnEventListener;
-import com.gerken.audioGuide.interfaces.OnLocationChangedListener;
+import com.gerken.audioGuide.interfaces.listeners.OnLocationChangedListener;
 
 public class DummyFixedPlaceLocationTracker implements LocationTracker {
 	private final double FIXED_LATITUDE = 50.08693;
 	private final double FIXED_LONGITUDE = 14.42079;
-	private final int DELAY_MS = 500;
+	private final int DELAY_MS = 10000;
 	
 	private ArrayList<OnLocationChangedListener> _locationChangedListeners = 
 			new ArrayList<OnLocationChangedListener>();
