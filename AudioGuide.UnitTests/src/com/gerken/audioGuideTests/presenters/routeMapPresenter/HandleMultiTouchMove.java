@@ -43,6 +43,40 @@ public class HandleMultiTouchMove {
 		verify(view).setMapPointerScale(AdditionalMatchers.eq(EXPECTED_SCALE, DEFAULT_DELTA));
 	}
 	
+	@Test
+	public void Given_ZoomOutMoveDone__Then_MapScrolledToKeepScreenCenterAtTheSamePlace() {
+		final int VIEW_WIDTH = 40;
+		final int VIEW_HEIGHT = 60;
+		final int ORIGINAL_SCROLL_X = 30;
+		final int ORIGINAL_SCROLL_Y = 40;
+		final int ORIGINAL_MAP_WIDTH = 200;
+		final int ORIGINAL_MAP_HEIGHT = 200;
+		
+		final int EXPECTED_VIEW_SCROLL_X = 5;
+		final int EXPECTED_VIEW_SCROLL_Y = 5;
+		
+		RouteMapView view = mock(RouteMapView.class);
+		when(view.getWidth()).thenReturn(VIEW_WIDTH);
+		when(view.getHeight()).thenReturn(VIEW_HEIGHT);		
+		when(view.getOriginalMapWidth()).thenReturn(ORIGINAL_MAP_WIDTH);
+		when(view.getOriginalMapHeight()).thenReturn(ORIGINAL_MAP_HEIGHT);
+		when(view.getScrollX()).thenReturn(ORIGINAL_SCROLL_X);
+		when(view.getScrollY()).thenReturn(ORIGINAL_SCROLL_Y);
+		
+		SutSetupResult sutSetupResult = setupSut(view);
+		sutSetupResult.multiTouchListener.onMultiTouchDown(
+			(Point<Float>[])new Point[]{ new Point<Float>(20f, 0f), new Point<Float>(40f, 0f) }
+		);
+		
+		// --- Act
+		sutSetupResult.multiTouchListener.onMultiTouchMove(
+			(Point<Float>[])new Point[]{ new Point<Float>(25f, 0f), new Point<Float>(35f, 0f) }
+		);
+		
+		// --- Assert
+		verify(view).scrollTo(EXPECTED_VIEW_SCROLL_X, EXPECTED_VIEW_SCROLL_Y);
+	}
+	
 	private SutSetupResult setupSut(RouteMapView view) {
 		SutSetupResult result = new SutSetupResult();
 		
