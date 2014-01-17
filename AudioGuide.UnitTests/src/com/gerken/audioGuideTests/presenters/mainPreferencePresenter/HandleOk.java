@@ -8,14 +8,10 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
 import com.gerken.audioGuide.interfaces.ApplicationSettingsStorage;
-import com.gerken.audioGuide.interfaces.MediaAssetManager;
 import com.gerken.audioGuide.interfaces.listeners.OnEventListener;
-import com.gerken.audioGuide.interfaces.listeners.OnLocationChangedListener;
-import com.gerken.audioGuide.interfaces.listeners.OnMultiTouchListener;
 import com.gerken.audioGuide.interfaces.views.MainPreferenceView;
 import com.gerken.audioGuide.objectModel.City;
 import com.gerken.audioGuide.presenters.MainPreferencePresenter;
-import com.gerken.audioGuide.presenters.RouteMapPresenter;
 
 public class HandleOk {
 	private Random _random = new Random(System.currentTimeMillis());
