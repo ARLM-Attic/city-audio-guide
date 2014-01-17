@@ -2,6 +2,8 @@ package com.gerken.audioGuideTests.presenters.routeMapPresenter;
 
 import static org.mockito.Mockito.*;
 
+import java.util.Random;
+
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -17,6 +19,7 @@ import com.gerken.audioGuide.objectModel.Route;
 import com.gerken.audioGuide.presenters.RouteMapPresenter;
 
 public class HandleLocationChanged {
+	private Random _random = new Random(System.currentTimeMillis());
 	
 	@Test
 	public void Given_NewLocationIsOnMap__Then_MapPointerShown_MapScrolled() {
@@ -109,17 +112,17 @@ public class HandleLocationChanged {
 		
 		final int MAP_WIDTH = 400;
 		final int MAP_HEIGHT = 200;
-		final int SCR_WIDTH = 100;
-		final int SCR_HEIGHT = 200;
+		final int SCR_WIDTH = 80;
+		final int SCR_HEIGHT = 120;
 		final int MAP_POINTER_WIDTH = 20;
 		final int MAP_POINTER_HEIGHT = 20;
 		
-		final int EXP_MAP_POINTER_X = 45; //100;
-		final int EXP_MAP_POINTER_Y = 20; //50;
-		final int EXP_SCROLL_TO_X = 50;
+		final int EXP_MAP_POINTER_X = 45;
+		final int EXP_MAP_POINTER_Y = 20;
+		final int EXP_SCROLL_TO_X = 10;
 		final int EXP_SCROLL_TO_Y = 0;
 		
-		final int ROUTE_ID = 42;
+		final int ROUTE_ID = _random.nextInt();
 		
 		MapBounds bounds = new MapBounds(MAP_NORTH, MAP_WEST, MAP_SOUTH, MAP_EAST);
 		City city = createSingleRouteCity(ROUTE_ID, bounds);
@@ -136,21 +139,14 @@ public class HandleLocationChanged {
 		
 		SutSetupResult sutSetupResult = setupSut(city, view, tracker);
 		
-		// Zoom = 0.5
-		sutSetupResult.multiTouchListener.onMultiTouchDown(
-			(Point<Float>[])new Point[]{ new Point<Float>(20f, 0f), new Point<Float>(40f, 0f) }
-		);	
-		sutSetupResult.multiTouchListener.onMultiTouchMove(
-			(Point<Float>[])new Point[]{ new Point<Float>(25f, 0f), new Point<Float>(35f, 0f) }
-		);
-		sutSetupResult.multiTouchListener.onMultiTouchUp();
+		doZoomOutScaleOneHalf(sutSetupResult.multiTouchListener);		
 		
 		// --- Act
 		sutSetupResult.locationChangedListener.onLocationChanged(NEW_LATITUDE, NEW_LONGITUDE);
 		
 		// --- Assert
 		verify(view).showLocationPointerAt(EXP_MAP_POINTER_X, EXP_MAP_POINTER_Y);
-		//verify(view).scrollTo(EXP_SCROLL_TO_X, EXP_SCROLL_TO_Y);
+		verify(view).scrollTo(EXP_SCROLL_TO_X, EXP_SCROLL_TO_Y);
 	}
 	
 	@Test
@@ -190,6 +186,17 @@ public class HandleLocationChanged {
 		
 		// --- Assert
 		verify(view, times(1)).scrollTo(anyInt(), anyInt());
+	}
+	
+	@SuppressWarnings("unchecked")
+	private void doZoomOutScaleOneHalf(OnMultiTouchListener multiTouchListener) {
+		multiTouchListener.onMultiTouchDown(
+			(Point<Float>[])new Point[]{ new Point<Float>(20f, 0f), new Point<Float>(40f, 0f) }
+		);
+		multiTouchListener.onMultiTouchMove(
+			(Point<Float>[])new Point[]{ new Point<Float>(25f, 0f), new Point<Float>(35f, 0f) }
+		);
+		multiTouchListener.onMultiTouchUp();
 	}
 	
 	private SutSetupResult setupSut(City city, RouteMapView view, LocationTracker tracker) {
