@@ -7,6 +7,7 @@ import java.util.Random;
 import junit.framework.Assert;
 
 import org.junit.Test;
+import org.mockito.AdditionalMatchers;
 import org.mockito.ArgumentCaptor;
 
 import com.gerken.audioGuide.interfaces.ApplicationSettingsStorage;
@@ -41,9 +42,13 @@ public class HandleViewInitialized {
 	@Test
 	public void Given_CityHasRoutes__Then_RouteListPopulatedInView() {
 		final int ROUTE_ID_1 = _random.nextInt();
-		final String ROUTE_NAME_1 = "";
+		final String ROUTE_NAME_1 = createRandomString();
 		final int ROUTE_ID_2 = _random.nextInt();
-		final String ROUTE_NAME_2 = "";
+		final String ROUTE_NAME_2 = createRandomString();
+		
+		final CharSequence[] EXPECTED_ENTRIES = new CharSequence[] { ROUTE_NAME_1, ROUTE_NAME_2 };
+		final CharSequence[] EXPECTED_ENTRY_VALUES = 
+			new CharSequence[] { String.valueOf(ROUTE_ID_1), String.valueOf(ROUTE_ID_2) };
 		
 		City city = new City();
 		city.getRoutes().add(new Route(ROUTE_ID_1, ROUTE_NAME_1));
@@ -58,8 +63,12 @@ public class HandleViewInitialized {
 		sutSetupResult.viewInitializedListener.onEvent();
 		
 		// --- Assert
-		//verify(view).setRouteChoices(String.valueOf(EXPECTED_ROUTE_ID));
-		Assert.fail("FINISH THIS!");
+		verify(view).setRouteChoices(
+			AdditionalMatchers.aryEq(EXPECTED_ENTRIES), AdditionalMatchers.aryEq(EXPECTED_ENTRY_VALUES));
+	}
+	
+	private String createRandomString() {
+		return String.valueOf(_random.nextLong());
 	}
 	
 	private SutSetupResult setupSut(MainPreferenceView view, ApplicationSettingsStorage settignsStorage) {
