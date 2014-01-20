@@ -10,13 +10,16 @@ import org.mockito.ArgumentCaptor;
 import com.gerken.audioGuide.containers.Point;
 import com.gerken.audioGuide.interfaces.LocationTracker;
 import com.gerken.audioGuide.interfaces.MediaAssetManager;
+import com.gerken.audioGuide.interfaces.listeners.OnEventListener;
 import com.gerken.audioGuide.interfaces.listeners.OnLocationChangedListener;
 import com.gerken.audioGuide.interfaces.listeners.OnMultiTouchListener;
+import com.gerken.audioGuide.interfaces.listeners.OnViewStateRestoreListener;
 import com.gerken.audioGuide.interfaces.views.RouteMapView;
 import com.gerken.audioGuide.objectModel.City;
 import com.gerken.audioGuide.objectModel.MapBounds;
 import com.gerken.audioGuide.objectModel.Route;
 import com.gerken.audioGuide.presenters.RouteMapPresenter;
+import com.gerken.audioGuideTests.SimpleViewStateContainer;
 
 public class HandleLocationChanged {
 	private Random _random = new Random(System.currentTimeMillis());
@@ -188,6 +191,57 @@ public class HandleLocationChanged {
 		verify(view, times(1)).scrollTo(anyInt(), anyInt());
 	}
 	
+	@Test
+	public void Given_SecondLocationOnMapSignaledAfterStateRestoring__Then_MapNotScrolled() throws InterruptedException {
+		final double MAP_NORTH = 26.0;
+		final double MAP_WEST = 12.0;
+		final double MAP_SOUTH = 22.0;
+		final double MAP_EAST = 16.0;
+		
+		final double NEW_LATITUDE = 25.0;
+		final double NEW_LONGITUDE = 13.0;
+		
+		final int MAP_WIDTH = 400;
+		final int MAP_HEIGHT = 200;
+		final float SCALE = 1f;
+		final boolean MAP_POINTER_IS_VISIBLE = true;
+		final boolean SCROLLING_TO_CURRENT_LOCATION_HAS_ALREADY_BEEN_DONE = true;
+		
+		final int ROUTE_ID = _random.nextInt();
+		
+		SimpleViewStateContainer container = new SimpleViewStateContainer();
+		
+		MapBounds bounds = new MapBounds(MAP_NORTH, MAP_WEST, MAP_SOUTH, MAP_EAST);
+		City city = createSingleRouteCity(ROUTE_ID, bounds);
+		
+		RouteMapView view = mock(RouteMapView.class);
+		when(view.getHeight()).thenReturn(_random.nextInt());
+		when(view.getWidth()).thenReturn(_random.nextInt());
+		when(view.getMapHeight()).thenReturn(MAP_HEIGHT);
+		when(view.getMapWidth()).thenReturn(MAP_WIDTH);
+		when(view.getOriginalMapHeight()).thenReturn(MAP_HEIGHT);
+		when(view.getOriginalMapWidth()).thenReturn(MAP_WIDTH);
+		when(view.getRouteId()).thenReturn(ROUTE_ID);
+		LocationTracker tracker = mock(LocationTracker.class);
+		
+		RouteMapPresenter.RouteMapViewStateContainer containerWrapper = 
+				new RouteMapPresenter.RouteMapViewStateContainer(container);
+		containerWrapper.setScale(SCALE);
+		containerWrapper.setMapPointerVisible(MAP_POINTER_IS_VISIBLE);
+		containerWrapper.setMapPointerPosition(_random.nextInt(), _random.nextInt());
+		containerWrapper.setScrollingToCurrentLocactionDone(SCROLLING_TO_CURRENT_LOCATION_HAS_ALREADY_BEEN_DONE);
+		
+		SutSetupResult sutSetupResult = setupSut(city, view, tracker);
+		sutSetupResult.viewStateRestoreListener.onStateRestore(container);
+		sutSetupResult.viewLayoutCompleteListener.onEvent();
+		
+		// --- Act
+		sutSetupResult.locationChangedListener.onLocationChanged(NEW_LATITUDE, NEW_LONGITUDE);
+		
+		// --- Assert
+		verify(view, times(1)).scrollTo(anyInt(), anyInt());
+	}
+	
 	@SuppressWarnings("unchecked")
 	private void doZoomOutScaleOneHalf(OnMultiTouchListener multiTouchListener) {
 		multiTouchListener.onMultiTouchDown(
@@ -208,7 +262,16 @@ public class HandleLocationChanged {
 		
 		ArgumentCaptor<OnMultiTouchListener> multiTouchListenerCaptor = 
 				ArgumentCaptor.forClass(OnMultiTouchListener.class);
-		doNothing().when(view).addViewMultiTouchListener(multiTouchListenerCaptor.capture());		
+		doNothing().when(view).addViewMultiTouchListener(multiTouchListenerCaptor.capture());
+		
+		ArgumentCaptor<OnViewStateRestoreListener> viewStateRestoreListenerCaptor = 
+				ArgumentCaptor.forClass(OnViewStateRestoreListener.class);
+		doNothing().when(view).addViewInstanceStateRestoredListener(viewStateRestoreListenerCaptor.capture());
+		
+		ArgumentCaptor<OnEventListener> viewLayoutCompleteListenerCaptor = 
+				ArgumentCaptor.forClass(OnEventListener.class);
+		doNothing().when(view).addViewLayoutCompleteListener(
+				viewLayoutCompleteListenerCaptor.capture());
 		
 		RouteMapPresenter sut = new RouteMapPresenter(city, view, mock(MediaAssetManager.class));
 		sut.setLocationTracker(tracker);
@@ -216,6 +279,8 @@ public class HandleLocationChanged {
 		result.sut = sut;
 		result.locationChangedListener = locationChangedListenerCaptor.getValue();
 		result.multiTouchListener = multiTouchListenerCaptor.getValue();
+		result.viewStateRestoreListener = viewStateRestoreListenerCaptor.getValue();
+		result.viewLayoutCompleteListener = viewLayoutCompleteListenerCaptor.getValue();
 		
 		return result;
 	}
@@ -224,6 +289,8 @@ public class HandleLocationChanged {
 		public RouteMapPresenter sut;
 		public OnLocationChangedListener locationChangedListener;
 		public OnMultiTouchListener multiTouchListener;
+		public OnViewStateRestoreListener viewStateRestoreListener;
+		public OnEventListener viewLayoutCompleteListener;
 	}
 	
 	private City createSingleRouteCity(int routeId, MapBounds routeMapBounds) {
