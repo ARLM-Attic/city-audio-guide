@@ -12,6 +12,9 @@ public class BitmapDownscalingResult implements BitmapContainer {
 	private int _finalWidth = 0;
 	private int _finalHeight= 0;
 	
+	public BitmapDownscalingResult() {		
+	}
+	
 	public BitmapDownscalingResult(Bitmap finalBitmap,
 			int finalWidth, int finalHeight,
 			int finalHorizontalPadding, int finalVerticalPadding) {
