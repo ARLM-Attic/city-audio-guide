@@ -7,6 +7,7 @@ import java.util.Random;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
+import com.gerken.audioGuide.graphics.BitmapDownscalingResult;
 import com.gerken.audioGuide.interfaces.DownscalingBitmapLoader;
 import com.gerken.audioGuide.interfaces.listeners.OnEventListener;
 import com.gerken.audioGuide.interfaces.views.AuxiliaryView;
@@ -63,6 +64,30 @@ public class HandleViewLayoutComplete {
 		
 		// --- Assert
 		verify(bitmapLoader).load(EXPECTED_PORTRAIT_BACKGROUND_IMAGE_NAME, WIDTH, HEIGHT);
+	}
+	
+	@Test
+	public void Given_NonNullBitmapGotFromLoader__Then_BitmapSentToView() throws Exception {
+		BitmapDownscalingResult dummyResult = new BitmapDownscalingResult();
+		
+		AuxiliaryView auxView = mock(AuxiliaryView.class);
+		when(auxView.getWidth()).thenReturn(_random.nextInt());
+		when(auxView.getHeight()).thenReturn(_random.nextInt());
+		
+		DownscalingBitmapLoader bitmapLoader = mock(DownscalingBitmapLoader.class);
+		when(bitmapLoader.load(anyString(), anyInt(), anyInt())).thenReturn(dummyResult);
+
+		City city = new City(_random.nextInt(), createRandomString(), 
+			new CityConfiguration(createRandomString(),	createRandomString(), createRandomString())
+		);
+		
+		SutSetupResult sutSetupResult = setupSut(city, auxView, bitmapLoader);
+		
+		// --- Act
+		sutSetupResult.viewLayoutCompleteListener.onEvent();
+		
+		// --- Assert
+		verify(auxView).setBackgroundImage(dummyResult);
 	}
 	
 	private String createRandomString() {
