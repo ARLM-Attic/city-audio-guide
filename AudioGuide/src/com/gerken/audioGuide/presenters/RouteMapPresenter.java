@@ -156,14 +156,14 @@ public class RouteMapPresenter {
 	}
 	
 	private float adjustScaleToCoverScreenSize(float scaleToAdjust) {
-		float minScale = Math.min(
-			(float)_view.getWidth()/(float)_view.getOriginalMapWidth(), 
-			(float)_view.getHeight()/(float)_view.getOriginalMapHeight()
+		final float UNSCALED = 1f;
+		float minScale = Math.min(UNSCALED, 
+			Math.min(
+				(float)_view.getWidth()/(float)_view.getOriginalMapWidth(), 
+				(float)_view.getHeight()/(float)_view.getOriginalMapHeight()
+			)
 		);
-		if(minScale < 1f)
-			return Math.max(minScale, scaleToAdjust);
-		else
-			return scaleToAdjust;
+		return Math.max(minScale, scaleToAdjust);
 	}
 
 	private void handleViewStarted() {
