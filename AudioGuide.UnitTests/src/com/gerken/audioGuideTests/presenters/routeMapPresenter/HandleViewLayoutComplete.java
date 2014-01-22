@@ -8,7 +8,6 @@ import org.junit.Test;
 import org.mockito.AdditionalMatchers;
 import org.mockito.ArgumentCaptor;
 
-import com.gerken.audioGuide.containers.Point;
 import com.gerken.audioGuide.interfaces.MediaAssetManager;
 import com.gerken.audioGuide.interfaces.listeners.OnEventListener;
 import com.gerken.audioGuide.interfaces.listeners.OnViewStateRestoreListener;
@@ -22,12 +21,20 @@ public class HandleViewLayoutComplete {
 	
 	@Test
 	public void Given_ScaleStoredToInstanceState__Then_MapScaled() {
+		final int VIEW_WIDTH = 40;
+		final int VIEW_HEIGHT = 60;
+		final int ORIGINAL_MAP_WIDTH = 200;
+		final int ORIGINAL_MAP_HEIGHT = 160;
+		
 		final float EXPECTED_SCALE = 0.5f;
+		
 		SimpleViewStateContainer container = new SimpleViewStateContainer();
 		
 		RouteMapView view = mock(RouteMapView.class);
-		when(view.getHeight()).thenReturn(_random.nextInt());
-		when(view.getWidth()).thenReturn(_random.nextInt());
+		when(view.getWidth()).thenReturn(VIEW_WIDTH);
+		when(view.getHeight()).thenReturn(VIEW_HEIGHT);
+		when(view.getOriginalMapWidth()).thenReturn(ORIGINAL_MAP_WIDTH);
+		when(view.getOriginalMapHeight()).thenReturn(ORIGINAL_MAP_HEIGHT);		
 		
 		RouteMapPresenter.RouteMapViewStateContainer containerWrapper = 
 				new RouteMapPresenter.RouteMapViewStateContainer(container);
@@ -41,6 +48,38 @@ public class HandleViewLayoutComplete {
 		
 		// --- Assert
 		verify(view).setMapScale(EXPECTED_SCALE);
+	}
+	
+	@Test
+	public void Given_ScaledMapDoesNotCoverAtLeastOneDimensionAfterRestoringInstanceState__Then_MapScaleAdjusted() {
+		final int VIEW_WIDTH = 60;
+		final int VIEW_HEIGHT = 40;
+		final int ORIGINAL_MAP_WIDTH = 200;
+		final int ORIGINAL_MAP_HEIGHT = 160;
+		
+		final float ORIGINAL_SCALE = 0.2f;
+		final float EXPECTED_ADJUSTED_SCALE = 0.25f;
+		SimpleViewStateContainer container = new SimpleViewStateContainer();
+		
+		RouteMapView view = mock(RouteMapView.class);
+		when(view.getWidth()).thenReturn(VIEW_WIDTH);
+		when(view.getHeight()).thenReturn(VIEW_HEIGHT);
+		when(view.getOriginalMapWidth()).thenReturn(ORIGINAL_MAP_WIDTH);
+		when(view.getOriginalMapHeight()).thenReturn(ORIGINAL_MAP_HEIGHT);
+		
+		
+		RouteMapPresenter.RouteMapViewStateContainer containerWrapper = 
+				new RouteMapPresenter.RouteMapViewStateContainer(container);
+		containerWrapper.setScale(ORIGINAL_SCALE);
+		
+		SutSetupResult sutSetupResult = setupSut(view);
+		sutSetupResult.viewStateRestoreListener.onStateRestore(container);
+		
+		// --- Act
+		sutSetupResult.viewLayoutCompleteListener.onEvent();
+		
+		// --- Assert
+		verify(view).setMapScale(EXPECTED_ADJUSTED_SCALE);
 	}
 	
 	@Test
