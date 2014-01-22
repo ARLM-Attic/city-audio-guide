@@ -136,7 +136,8 @@ public class RouteMapPresenter {
 	private void handleViewLayoutComplete() {
 		if(_viewInstanceRestoringData != null) {
 			RouteMapViewStateContainer rmc = new RouteMapViewStateContainer(_viewInstanceRestoringData);
-			_currentScale = _originalScale = rmc.getScale();
+			_currentScale = _originalScale = 
+				adjustScaleToCoverScreenSize(rmc.getScale());
 			scrollToShowScreenCenterAt(rmc.getScreenCenterAbsX(), rmc.getScreenCenterAbsY(), _currentScale);
 			_view.setMapScale(_currentScale);
 			resizeMap(getScaledMapSize(_currentScale));
@@ -153,13 +154,24 @@ public class RouteMapPresenter {
 			_viewInstanceRestoringData = null;
 		}
 	}
+	
+	private float adjustScaleToCoverScreenSize(float scaleToAdjust) {
+		float minScale = Math.min(
+			(float)_view.getWidth()/(float)_view.getOriginalMapWidth(), 
+			(float)_view.getHeight()/(float)_view.getOriginalMapHeight()
+		);
+		if(minScale < 1f)
+			return Math.max(minScale, scaleToAdjust);
+		else
+			return scaleToAdjust;
+	}
 
-	protected void handleViewStarted() {
+	private void handleViewStarted() {
 		_locationTracker.startTracking();
 		_isScrollingToCurrentLocationDone = false;
 	}
 
-	protected void handleViewStopped() {
+	private void handleViewStopped() {
 		_locationTracker.stopTracking();		
 	}
 
