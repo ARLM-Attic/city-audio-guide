@@ -51,7 +51,7 @@ public class HandleViewLayoutComplete {
 	}
 	
 	@Test
-	public void Given_ScaledMapDoesNotCoverAtLeastOneDimensionAfterRestoringInstanceState__Then_MapScaleAdjusted() {
+	public void Given_ScaledLandscapeMapDoesNotCoverAtLeastOneLandscapeScreenDimensionAfterRestoringInstanceState_MapLargerThanScreenInBothPositions__Then_MapScaleAdjusted() {
 		final int VIEW_WIDTH = 60;
 		final int VIEW_HEIGHT = 40;
 		final int ORIGINAL_MAP_WIDTH = 200;
@@ -65,8 +65,69 @@ public class HandleViewLayoutComplete {
 		when(view.getWidth()).thenReturn(VIEW_WIDTH);
 		when(view.getHeight()).thenReturn(VIEW_HEIGHT);
 		when(view.getOriginalMapWidth()).thenReturn(ORIGINAL_MAP_WIDTH);
-		when(view.getOriginalMapHeight()).thenReturn(ORIGINAL_MAP_HEIGHT);
+		when(view.getOriginalMapHeight()).thenReturn(ORIGINAL_MAP_HEIGHT);		
 		
+		RouteMapPresenter.RouteMapViewStateContainer containerWrapper = 
+				new RouteMapPresenter.RouteMapViewStateContainer(container);
+		containerWrapper.setScale(ORIGINAL_SCALE);
+		
+		SutSetupResult sutSetupResult = setupSut(view);
+		sutSetupResult.viewStateRestoreListener.onStateRestore(container);
+		
+		// --- Act
+		sutSetupResult.viewLayoutCompleteListener.onEvent();
+		
+		// --- Assert
+		verify(view).setMapScale(EXPECTED_ADJUSTED_SCALE);
+	}
+	
+	@Test
+	public void Given_ScaledPortraitMapDoesNotCoverAtLeastOnePortraitScreenDimensionAfterRestoringInstanceState_MapLargerThanScreenInBothPositions__Then_MapScaleAdjusted() {
+		final int VIEW_WIDTH = 40;
+		final int VIEW_HEIGHT = 60;
+		final int ORIGINAL_MAP_WIDTH = 160;
+		final int ORIGINAL_MAP_HEIGHT = 200;
+		
+		final float ORIGINAL_SCALE = 0.2f;
+		final float EXPECTED_ADJUSTED_SCALE = 0.25f;
+		SimpleViewStateContainer container = new SimpleViewStateContainer();
+		
+		RouteMapView view = mock(RouteMapView.class);
+		when(view.getWidth()).thenReturn(VIEW_WIDTH);
+		when(view.getHeight()).thenReturn(VIEW_HEIGHT);
+		when(view.getOriginalMapWidth()).thenReturn(ORIGINAL_MAP_WIDTH);
+		when(view.getOriginalMapHeight()).thenReturn(ORIGINAL_MAP_HEIGHT);		
+		
+		RouteMapPresenter.RouteMapViewStateContainer containerWrapper = 
+				new RouteMapPresenter.RouteMapViewStateContainer(container);
+		containerWrapper.setScale(ORIGINAL_SCALE);
+		
+		SutSetupResult sutSetupResult = setupSut(view);
+		sutSetupResult.viewStateRestoreListener.onStateRestore(container);
+		
+		// --- Act
+		sutSetupResult.viewLayoutCompleteListener.onEvent();
+		
+		// --- Assert
+		verify(view).setMapScale(EXPECTED_ADJUSTED_SCALE);
+	}
+	
+	@Test
+	public void Given_ScaledLandscapeMapDoesNotCoverAtLeastOneLandscapeScreenDimensionAfterRestoringInstanceState_MapSmallerThanLandscapeScreen__Then_MapDisplayedUnscaled() {
+		final int VIEW_WIDTH = 60;
+		final int VIEW_HEIGHT = 40;
+		final int ORIGINAL_MAP_WIDTH = 50;
+		final int ORIGINAL_MAP_HEIGHT = 36;
+		
+		final float ORIGINAL_SCALE = 0.8f;
+		final float EXPECTED_ADJUSTED_SCALE = 1f;
+		SimpleViewStateContainer container = new SimpleViewStateContainer();
+		
+		RouteMapView view = mock(RouteMapView.class);
+		when(view.getWidth()).thenReturn(VIEW_WIDTH);
+		when(view.getHeight()).thenReturn(VIEW_HEIGHT);
+		when(view.getOriginalMapWidth()).thenReturn(ORIGINAL_MAP_WIDTH);
+		when(view.getOriginalMapHeight()).thenReturn(ORIGINAL_MAP_HEIGHT);		
 		
 		RouteMapPresenter.RouteMapViewStateContainer containerWrapper = 
 				new RouteMapPresenter.RouteMapViewStateContainer(container);
